@@ -50,7 +50,7 @@ return [
             ],
             'products' => [
                 'enabled' => true,
-                'url'     => 'https://sidooh-products.herokuapp.com/api/products's
+                'url'     => 'https://sidooh-products.herokuapp.com/api/products'
             ]
         ],
     ],
