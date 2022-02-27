@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Repositories\EventRepositories;
+
+use App\Enums\EventType;
+use App\Enums\MpesaReference;
+use App\Enums\Status;
+use App\Models\Payment;
+use App\Repositories\VoucherRepository;
+use App\Services\SidoohAccounts;
+use App\Services\SidoohNotify;
+use App\Services\SidoohProducts;
+use DrH\Mpesa\Entities\MpesaStkCallback;
+use Throwable;
+
+class MpesaEventRepository extends EventRepository
+{
+    public static function stkPaymentFailed($stkCallback)
+    {
+        // TODO: Make into a transaction/try catch?
+        $p = Payment::whereProviderId($stkCallback->request->id)->whereSubtype('STK')->firstOrFail();
+
+        if($p->status == 'FAILED') return;
+
+        $p->status = Status::FAILED->name;
+        $p->save();
+
+        SidoohProducts::paymentCallback($p->payable_id, $p->payable_type, Status::FAILED);
+
+        //  TODO: Can we inform the user of the actual issue?
+        $message = "Sorry! We failed to complete your transaction. No amount was deducted from your account. We apologize for the inconvenience. Please try again.";
+
+        SidoohNotify::notify([$stkCallback->request->phone], $message, EventType::PAYMENT_FAILURE);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public static function stkPaymentReceived(MpesaStkCallback $stkCallback)
+    {
+        $otherPhone = explode(" - ", $stkCallback->request->description);
+
+        $p = Payment::whereProviderId($stkCallback->request->id)->whereSubtype('STK')->firstOrFail();
+
+        if($p->status == 'COMPLETED') return;
+
+        $p->status = Status::COMPLETED->name;
+        $p->save();
+
+        $purchaseData = match ($stkCallback->request->reference) {
+            MpesaReference::AIRTIME => [
+                'phone'   => count($otherPhone) > 1
+                    ? $otherPhone[1]
+                    : $stkCallback->PhoneNumber ?? $stkCallback->request->phone,
+                "product" => "airtime"
+            ],
+            MpesaReference::PAY_SUBSCRIPTION,
+            MpesaReference::PRE_AGENT_REGISTER_ASPIRING,
+            MpesaReference::PRE_AGENT_REGISTER_THRIVING,
+            MpesaReference::AGENT_REGISTER,
+            MpesaReference::AGENT_REGISTER_ASPIRING,
+            MpesaReference::AGENT_REGISTER_THRIVING => [
+                "product" => "subscription"
+            ],
+            MpesaReference::PAY_VOUCHER => [
+                'phone'   => count($otherPhone) > 1
+                    ? $otherPhone[1]
+                    : $stkCallback->PhoneNumber ?? $stkCallback->request->phone,
+                "product" => "voucher",
+            ],
+            MpesaReference::PAY_UTILITY => [
+                'account'  => $otherPhone[1],
+                'provider' => explode(" ", $stkCallback->request->description)[0],
+                'product'  => 'utility'
+            ],
+        };
+
+        if($stkCallback->request->reference) {
+            $accountId = SidoohAccounts::findByPhone($purchaseData['phone'])['id'];
+
+            VoucherRepository::deposit($accountId, $stkCallback->amount);
+        } else {
+            $purchaseData['amount'] = $stkCallback->amount;
+
+            SidoohProducts::requestPurchase($p->payable_id, $purchaseData);
+        }
+    }
+}

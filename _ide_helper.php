@@ -4,7 +4,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 9.0.2.
+ * Generated for Laravel 9.2.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -7112,7 +7112,7 @@
      * @method static \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
      * @method static \Illuminate\Http\Client\PendingRequest dd()
      * @method static \Illuminate\Http\Client\PendingRequest dump()
-     * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0, ?callable $when = null)
+     * @method static \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0, ?callable $when = null, bool $throw = true)
      * @method static \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
      * @method static \Illuminate\Http\Client\PendingRequest stub(callable $callback)
      * @method static \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
@@ -9021,7 +9021,7 @@
                         return $instance->pushRaw($payload, $queue, $options);
         }
                     /**
-         * Push a new job onto the queue after a delay.
+         * Push a new job onto the queue after (n) seconds.
          *
          * @param \DateTimeInterface|\DateInterval|int $delay
          * @param string $job
@@ -9050,7 +9050,7 @@
                         return $instance->pushOn($queue, $job, $data);
         }
                     /**
-         * Push a new job onto the queue after a delay.
+         * Push a new job onto a specific queue after (n) seconds.
          *
          * @param string $queue
          * @param \DateTimeInterface|\DateInterval|int $delay
@@ -9125,6 +9125,83 @@
                         return $instance->setConnectionName($name);
         }
                     /**
+         * Release a reserved job back onto the queue after (n) seconds.
+         *
+         * @param string $queue
+         * @param \Illuminate\Queue\Jobs\DatabaseJobRecord $job
+         * @param int $delay
+         * @return mixed 
+         * @static 
+         */ 
+        public static function release($queue, $job, $delay)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        return $instance->release($queue, $job, $delay);
+        }
+                    /**
+         * Delete a reserved job from the queue.
+         *
+         * @param string $queue
+         * @param string $id
+         * @return void 
+         * @throws \Throwable
+         * @static 
+         */ 
+        public static function deleteReserved($queue, $id)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        $instance->deleteReserved($queue, $id);
+        }
+                    /**
+         * Delete a reserved job from the reserved queue and release it.
+         *
+         * @param string $queue
+         * @param \Illuminate\Queue\Jobs\DatabaseJob $job
+         * @param int $delay
+         * @return void 
+         * @static 
+         */ 
+        public static function deleteAndRelease($queue, $job, $delay)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        $instance->deleteAndRelease($queue, $job, $delay);
+        }
+                    /**
+         * Delete all of the jobs from the queue.
+         *
+         * @param string $queue
+         * @return int 
+         * @static 
+         */ 
+        public static function clear($queue)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        return $instance->clear($queue);
+        }
+                    /**
+         * Get the queue or return the default.
+         *
+         * @param string|null $queue
+         * @return string 
+         * @static 
+         */ 
+        public static function getQueue($queue)
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        return $instance->getQueue($queue);
+        }
+                    /**
+         * Get the underlying database instance.
+         *
+         * @return \Illuminate\Database\Connection 
+         * @static 
+         */ 
+        public static function getDatabase()
+        {
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
+                        return $instance->getDatabase();
+        }
+                    /**
          * Get the backoff for an object-based queue handler.
          *
          * @param mixed $job
@@ -9133,7 +9210,7 @@
          */ 
         public static function getJobBackoff($job)
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        /** @var \Illuminate\Queue\SyncQueue $instance */
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
                         return $instance->getJobBackoff($job);
         }
                     /**
@@ -9145,7 +9222,7 @@
          */ 
         public static function getJobExpiration($job)
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        /** @var \Illuminate\Queue\SyncQueue $instance */
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
                         return $instance->getJobExpiration($job);
         }
                     /**
@@ -9157,7 +9234,7 @@
          */ 
         public static function createPayloadUsing($callback)
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        \Illuminate\Queue\SyncQueue::createPayloadUsing($callback);
+                        \Illuminate\Queue\DatabaseQueue::createPayloadUsing($callback);
         }
                     /**
          * Get the container instance being used by the connection.
@@ -9167,7 +9244,7 @@
          */ 
         public static function getContainer()
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        /** @var \Illuminate\Queue\SyncQueue $instance */
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
                         return $instance->getContainer();
         }
                     /**
@@ -9179,7 +9256,7 @@
          */ 
         public static function setContainer($container)
         {            //Method inherited from \Illuminate\Queue\Queue         
-                        /** @var \Illuminate\Queue\SyncQueue $instance */
+                        /** @var \Illuminate\Queue\DatabaseQueue $instance */
                         $instance->setContainer($container);
         }
          
@@ -12147,7 +12224,7 @@
          * Create a route group with shared attributes.
          *
          * @param array $attributes
-         * @param \Closure|string $routes
+         * @param \Closure|array|string $routes
          * @return void 
          * @static 
          */ 
@@ -12299,7 +12376,7 @@
          *
          * @param \Illuminate\Routing\Route $route
          * @return \Illuminate\Routing\Route 
-         * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+         * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
          * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
          * @static 
          */ 
@@ -12313,7 +12390,7 @@
          *
          * @param \Illuminate\Routing\Route $route
          * @return void 
-         * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+         * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
          * @throws \Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException
          * @static 
          */ 
@@ -17212,7 +17289,7 @@ namespace  {
              * @param mixed $id
              * @param array $columns
              * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[] 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
              * @static 
              */ 
             public static function findOrFail($id, $columns = [])
@@ -17282,7 +17359,7 @@ namespace  {
              *
              * @param array $columns
              * @return \Illuminate\Database\Eloquent\Model|static 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
              * @static 
              */ 
             public static function firstOrFail($columns = [])
@@ -17310,7 +17387,7 @@ namespace  {
              *
              * @param array|string $columns
              * @return \Illuminate\Database\Eloquent\Model 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
              * @throws \Illuminate\Database\MultipleRecordsFoundException
              * @static 
              */ 
@@ -17338,7 +17415,7 @@ namespace  {
              *
              * @param string|\Illuminate\Database\Query\Expression $column
              * @return mixed 
-             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+             * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<\Illuminate\Database\Eloquent\Model>
              * @static 
              */ 
             public static function valueOrFail($column)
@@ -17906,10 +17983,11 @@ namespace  {
                 /**
              * Apply the callback if the given "value" is (or resolves to) truthy.
              *
+             * @template TWhenParameter
              * @template TWhenReturnType
-             * @param bool $value
-             * @param \Illuminate\Database\Eloquent\(callable($this):  TWhenReturnType)|null  $callback
-             * @param \Illuminate\Database\Eloquent\(callable($this):  TWhenReturnType)|null  $default
+             * @param \Illuminate\Database\Eloquent\(callable($this):  TWhenParameter)|TWhenParameter  $value
+             * @param \Illuminate\Database\Eloquent\(callable($this,  TWhenParameter): TWhenReturnType)|null  $callback
+             * @param \Illuminate\Database\Eloquent\(callable($this,  TWhenParameter): TWhenReturnType)|null  $default
              * @return $this|\Illuminate\Database\Eloquent\TWhenReturnType 
              * @static 
              */ 
@@ -17922,10 +18000,11 @@ namespace  {
                 /**
              * Apply the callback if the given "value" is (or resolves to) falsy.
              *
+             * @template TUnlessParameter
              * @template TUnlessReturnType
-             * @param bool $value
-             * @param \Illuminate\Database\Eloquent\(callable($this):  TUnlessReturnType)  $callback
-             * @param \Illuminate\Database\Eloquent\(callable($this):  TUnlessReturnType)|null  $default
+             * @param \Illuminate\Database\Eloquent\(callable($this):  TUnlessParameter)|TUnlessParameter  $value
+             * @param \Illuminate\Database\Eloquent\(callable($this,  TUnlessParameter): TUnlessReturnType)|null  $callback
+             * @param \Illuminate\Database\Eloquent\(callable($this,  TUnlessParameter): TUnlessReturnType)|null  $default
              * @return $this|\Illuminate\Database\Eloquent\TUnlessReturnType 
              * @static 
              */ 

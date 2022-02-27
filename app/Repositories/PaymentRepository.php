@@ -9,16 +9,14 @@ use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Enums\TransactionType;
 use App\Enums\VoucherType;
-use App\Models\Enterprise;
+use App\Events\PaymentSuccessEvent;
+use App\Models\FloatAccount;
 use App\Models\Payment;
-use App\Models\SubscriptionType;
-use App\Models\Transaction;
 use App\Models\Voucher;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
-use JetBrains\PhpStorm\ArrayShape;
 use Propaganistas\LaravelPhone\PhoneNumber;
 use Throwable;
 
@@ -30,8 +28,15 @@ class PaymentRepository
     {
         $number = $this->data['mpesa_number'] ?? $this->data['phone'];
 
+        $reference = match ($this->data['product']) {
+            "airtime" => MpesaReference::AIRTIME,
+            "voucher" => MpesaReference::PAY_VOUCHER,
+            "utility" => MpesaReference::PAY_UTILITY,
+            "subscription" => MpesaReference::AGENT_REGISTER
+        };
+
         try {
-            $stkResponse = mpesa_request($number, $this->data['amount'], MpesaReference::AIRTIME, $this->data['description']);
+            $stkResponse = mpesa_request($number, $this->data['amount'], $reference, $this->data['description']);
         } catch (MpesaException $e) {
 //            TODO: Inform customer of issue?
             Log::critical($e);
@@ -52,20 +57,9 @@ class PaymentRepository
     }
 
     /**
-     * @throws Exception
-     * @throws Throwable
+     * @throws Exception|Throwable
      */
-    #[ArrayShape([
-        'amount'         => "mixed",
-        'type'           => "\App\Enums\PaymentType",
-        'subtype'        => "\App\Enums\PaymentSubtype",
-        'status'         => "\App\Enums\Status",
-        'provider_id'    => "mixed",
-        'provider_type'  => "mixed",
-        'phone'          => "string",
-        'account_number' => "mixed|null"
-    ])]
-    public function voucher()
+    public function voucher($transactionId): Model|Payment
     {
         $account = $this->data['account'];
         $destination = $this->data['destination'];
@@ -85,43 +79,50 @@ class PaymentRepository
         $voucher->save();
 
         $paymentData = [
+            'payable_type'  => PayableType::TRANSACTION->name,
+            'payable_id'    => $transactionId,
             'amount'        => $this->data['amount'],
-            'type'          => PaymentType::SIDOOH,
-            'subtype'       => PaymentSubtype::VOUCHER,
-            'status'        => Status::COMPLETED,
+            'type'          => PaymentType::SIDOOH->name,
+            'subtype'       => PaymentSubtype::VOUCHER->name,
+            'status'        => Status::COMPLETED->name,
             'provider_id'   => $voucher->id,
             'provider_type' => $voucher->getMorphClass(),
         ];
 
         if($this->data['product'] === 'subscription') {
-            $paymentData['amount'] = SubscriptionType::wherePrice($this->data['amount'])->firstOrFail()->value('price');
-            $paymentData['status'] = Status::PENDING;
+            $paymentData['status'] = Status::PENDING->name;
         } else if($this->data['product'] === 'airtime') {
             $paymentData['phone'] = PhoneNumber::make($destination, 'KE')->formatE164();
         } else if($this->data['product'] === 'utility') {
             $paymentData['account_number'] = $destination;
         }
 
-        if($this->data['product'] === 'merchant') $paymentData['status'] = Status::PENDING;
+        if($this->data['product'] === 'merchant') $paymentData['status'] = Status::PENDING->name;
 
         $voucher->voucherTransaction()->create([
             'amount'      => $this->data['amount'],
-            'type'        => TransactionType::DEBIT,
+            'type'        => TransactionType::DEBIT->name,
             'description' => $this->data['description']
         ]);
 
         $this->data += $paymentData;
 
-        return Payment::create($this->data);
+        $payment = Payment::create($this->data);
+
+        PaymentSuccessEvent::dispatch($payment->payable_id, $this->data);
+
+        return $payment;
     }
 
     /**
      * @throws Throwable
      */
-    public function float()
+    public function float(int $transactionId): Model|Payment
     {
-        $enterprise = Enterprise::findOrFail($this->data['enterprise_id']);
-        $float = $enterprise->floatAccount;
+        $float = FloatAccount::firstOrCreate([
+            'accountable_id'   => $this->data['enterprise_id'],
+            'accountable_type' => "ENTERPRISE"
+        ], []);
 
         if($float) {
             $bal = $float->balance;
@@ -133,6 +134,8 @@ class PaymentRepository
         $float->save();
 
         $paymentData = [
+            'payable_type'  => PayableType::TRANSACTION->name,
+            'payable_id'    => $transactionId,
             'amount'        => $this->data['amount'],
             'type'          => PaymentType::SIDOOH,
             'subtype'       => PaymentSubtype::VOUCHER,

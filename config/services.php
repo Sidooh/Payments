@@ -31,6 +31,7 @@ return [
     ],
 
     'sidooh' => [
+        'tagline'            => 'Sidooh, Makes You Money with Every Purchase.',
         'mpesa'              => [
             'env' => 'local',
             'b2c' => [
@@ -46,11 +47,11 @@ return [
             ],
             'accounts' => [
                 'enabled' => true,
-                'url'     => 'https://sidooh-accounts.herokuapp.com/api/accounts'
+                'url'     => 'http://localhost:3000/api'
             ],
             'products' => [
                 'enabled' => true,
-                'url'     => 'https://sidooh-products.herokuapp.com/api/products'
+                'url'     => 'http://localhost:8000/api/v1/products'
             ]
         ],
     ],

@@ -14,6 +14,11 @@ class FloatAccount extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'accountable_id',
+        'accountable_type',
+    ];
+
     /**
      * ---------------------------------------- Relationships ----------------------------------------
      */

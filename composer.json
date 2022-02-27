@@ -12,7 +12,8 @@
         "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.14",
         "laravel/tinker": "^2.7",
-        "propaganistas/laravel-phone": "^4.3"
+        "propaganistas/laravel-phone": "^4.3",
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^12.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
