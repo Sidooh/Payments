@@ -9,14 +9,14 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class SidoohProducts
+class SidoohProducts extends SidoohService
 {
     /**
      * @throws RequestException
      */
     public static function paymentCallback(int $payableId, string $payableType, Status $status)
     {
-        Log::alert('****************************    SIDOOH-SRV PRODUCTS: Payment Callback     ****************************');
+        Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Payment Callback...   --- --- --- --- ---');
 
         $url = config("services.sidooh.services.products.url") . "/callback";
 
@@ -26,17 +26,18 @@ class SidoohProducts
             "status"       => $status->name
         ])->throw();
     }
+
     /**
      * @throws RequestException
      */
-    public static function requestPurchase(int $transactionId, array $data): PromiseInterface|Response
+    public static function requestPurchase(array $transactionIds, array $data): PromiseInterface|Response
     {
-        Log::alert('****************************    SIDOOH-SRV PRODUCTS: Request Purchase     ****************************');
+        Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Request Purchase...   --- --- --- --- ---');
 
         $url = config("services.sidooh.services.products.url") . "/purchase";
 
         return Http::retry(3)->post($url, [
-            "transaction_id"   => $transactionId,
+            "transaction_ids"   => $transactionIds,
             "data" => $data
         ])->throw();
     }
