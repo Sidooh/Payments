@@ -39,9 +39,9 @@ class PaymentRepository
     }
 
 
-    public function mpesa(): Model|Payment|null
+    public function mpesa()
     {
-        $number = $this->data['mpesa_number'] ?? $this->data['phone'];
+        $number = $this->data['mpesa_number'] ?? $this->data['payment_account']['phone'];
 
         $reference = match ($this->data['product']) {
             "airtime" => MpesaReference::AIRTIME,
@@ -51,24 +51,29 @@ class PaymentRepository
         };
 
         try {
-            $stkResponse = mpesa_request($number, $this->data['amount'], $reference, $this->data['description']);
+            $stkResponse = mpesa_request($number, $this->amount, $reference, $this->transactions[0]["description"]);
         } catch (MpesaException $e) {
 //            TODO: Inform customer of issue?
             Log::critical($e);
             return null;
         }
 
-        return Payment::create([
+        $paymentData = array_map(fn($transaction) => [
             'payable_type'  => PayableType::TRANSACTION->name,
-            'payable_id'    => $transactionId,
-            'amount'        => $amount,
-            'status'        => Status::PENDING->name,
+            'payable_id'    => $transaction["id"],
+            'amount'        => $transaction["amount"],
             'type'          => PaymentType::MPESA->name,
             'subtype'       => PaymentSubtype::STK->name,
+            'status'        => $this->data['product'] === 'subscription'
+                ? Status::PENDING->name
+                : Status::COMPLETED->name,
             'provider_id'   => $stkResponse->id,
             'provider_type' => $stkResponse->getMorphClass(),
-            'phone'         => PhoneNumber::make($this->data['destination'] ?? null, 'KE')->formatE164()
-        ]);
+            "created_at"    => now(),
+            "updated_at"    => now(),
+        ], $this->transactions);
+
+        Payment::insert($paymentData);
     }
 
     /**

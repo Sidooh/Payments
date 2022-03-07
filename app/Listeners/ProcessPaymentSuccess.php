@@ -25,7 +25,7 @@ class ProcessPaymentSuccess implements ShouldQueue
      */
     public function handle(PaymentSuccessEvent $event)
     {
-        Log::info('--- --- --- --- ---   ...[EVENT]: Process Successful Payment...   --- --- --- --- ---');
+        Log::info('--- --- --- --- ---   ...[EVENT]: Process Payment Success...   --- --- --- --- ---');
 
         $response = SidoohProducts::requestPurchase($event->transactions, $event->data);
 
