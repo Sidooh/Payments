@@ -14,7 +14,7 @@ use Throwable;
 
 class VoucherController extends Controller
 {
-    public function deposit(Request $request): Model|Builder|Voucher
+    public function credit(Request $request): Model|Builder|Voucher
     {
         $request->validate([
             'account_id' => ['required'],

@@ -25,7 +25,8 @@ Route::post('/nats', [PaymentController::class, 'nats']);
 Route::prefix('/v1')->group(function() {
     Route::prefix('/payments')->group(function() {
         Route::post('/', PaymentController::class);
-        Route::post('/voucher/deposit', [VoucherController::class, 'deposit']);
+        Route::post('/voucher/credit', [VoucherController::class, 'credit']);
+        Route::post('/voucher/debit', [VoucherController::class, 'deposit']);
         Route::post('/voucher/disburse', [VoucherController::class, 'disburse']);
     });
 });
