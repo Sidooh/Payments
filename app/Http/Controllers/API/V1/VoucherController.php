@@ -19,9 +19,14 @@ class VoucherController extends Controller
         $request->validate([
             'account_id' => ['required'],
             'amount'     => ['required'],
+            "notify"     => ['required', 'boolean']
         ]);
 
-        return VoucherRepository::deposit($request->input('account_id'), $request->input('amount'));
+        $accountId = $request->input('account_id');
+        $amount = $request->input('amount');
+        $notify = $request->boolean('"notify');
+
+        return VoucherRepository::credit($accountId, $amount, $notify);
     }
 
     /**
