@@ -33,7 +33,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperFloatAccount {}
 }
@@ -61,7 +60,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperFloatAccountTransaction {}
 }
@@ -81,7 +79,6 @@ namespace App\Models{
  * @property int $provider_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $payable
  * @method static \Database\Factories\PaymentFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newQuery()
@@ -97,7 +94,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereSubtype($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperPayment {}
 }
@@ -126,7 +122,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperVoucher {}
 }
@@ -154,7 +149,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|VoucherTransaction whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VoucherTransaction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VoucherTransaction whereVoucherId($value)
- * @mixin \Eloquent
  */
 	class IdeHelperVoucherTransaction {}
 }

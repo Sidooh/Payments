@@ -4,10 +4,13 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
+use App\Models\Voucher;
 use App\Repositories\PaymentRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use JetBrains\PhpStorm\ArrayShape;
 use Throwable;
 
 class PaymentController extends Controller
@@ -43,5 +46,16 @@ class PaymentController extends Controller
         return $this->successResponse(
             message: "Payment Created!"
         );
+    }
+
+    #[ArrayShape([
+        "payment" => "array",
+        "voucher" => "array"
+    ])] public function findDetails(int $transactionId, int $accountId): array
+    {
+        return [
+            "payment" => Payment::wherePayableId($transactionId)->first()->toArray(),
+            "voucher" => Voucher::whereAccountId($accountId)->first()->toArray()
+        ];
     }
 }

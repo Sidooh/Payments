@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 class SidoohService
 {
-    public static function send(): PendingRequest
+    public static function http(): PendingRequest
     {
-        return Http::retry(3)->acceptJson();
+        return Http::/*retry(1)->*/acceptJson();
     }
 }

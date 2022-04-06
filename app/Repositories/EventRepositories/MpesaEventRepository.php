@@ -74,7 +74,7 @@ class MpesaEventRepository extends EventRepository
         if($purchaseData["product"] === "voucher") {
             $accountId = SidoohAccounts::findByPhone($purchaseData['phone'])['id'];
 
-            VoucherRepository::deposit($accountId, $stkCallback->amount);
+            VoucherRepository::credit($accountId, $stkCallback->amount);
         } else {
             $purchaseData['amount'] = $stkCallback->amount;
 

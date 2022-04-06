@@ -28,5 +28,7 @@ Route::prefix('/v1')->group(function() {
         Route::post('/voucher/credit', [VoucherController::class, 'credit']);
         Route::post('/voucher/debit', [VoucherController::class, 'deposit']);
         Route::post('/voucher/disburse', [VoucherController::class, 'disburse']);
+
+        Route::get("/details/{transactionId}/{accountId}", [PaymentController::class, "findDetails"]);
     });
 });

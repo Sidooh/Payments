@@ -6,7 +6,6 @@ use App\Enums\Description;
 use App\Enums\TransactionType;
 use App\Events\VoucherPurchaseEvent;
 use App\Helpers\ApiResponse;
-use App\Models\Enterprise;
 use App\Models\FloatAccount;
 use App\Models\FloatAccountTransaction;
 use App\Models\Voucher;
@@ -21,7 +20,7 @@ class VoucherRepository
 {
     use ApiResponse;
 
-    public static function credit(int $accountId, $amount, bool $notify): Model|Builder|Voucher
+    public static function credit(int $accountId, $amount, $notify): Model|Builder|Voucher
     {
         $voucher = Voucher::whereAccountId($accountId)->firstOrFail();
 
@@ -46,8 +45,7 @@ class VoucherRepository
 
             $vouchers = Voucher::whereEnterpriseId($disburseData['enterprise_id'])
                 ->whereIn('account_id', $disburseData['accounts'])
-                ->whereType("ENTERPRISE_{$disburseData['disburse_type']}")
-                ->get();
+                ->whereType("ENTERPRISE_{$disburseData['disburse_type']}")->get();
 
             if($vouchers->isEmpty()) return;
 

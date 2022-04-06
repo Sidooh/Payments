@@ -22,9 +22,9 @@ class VoucherController extends Controller
             "notify"     => ['required', 'boolean']
         ]);
 
-        $accountId = $request->input('account_id');
-        $amount = $request->input('amount');
-        $notify = $request->boolean('"notify');
+        $accountId = $request->input("account_id");
+        $amount = $request->input("amount");
+        $notify = $request->boolean("notify");
 
         return VoucherRepository::credit($accountId, $amount, $notify);
     }
