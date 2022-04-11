@@ -18,8 +18,11 @@ trait ApiResponse
     protected function errorResponse($message = null, $code = 500): JsonResponse
     {
         return response()->json([
-            'status'  => 'error',
-            'message' => $message,
+            'errors'  => [
+                [
+                    'message' => $message
+                ]
+            ]
         ], $code);
     }
 }

@@ -14,6 +14,11 @@ use Throwable;
 
 class VoucherController extends Controller
 {
+    public function show(Voucher $voucher): array
+    {
+        return $voucher->toArray();
+    }
+
     public function credit(Request $request): Model|Builder|Voucher
     {
         $request->validate([
