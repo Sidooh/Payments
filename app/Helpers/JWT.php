@@ -16,6 +16,7 @@ class JWT extends Guard
 
     static function verify($token)
     {
+        Log::info($token);
         try {
             $secret = env('JWT_KEY');
 
@@ -44,7 +45,7 @@ class JWT extends Guard
 
             return !$tokenExpired && $base64UrlSignature === $signatureProvided;
         } catch (Exception $err) {
-            Log::error('--- --- --- --- ---   ...[JWT]: Unable to verify auth token...   --- --- --- --- ---', $err);
+            Log::error('--- --- --- --- ---   ...[JWT]: Unable to verify auth token...   --- --- --- --- ---', [$err]);
 
             return false;
         }

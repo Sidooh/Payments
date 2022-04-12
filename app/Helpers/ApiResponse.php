@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 trait ApiResponse
 {
@@ -17,6 +18,7 @@ trait ApiResponse
 
     protected function errorResponse($message = null, $code = 500): JsonResponse
     {
+        Log::error($code);
         return response()->json([
             'errors'  => [
                 [
