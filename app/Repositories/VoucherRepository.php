@@ -53,11 +53,11 @@ class VoucherRepository
                 ->whereIn('account_id', $disburseData['accounts'])
                 ->whereType("ENTERPRISE_{$disburseData['disburse_type']}")->get();
 
-            if($vouchers->isEmpty()) return;
+            if($vouchers->isEmpty()) return null;
 
             $floatDebitAmount = $vouchers->sum('voucher_top_up_amount');
 
-            if($floatDebitAmount < 1) return;
+            if($floatDebitAmount < 1) return null;
             if($floatAccount->balance < $floatDebitAmount) throw new Exception('Insufficient float balance!', 422);
 
             $creditVouchers = $vouchers->map(function(Voucher $voucher) {
