@@ -21,7 +21,7 @@ class VoucherController extends Controller
 
     public function getAccountVouchers(int $accountId): array
     {
-        $vouchers = Voucher::whereAccountId($accountId)->get();
+        $vouchers = Voucher::select(["id", "type", "balance"])->whereAccountId($accountId)->get();
 
         return $vouchers->toArray();
     }
