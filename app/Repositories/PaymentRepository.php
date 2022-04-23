@@ -10,10 +10,12 @@ use App\Enums\Status;
 use App\Enums\TransactionType;
 use App\Enums\VoucherType;
 use App\Events\PaymentSuccessEvent;
+use App\Models\FloatAccount;
 use App\Models\Payment;
 use App\Models\Voucher;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -107,6 +109,42 @@ class PaymentRepository
         if($data["product"] === "utility") $data["provider"] = $this->data["provider"];
 
         PaymentSuccessEvent::dispatch(Arr::pluck($this->transactions, 'id'), $data);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function float(): Model|Payment
+    {
+        $float = FloatAccount::firstOrCreate([
+            'accountable_id'   => $this->data['enterprise_id'],
+            'accountable_type' => "ENTERPRISE"
+        ]);
+
+        if($float) {
+            $bal = $float->balance;
+
+            if($bal < (int)$this->data['amount']) throw new Exception("Insufficient float balance!");
+        }
+
+        $float->balance -= $this->data['amount'];
+        $float->save();
+
+        $paymentData = $this->getPaymentData(
+            $float->id,
+            $float->getMorphClass(),
+            PaymentType::SIDOOH,
+            PaymentSubtype::FLOAT
+        );
+
+        $float->floatAccountTransaction()->create([
+            'amount'      => $this->data['amount'],
+            'type'        => TransactionType::DEBIT,
+            'description' => $this->transactions[0]["description"]
+        ]);
+
+        $this->data += $paymentData;
+        return Payment::create($this->data);
     }
 
     public function getPaymentData(int $providerId, string $providerType, PaymentType $type, PaymentSubtype $subtype): array
