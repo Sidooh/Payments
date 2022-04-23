@@ -19,8 +19,8 @@ class PaymentController extends Controller
      * Handle the incoming request.
      *
      * @param Request $request
-     * @return JsonResponse
      * @throws Throwable
+     * @return JsonResponse
      */
     public function __invoke(Request $request): JsonResponse
     {
@@ -43,9 +43,7 @@ class PaymentController extends Controller
 
 //        PaymentCreated::dispatch($payment->toArray());
 
-        return $this->successResponse(
-            message: "Payment Created!"
-        );
+        return $this->successResponse(message: "Payment Created!");
     }
 
     #[ArrayShape([

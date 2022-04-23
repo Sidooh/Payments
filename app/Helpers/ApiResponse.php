@@ -3,22 +3,21 @@
 namespace App\Helpers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 trait ApiResponse
 {
     protected function successResponse($data = [], $message = null, $code = 200): JsonResponse
     {
-        return response()->json([
-            'status'  => 'success',
-            'message' => $message,
-            'data'    => $data
-        ], $code);
+        $res["status"] = "success";
+
+        if($data) $res["data"] = $data;
+        if($message) $res["message"] = $message;
+
+        return response()->json($res, $code);
     }
 
     protected function errorResponse($message = null, $code = 500): JsonResponse
     {
-        Log::error($code);
         return response()->json([
             'errors'  => [
                 [

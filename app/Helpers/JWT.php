@@ -9,14 +9,8 @@ use Laravel\Sanctum\Guard;
 
 class JWT extends Guard
 {
-    function getSecretKey()
-    {
-        return env('JWT_KEY');
-    }
-
     static function verify($token)
     {
-        Log::info($token);
         try {
             $secret = env('JWT_KEY');
 
@@ -39,7 +33,6 @@ class JWT extends Guard
             $base64UrlSignature = base_64_url_encode($signature);
 
             // verify it matches the signature provided in the token
-
             if($tokenExpired) Log::debug("Token has expired.");
             if($base64UrlSignature !== $signatureProvided) Log::debug("Token is invalid.");
 
