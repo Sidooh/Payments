@@ -9,17 +9,12 @@ use Laravel\Sanctum\Guard;
 
 class JWT extends Guard
 {
-    function getSecretKey()
-    {
-        return env('JWT_KEY');
-    }
-
-    static function verify($token)
+    static function verify($token): bool
     {
         try {
             $secret = env('JWT_KEY');
 
-            if(!isset($secret)) exit('Invalid JWT key!');
+            if(!isset($secret)) throw new Exception("Invalid JWT key!");
 
             // split the token
             $tokenParts = explode('.', $token);
@@ -38,13 +33,12 @@ class JWT extends Guard
             $base64UrlSignature = base_64_url_encode($signature);
 
             // verify it matches the signature provided in the token
-
             if($tokenExpired) Log::debug("Token has expired.");
             if($base64UrlSignature !== $signatureProvided) Log::debug("Token is invalid.");
 
             return !$tokenExpired && $base64UrlSignature === $signatureProvided;
         } catch (Exception $err) {
-            Log::error('--- --- --- --- ---   ...[JWT]: Unable to verify auth token...   --- --- --- --- ---', $err);
+            Log::error('--- --- --- --- ---   ...[JWT]: Unable to verify auth token...   --- --- --- --- ---', [$err]);
 
             return false;
         }

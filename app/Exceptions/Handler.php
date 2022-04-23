@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Helpers\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
@@ -20,8 +21,7 @@ class Handler extends ExceptionHandler
      *
      * @var array<int, class-string<Throwable>>
      */
-    protected $dontReport = [//
-    ];
+    protected $dontReport = [];
 
     /**
      * A list of the inputs that are never flashed for validation exceptions.
@@ -51,6 +51,7 @@ class Handler extends ExceptionHandler
             $e instanceof NotFoundHttpException => $this->errorResponse('The specified URL cannot be found', 404),
             $e instanceof ValidationException => $this->errorResponse($e->getMessage(), 422),
             $e instanceof ModelNotFoundException => $this->errorResponse('The specified resource cannot be found', 404),
+            $e instanceof AuthenticationException => $this->errorResponse("Not Authorized", 401),
             default => $this->errorResponse($e->getMessage())
         };
     }

@@ -19,19 +19,28 @@ class VoucherController extends Controller
         return $voucher->toArray();
     }
 
+    public function getAccountVouchers(int $accountId): array
+    {
+        $vouchers = Voucher::select(["id", "type", "balance"])->whereAccountId($accountId)->get();
+
+        return $vouchers->toArray();
+    }
+
     public function credit(Request $request): Model|Builder|Voucher
     {
         $request->validate([
-            'account_id' => ['required'],
-            'amount'     => ['required'],
-            "notify"     => ['required', 'boolean']
+            'account_id'  => ['required'],
+            'amount'      => ['required'],
+            "description" => ["required", "string"],
+            "notify"      => ['required', 'boolean']
         ]);
 
         $accountId = $request->input("account_id");
         $amount = $request->input("amount");
+        $description = $request->input("description");
         $notify = $request->boolean("notify");
 
-        return VoucherRepository::credit($accountId, $amount, $notify);
+        return VoucherRepository::credit($accountId, $amount, $description, $notify);
     }
 
     /**

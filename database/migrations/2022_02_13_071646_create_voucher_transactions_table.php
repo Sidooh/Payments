@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
 
             $table->string('type', 20); // DEBIT or CREDIT
-            $table->decimal('amount');
+            $table->integer('amount')->unsigned();
             $table->string('description');
             $table->foreignId('voucher_id')->constrained();
 

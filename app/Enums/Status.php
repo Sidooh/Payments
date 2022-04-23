@@ -7,5 +7,5 @@ enum Status
     case COMPLETED;
     case FAILED;
     case PENDING;
-    case REIMBURSED;
+    case REFUNDED;
 }
