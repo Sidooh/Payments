@@ -6,38 +6,38 @@ use App\Enums\Status;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class SidoohProducts
+class SidoohProducts extends SidoohService
 {
     /**
      * @throws RequestException
      */
     public static function paymentCallback(int $payableId, string $payableType, Status $status)
     {
-        Log::alert('****************************    SIDOOH-SRV PRODUCTS: Payment Callback     ****************************');
+        Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Payment Callback...   --- --- --- --- ---');
 
-        $url = config("services.sidooh.services.products.url") . "/callback";
+        $url = config("services.sidooh.services.products.url") . "/v1/products/callback";
 
-        Http::retry(3)->post($url, [
+        parent::http()->post($url, [
             "payable_id"   => $payableId,
             "payable_type" => $payableType,
             "status"       => $status->name
         ])->throw();
     }
+
     /**
      * @throws RequestException
      */
-    public static function requestPurchase(int $transactionId, array $data): PromiseInterface|Response
+    public static function requestPurchase(array $transactionIds, array $data): PromiseInterface|Response
     {
-        Log::alert('****************************    SIDOOH-SRV PRODUCTS: Request Purchase     ****************************');
+        Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Request Purchase...   --- --- --- --- ---');
 
-        $url = config("services.sidooh.services.products.url") . "/purchase";
+        $url = config("services.sidooh.services.products.url") . "/v1/products/purchase";
 
-        return Http::retry(3)->post($url, [
-            "transaction_id"   => $transactionId,
-            "data" => $data
+        return parent::http()->post($url, [
+            "transaction_ids" => $transactionIds,
+            "data"            => $data
         ])->throw();
     }
 }

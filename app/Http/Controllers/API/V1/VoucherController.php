@@ -14,14 +14,33 @@ use Throwable;
 
 class VoucherController extends Controller
 {
-    public function deposit(Request $request): Model|Builder|Voucher
+    public function show(Voucher $voucher): array
+    {
+        return $voucher->toArray();
+    }
+
+    public function getAccountVouchers(int $accountId): array
+    {
+        $vouchers = Voucher::select(["id", "type", "balance"])->whereAccountId($accountId)->get();
+
+        return $vouchers->toArray();
+    }
+
+    public function credit(Request $request): Model|Builder|Voucher
     {
         $request->validate([
-            'account_id' => ['required'],
-            'amount'     => ['required'],
+            'account_id'  => ['required'],
+            'amount'      => ['required'],
+            "description" => ["required", "string"],
+            "notify"      => ['required', 'boolean']
         ]);
 
-        return VoucherRepository::deposit($request->input('account_id'), $request->input('amount'));
+        $accountId = $request->input("account_id");
+        $amount = $request->input("amount");
+        $description = $request->input("description");
+        $notify = $request->boolean("notify");
+
+        return VoucherRepository::credit($accountId, $amount, $description, $notify);
     }
 
     /**

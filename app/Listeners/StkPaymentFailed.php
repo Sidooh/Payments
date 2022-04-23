@@ -23,7 +23,9 @@ class StkPaymentFailed
      */
     public function handle(StkPushPaymentFailedEvent $event)
     {
-        Log::info("----------------- STK Payment Failed ({$event->stkCallback->ResultDesc})");
+        Log::info('--- --- --- --- ---   ...[EVENT]: STK Payment Failed...   --- --- --- --- ---', [
+            "result_description" => $event->stkCallback->ResultDesc
+        ]);
 
         MpesaEventRepository::stkPaymentFailed($event->stkCallback);
     }

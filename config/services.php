@@ -43,15 +43,15 @@ return [
         'services'           => [
             'notify'   => [
                 'enabled' => true,
-                'url'     => 'https://hoodis-notify.herokuapp.com/api/notifications',
+                'url'     => env("SIDOOH_NOTIFY_API_URL"),
             ],
             'accounts' => [
                 'enabled' => true,
-                'url'     => 'http://localhost:3000/api'
+                'url'     => env("SIDOOH_ACCOUNTS_API_URL")
             ],
             'products' => [
                 'enabled' => true,
-                'url'     => 'http://localhost:8000/api/v1/products'
+                'url'     => env("SIDOOH_PRODUCTS_API_URL")
             ]
         ],
     ],

@@ -16,17 +16,30 @@ use App\Models\Voucher;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use Propaganistas\LaravelPhone\PhoneNumber;
 use Throwable;
 
 class PaymentRepository
 {
-    private array $data;
+    private array $data, $transactions;
+    private string $amount;
 
-    public function mpesa(int $transactionId, $amount): Model|Payment|null
+    /**
+     * @param array  $transactions
+     * @param string $amount
+     * @param array  $data
+     */
+    public function __construct(array $transactions, string $amount, array $data)
     {
-        $number = $this->data['mpesa_number'] ?? $this->data['phone'];
+        $this->transactions = $transactions;
+        $this->amount = $amount;
+        $this->data = $data;
+    }
+
+    public function mpesa()
+    {
+        $number = $this->data['mpesa_number'] ?? $this->data['payment_account']['phone'];
 
         $reference = match ($this->data['product']) {
             "airtime" => MpesaReference::AIRTIME,
@@ -36,33 +49,29 @@ class PaymentRepository
         };
 
         try {
-            $stkResponse = mpesa_request($number, $this->data['amount'], $reference, $this->data['description']);
+            $stkResponse = mpesa_request($number, $this->amount, $reference, $this->transactions[0]["description"]);
         } catch (MpesaException $e) {
 //            TODO: Inform customer of issue?
             Log::critical($e);
             return null;
         }
 
-        return Payment::create([
-            'payable_type'  => PayableType::TRANSACTION->name,
-            'payable_id'    => $transactionId,
-            'amount'        => $amount,
-            'status'        => Status::PENDING->name,
-            'type'          => PaymentType::MPESA->name,
-            'subtype'       => PaymentSubtype::STK->name,
-            'provider_id'   => $stkResponse->id,
-            'provider_type' => $stkResponse->getMorphClass(),
-            'phone'         => PhoneNumber::make($this->data['destination'] ?? null, 'KE')->formatE164()
-        ]);
+        $paymentData = $this->getPaymentData(
+            $stkResponse->id,
+            $stkResponse->getMorphClass(),
+            PaymentType::MPESA,
+            PaymentSubtype::STK
+        );
+
+        Payment::insert($paymentData);
     }
 
     /**
      * @throws Exception|Throwable
      */
-    public function voucher($transactionId): Model|Payment
+    public function voucher(): void
     {
-        $account = $this->data['account'];
-        $destination = $this->data['destination'];
+        $account = $this->data['payment_account'];
 
         $voucher = Voucher::firstOrCreate(['account_id' => $account['id']], [
             ...$account,
@@ -72,57 +81,45 @@ class PaymentRepository
         if($voucher) {
             $bal = $voucher->balance;
 
-            if($bal < (int)$this->data['amount']) throw new Exception("Insufficient voucher balance!");
+            if($bal < (int)$this->amount) throw new Exception("Insufficient voucher balance!");
         }
 
-        $voucher->balance -= $this->data['amount'];
+        $paymentData = $this->getPaymentData(
+            $voucher->id,
+            $voucher->getMorphClass(),
+            PaymentType::SIDOOH,
+            PaymentSubtype::VOUCHER
+        );
+
+        $voucher->balance -= $this->amount;
         $voucher->save();
-
-        $paymentData = [
-            'payable_type'  => PayableType::TRANSACTION->name,
-            'payable_id'    => $transactionId,
-            'amount'        => $this->data['amount'],
-            'type'          => PaymentType::SIDOOH->name,
-            'subtype'       => PaymentSubtype::VOUCHER->name,
-            'status'        => Status::COMPLETED->name,
-            'provider_id'   => $voucher->id,
-            'provider_type' => $voucher->getMorphClass(),
-        ];
-
-        if($this->data['product'] === 'subscription') {
-            $paymentData['status'] = Status::PENDING->name;
-        } else if($this->data['product'] === 'airtime') {
-            $paymentData['phone'] = PhoneNumber::make($destination, 'KE')->formatE164();
-        } else if($this->data['product'] === 'utility') {
-            $paymentData['account_number'] = $destination;
-        }
-
-        if($this->data['product'] === 'merchant') $paymentData['status'] = Status::PENDING->name;
-
         $voucher->voucherTransaction()->create([
-            'amount'      => $this->data['amount'],
+            'amount'      => $this->amount,
             'type'        => TransactionType::DEBIT->name,
-            'description' => $this->data['description']
+            'description' => $this->transactions[0]["description"]
         ]);
 
-        $this->data += $paymentData;
+        Payment::insert($paymentData);
 
-        $payment = Payment::create($this->data);
+        $data = [
+            "payments" => $paymentData,
+            "product"  => $this->data["product"]
+        ];
 
-        PaymentSuccessEvent::dispatch($payment->payable_id, $this->data);
+        if($data["product"] === "utility") $data["provider"] = $this->data["provider"];
 
-        return $payment;
+        PaymentSuccessEvent::dispatch(Arr::pluck($this->transactions, 'id'), $data);
     }
 
     /**
      * @throws Throwable
      */
-    public function float(int $transactionId): Model|Payment
+    public function float(): Model|Payment
     {
         $float = FloatAccount::firstOrCreate([
             'accountable_id'   => $this->data['enterprise_id'],
             'accountable_type' => "ENTERPRISE"
-        ], []);
+        ]);
 
         if($float) {
             $bal = $float->balance;
@@ -133,44 +130,38 @@ class PaymentRepository
         $float->balance -= $this->data['amount'];
         $float->save();
 
-        $paymentData = [
-            'payable_type'  => PayableType::TRANSACTION->name,
-            'payable_id'    => $transactionId,
-            'amount'        => $this->data['amount'],
-            'type'          => PaymentType::SIDOOH,
-            'subtype'       => PaymentSubtype::VOUCHER,
-            'status'        => Status::COMPLETED,
-            'provider_id'   => $float->id,
-            'provider_type' => $float->getMorphClass(),
-        ];
-
-        if($this->data['product'] === 'subscription') {
-            $paymentData['amount'] = $this->data['amount'];
-            $paymentData['status'] = Status::PENDING;
-        } else if($this->data['product'] === 'airtime') {
-            $paymentData['phone'] = PhoneNumber::make($this->data['account']['phone'], 'KE')->formatE164();
-        } else if($this->data['product'] === 'utility') {
-            $paymentData['account_number'] = $this->data['account']['phone'];
-        }
-
-        if($this->data['product'] === 'merchant') $paymentData['status'] = Status::PENDING;
+        $paymentData = $this->getPaymentData(
+            $float->id,
+            $float->getMorphClass(),
+            PaymentType::SIDOOH,
+            PaymentSubtype::FLOAT
+        );
 
         $float->floatAccountTransaction()->create([
             'amount'      => $this->data['amount'],
             'type'        => TransactionType::DEBIT,
-            'description' => $this->data['description']
+            'description' => $this->transactions[0]["description"]
         ]);
 
         $this->data += $paymentData;
         return Payment::create($this->data);
     }
 
-
-    /**
-     * @param array $data
-     */
-    public function setData(array $data): void
+    public function getPaymentData(int $providerId, string $providerType, PaymentType $type, PaymentSubtype $subtype): array
     {
-        $this->data = $data;
+        return array_map(fn($transaction) => [
+            'payable_type'  => PayableType::TRANSACTION->name,
+            'payable_id'    => $transaction["id"],
+            'amount'        => $transaction["amount"],
+            'type'          => $type->name,
+            'subtype'       => $subtype->name,
+            'status'        => $this->data['product'] === 'subscription'
+                ? Status::PENDING->name
+                : Status::COMPLETED->name,
+            'provider_id'   => $providerId,
+            'provider_type' => $providerType,
+            "created_at"    => now(),
+            "updated_at"    => now(),
+        ], $this->transactions);
     }
 }

@@ -6,7 +6,6 @@ use App\Enums\Description;
 use App\Enums\TransactionType;
 use App\Events\VoucherPurchaseEvent;
 use App\Helpers\ApiResponse;
-use App\Models\Enterprise;
 use App\Models\FloatAccount;
 use App\Models\FloatAccountTransaction;
 use App\Models\Voucher;
@@ -21,14 +20,20 @@ class VoucherRepository
 {
     use ApiResponse;
 
-    public static function deposit(int $accountId, $amount): Model|Builder|Voucher
+    public static function credit(int $accountId, $amount, string $description, bool $notify = false): Model|Builder|Voucher
     {
         $voucher = Voucher::whereAccountId($accountId)->firstOrFail();
 
         $voucher->balance += (double)$amount;
         $voucher->save();
 
-        VoucherPurchaseEvent::dispatch($voucher, $amount);
+        $voucher->voucherTransaction()->create([
+            'amount'      => (double)$amount,
+            'type'        => TransactionType::CREDIT->name,
+            'description' => $description
+        ]);
+
+        if($notify) VoucherPurchaseEvent::dispatch($voucher, $amount);
 
         return $voucher;
     }
@@ -46,14 +51,13 @@ class VoucherRepository
 
             $vouchers = Voucher::whereEnterpriseId($disburseData['enterprise_id'])
                 ->whereIn('account_id', $disburseData['accounts'])
-                ->whereType("ENTERPRISE_{$disburseData['disburse_type']}")
-                ->get();
+                ->whereType("ENTERPRISE_{$disburseData['disburse_type']}")->get();
 
-            if($vouchers->isEmpty()) return;
+            if($vouchers->isEmpty()) return null;
 
             $floatDebitAmount = $vouchers->sum('voucher_top_up_amount');
 
-            if($floatDebitAmount < 1) return;
+            if($floatDebitAmount < 1) return null;
             if($floatAccount->balance < $floatDebitAmount) throw new Exception('Insufficient float balance!', 422);
 
             $creditVouchers = $vouchers->map(function(Voucher $voucher) {

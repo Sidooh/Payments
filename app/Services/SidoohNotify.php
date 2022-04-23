@@ -3,41 +3,30 @@
 namespace App\Services;
 
 use App\Enums\EventType;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class SidoohNotify
+class SidoohNotify extends SidoohService
 {
-    public static function notify(array $to, string $message, EventType $eventType): array
+    public static function notify(array $to, string $message, EventType $eventType)
     {
-//        Log::info('----------------- Sidooh SMS Notification', [
-//            'eventType' => $eventType,
-//            'to'        => $to,
-//            'message'   => $message
-//        ]);
-//        $url = env('SIDOOH_NOTIFY_URL');
-
-        Log::alert('****************************    SIDOOH NOTIFY     ****************************');
-        Log::alert('******************************************************************************');
-
-        Log::info([
+        Log::info('--- --- --- --- ---   ...[SRV - NOTIFY]: Send Notification...   --- --- --- --- ---', [
             "channel"     => "sms",
             "event_type"  => $eventType->value,
             "destination" => implode(', ', $to),
             "content"     => $message
         ]);
 
-        return [];
+        $url = config('services.sidooh.services.notify.url') . "/notifications";
 
-        $response = Http::retry(3)->post($url, [
+        $response = parent::http()->post($url, [
             "channel"     => "sms",
             "event_type"  => $eventType->value,
             "destination" => $to,
             "content"     => $message
-        ]);
+        ])->json();
 
-        Log::info('----------------- Sidooh SMS Notification sent', [
-            'id' => $response->json()['id']
+        Log::info('--- --- --- --- ---   ...SRV - NOTIFY: Notification Sent...   --- --- --- --- ---', [
+            'id' => $response["id"]
         ]);
 
         return $response->json();

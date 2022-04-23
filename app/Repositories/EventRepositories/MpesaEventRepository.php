@@ -2,6 +2,7 @@
 
 namespace App\Repositories\EventRepositories;
 
+use App\Enums\Description;
 use App\Enums\EventType;
 use App\Enums\MpesaReference;
 use App\Enums\Status;
@@ -40,12 +41,8 @@ class MpesaEventRepository extends EventRepository
     {
         $otherPhone = explode(" - ", $stkCallback->request->description);
 
-        $p = Payment::whereProviderId($stkCallback->request->id)->whereSubtype('STK')->firstOrFail();
-
-        if($p->status == 'COMPLETED') return;
-
-        $p->status = Status::COMPLETED->name;
-        $p->save();
+        $payments = Payment::whereProviderId($stkCallback->request->id)->whereSubtype('STK');
+        $payments->update(["status" => Status::COMPLETED->name]);
 
         $purchaseData = match ($stkCallback->request->reference) {
             MpesaReference::AIRTIME => [
@@ -75,14 +72,14 @@ class MpesaEventRepository extends EventRepository
             ],
         };
 
-        if($stkCallback->request->reference) {
+        if($purchaseData["product"] === "voucher") {
             $accountId = SidoohAccounts::findByPhone($purchaseData['phone'])['id'];
 
-            VoucherRepository::deposit($accountId, $stkCallback->amount);
+            VoucherRepository::credit($accountId, $stkCallback->amount, Description::VOUCHER_PURCHASE->value, true);
         } else {
             $purchaseData['amount'] = $stkCallback->amount;
 
-            SidoohProducts::requestPurchase($p->payable_id, $purchaseData);
+            SidoohProducts::requestPurchase($payments->pluck('payable_id')->toArray(), $purchaseData);
         }
     }
 }

@@ -11,13 +11,13 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('vouchers', function (Blueprint $table) {
             $table->id();
 
             $table->string('type', 20);
-            $table->decimal('balance', 10)->default(0);
+            $table->integer('balance')->unsigned()->default(0);
             $table->foreignId('account_id')->unsigned();
             $table->foreignId('enterprise_id')->nullable();
 
@@ -32,7 +32,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('vouchers');
     }
