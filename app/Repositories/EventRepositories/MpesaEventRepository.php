@@ -2,6 +2,7 @@
 
 namespace App\Repositories\EventRepositories;
 
+use App\Enums\Description;
 use App\Enums\EventType;
 use App\Enums\MpesaReference;
 use App\Enums\Status;
@@ -74,7 +75,7 @@ class MpesaEventRepository extends EventRepository
         if($purchaseData["product"] === "voucher") {
             $accountId = SidoohAccounts::findByPhone($purchaseData['phone'])['id'];
 
-            VoucherRepository::credit($accountId, $stkCallback->amount);
+            VoucherRepository::credit($accountId, $stkCallback->amount, Description::VOUCHER_PURCHASE->value, true);
         } else {
             $purchaseData['amount'] = $stkCallback->amount;
 

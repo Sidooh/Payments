@@ -20,12 +20,18 @@ class VoucherRepository
 {
     use ApiResponse;
 
-    public static function credit(int $accountId, $amount, $notify): Model|Builder|Voucher
+    public static function credit(int $accountId, $amount, string $description, bool $notify = false): Model|Builder|Voucher
     {
         $voucher = Voucher::whereAccountId($accountId)->firstOrFail();
 
         $voucher->balance += (double)$amount;
         $voucher->save();
+
+        $voucher->voucherTransaction()->create([
+            'amount'      => (double)$amount,
+            'type'        => TransactionType::CREDIT->name,
+            'description' => $description
+        ]);
 
         if($notify) VoucherPurchaseEvent::dispatch($voucher, $amount);
 

@@ -25,7 +25,6 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get("/details/{transactionId}/{accountId}", [PaymentController::class, "findDetails"]);
     });
 
-    Route::prefix('/vouchers')->group(function() {
-        Route::get('/{voucher}', [VoucherController::class, "show"]);
-    });
+    Route::get('/accounts/{accountId}/vouchers', [VoucherController::class, "getAccountVouchers"]);
+    Route::get('/vouchers/{voucher}', [VoucherController::class, "show"]);
 });

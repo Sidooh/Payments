@@ -9,12 +9,12 @@ use Laravel\Sanctum\Guard;
 
 class JWT extends Guard
 {
-    static function verify($token)
+    static function verify($token): bool
     {
         try {
             $secret = env('JWT_KEY');
 
-            if(!isset($secret)) exit('Invalid JWT key!');
+            if(!isset($secret)) throw new Exception("Invalid JWT key!");
 
             // split the token
             $tokenParts = explode('.', $token);
