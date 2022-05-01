@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\Description;
 use App\Enums\MpesaReference;
 use App\Enums\PayableType;
 use App\Enums\PaymentSubtype;
@@ -13,6 +14,7 @@ use App\Events\PaymentSuccessEvent;
 use App\Models\FloatAccount;
 use App\Models\Payment;
 use App\Models\Voucher;
+use App\Services\SidoohAccounts;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -108,7 +110,15 @@ class PaymentRepository
 
         if($data["product"] === "utility") $data["provider"] = $this->data["provider"];
 
-        PaymentSuccessEvent::dispatch(Arr::pluck($this->transactions, 'id'), $data);
+        if($data["product"] === "voucher") {
+            foreach($this->transactions as $trans) {
+                ["id" => $accountId] = SidoohAccounts::findByPhone($trans['destination']);
+
+                VoucherRepository::credit($accountId, $trans["amount"], Description::VOUCHER_PURCHASE->value, true);
+            }
+        } else {
+            PaymentSuccessEvent::dispatch(Arr::pluck($this->transactions, 'id'), $data);
+        }
     }
 
     /**

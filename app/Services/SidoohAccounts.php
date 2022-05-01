@@ -33,13 +33,7 @@ class SidoohAccounts extends SidoohService
 
         $url = config('services.sidooh.services.accounts.url') . "/accounts/phone/$phone";
 
-        $acc = Cache::remember($phone, (60 * 60 * 24), function() use ($url) {
-            $acc = parent::http()->get($url)->json();
-
-            Cache::put($acc['id'], $acc);
-
-            return $acc;
-        });
+        $acc = Cache::remember($phone, now()->addDay(), fn() => parent::fetch($url));
 
         if(!$acc) throw new Exception("Account doesn't exist!");
 
