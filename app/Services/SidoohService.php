@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -33,5 +35,28 @@ class SidoohService
         if($response->successful()) return $response->json()["token"];
 
         return $response->throw()->json();
+    }
+
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
+    static function fetch(string $url, string $method = "GET", array $data = [])
+    {
+        Log::info('--- --- --- --- ---   ...[SRV - ACCOUNTS]: Fetch...   --- --- --- --- ---', [
+            "method" => $method,
+            "data"   => $data
+        ]);
+
+        $options = strtoupper($method) === "POST"
+            ? ["json" => $data]
+            : [];
+
+        try {
+            return self::http()->send($method, $url, $options)->throw()->json();
+        } catch (Exception $err) {
+            Log::error($err);
+
+            if($err->getCode() === 401) throw new AuthenticationException();
+        }
     }
 }

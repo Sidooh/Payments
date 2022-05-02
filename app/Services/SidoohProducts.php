@@ -17,7 +17,7 @@ class SidoohProducts extends SidoohService
     {
         Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Payment Callback...   --- --- --- --- ---');
 
-        $url = config("services.sidooh.services.products.url") . "/v1/products/callback";
+        $url = config("services.sidooh.services.products.url") . "/products/callback";
 
         parent::http()->post($url, [
             "payable_id"   => $payableId,
@@ -33,7 +33,7 @@ class SidoohProducts extends SidoohService
     {
         Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Request Purchase...   --- --- --- --- ---');
 
-        $url = config("services.sidooh.services.products.url") . "/v1/products/purchase";
+        $url = config("services.sidooh.services.products.url") . "/products/purchase";
 
         return parent::http()->post($url, [
             "transaction_ids" => $transactionIds,
