@@ -14,7 +14,6 @@ RUN apt-get install -y libc-client-dev libkrb5-dev \
     && docker-php-ext-install intl \
     && docker-php-ext-install sockets \
     && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mysqli \
     && docker-php-ext-enable memcached
 
 # Clear cache
