@@ -24,7 +24,7 @@ class VoucherPurchaseSuccess
      * @return void
      * @throws Exception
      */
-    public function handle(VoucherPurchaseEvent $event)
+    public function handle(VoucherPurchaseEvent $event): void
     {
         Log::info('--- --- --- --- ---   ...[EVENT]: Voucher Purchase Success...   --- --- --- --- ---');
 

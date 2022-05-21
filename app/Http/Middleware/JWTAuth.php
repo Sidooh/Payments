@@ -22,7 +22,7 @@ class JWTAuth
      * @throws \Exception
      * @return JsonResponse
      */
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next): JsonResponse
     {
         $token = $request->bearerToken();
 

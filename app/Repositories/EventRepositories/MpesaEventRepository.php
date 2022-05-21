@@ -16,6 +16,9 @@ use Throwable;
 
 class MpesaEventRepository extends EventRepository
 {
+    /**
+     * @throws \Illuminate\Http\Client\RequestException
+     */
     public static function stkPaymentFailed($stkCallback)
     {
         // TODO: Make into a transaction/try catch?
