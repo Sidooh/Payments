@@ -4,6 +4,8 @@ FROM php:8.1-apache
 RUN apt-get update -y && apt-get install -y \
     build-essential \
     libicu-dev \
+    zlib1g-dev \
+    libmemcached-dev \
     zip \
     unzip
 
