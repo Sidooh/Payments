@@ -13,7 +13,7 @@ class SidoohAccounts extends SidoohService
      */
     static function find($id): array
     {
-        Log::info('--- --- --- --- ---   ...[SRV - ACCOUNTS]: Find Account...   --- --- --- --- ---', ['id' => $id]);
+        Log::info('--- --- --- --- ---   ...[SRV - ACCOUNTS]: Find...   --- --- --- --- ---', ['id' => $id]);
 
         $url = config('services.sidooh.services.accounts.url') . "/accounts/$id";
 
@@ -29,7 +29,7 @@ class SidoohAccounts extends SidoohService
      */
     public static function findByPhone($phone)
     {
-        Log::info('--- --- --- --- ---   ...[SRV - ACCOUNTS]: Find Account...   --- --- --- --- ---', ['phone' => $phone]);
+        Log::info('--- --- --- --- ---   ...[SRV - ACCOUNTS]: Find By Phone...   --- --- --- --- ---', ['phone' => $phone]);
 
         $url = config('services.sidooh.services.accounts.url') . "/accounts/phone/$phone";
 
