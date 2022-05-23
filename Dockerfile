@@ -1,7 +1,4 @@
-FROM php:8.1-fpm
-
-# Define working directory
-WORKDIR /home/app
+FROM php:8.1-apache
 
 # Install system libraries
 RUN apt-get update -y && apt-get install -y \
@@ -10,12 +7,7 @@ RUN apt-get update -y && apt-get install -y \
     zlib1g-dev \
     libmemcached-dev \
     zip \
-    unzip \
-    nginx \
-    git
-
-# Install supervisor
-RUN apt-get install -y supervisor
+    unzip
 
 # Install docker dependencies
 RUN apt-get install -y libc-client-dev libkrb5-dev \
@@ -26,35 +18,24 @@ RUN apt-get install -y libc-client-dev libkrb5-dev \
     && docker-php-ext-install pdo_mysql \
     && docker-php-ext-enable memcached
 
-# Download composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Add user for laravel application
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+# Download composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy code to /home/app
-COPY --chown=www:www-data . /home/app
+# Define working directory
+WORKDIR /home/app
 
-# add root to app group
-RUN chmod -R ug+w /home/app/storage
+# Copy project
+COPY . /home/app
 
-# Copy nginx/php/supervisor configs
-RUN cp docker/supervisor.conf /etc/supervisord.conf
-RUN cp docker/php.ini /usr/local/etc/php/conf.d/app.ini
-RUN cp docker/nginx.conf /etc/nginx/sites-enabled/default
-
-# PHP Error Log Files
-RUN mkdir /var/log/php
-RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
-
-# Deployment steps
-RUN composer install --optimize-autoloader --no-dev
-RUN chmod +x /home/app/docker/run.sh
+# Run composer install && update
+RUN composer install
+RUN php /home/app/artisan queue:work --verbose --sleep=3 --tries=3 &
 
 # Expose the port
-EXPOSE 80
-ENTRYPOINT ["/home/app/docker/run.sh"]
+EXPOSE 8080
+
+# Start artisan
+CMD php artisan serve --host=0.0.0.0 --port=8080
