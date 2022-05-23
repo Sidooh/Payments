@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 cd /home/app || exit
 
 # php artisan migrate:fresh --seed
