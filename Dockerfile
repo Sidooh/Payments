@@ -32,7 +32,7 @@ COPY . /home/app
 
 # Run composer install && update
 RUN composer install
-RUN php /home/app/artisan queue:work --verbose --sleep=3 --tries=3 &
+#RUN php /home/app/artisan queue:work --verbose --sleep=3 --tries=3 &
 
 # Expose the port
 EXPOSE 8080
