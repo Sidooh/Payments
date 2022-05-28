@@ -31,13 +31,16 @@ class SidoohProducts extends SidoohService
      */
     public static function requestPurchase(array $transactionIds, array $data): PromiseInterface|Response
     {
-        Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Request Purchase...   --- --- --- --- ---');
+        Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Request Purchase...   --- --- --- --- ---', [
+            "transaction_ids" => $transactionIds,
+            "data" => $data
+        ]);
 
         $url = config("services.sidooh.services.products.url") . "/products/purchase";
 
         return parent::http()->post($url, [
             "transaction_ids" => $transactionIds,
-            "data"            => $data
+            "data" => $data
         ])->throw();
     }
 }
