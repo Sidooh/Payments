@@ -165,9 +165,7 @@ class PaymentRepository
             'amount'        => $transaction["amount"],
             'type'          => $type->name,
             'subtype'       => $subtype->name,
-            'status'        => $this->data['product'] === 'subscription'
-                ? Status::PENDING->name
-                : Status::COMPLETED->name,
+            'status'        => Status::PENDING->name,
             'provider_id'   => $providerId,
             'provider_type' => $providerType,
             "created_at"    => now(),
