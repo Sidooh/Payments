@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Enums\Description;
 use App\Enums\TransactionType;
+use App\Enums\VoucherType;
 use App\Events\VoucherPurchaseEvent;
 use App\Helpers\ApiResponse;
 use App\Models\FloatAccount;
@@ -22,7 +23,10 @@ class VoucherRepository
 
     public static function credit(int $accountId, $amount, string $description, bool $notify = false): Model|Builder|Voucher
     {
-        $voucher = Voucher::whereAccountId($accountId)->firstOrFail();
+        $voucher = Voucher::firstOrCreate([
+            "account_id" => $accountId,
+            "type" => VoucherType::SIDOOH
+        ]);
 
         $voucher->balance += (double)$amount;
         $voucher->save();
