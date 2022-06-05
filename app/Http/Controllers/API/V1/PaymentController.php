@@ -34,7 +34,7 @@ class PaymentController extends Controller
 
         $repo = new PaymentRepository($data['transactions'], $data['total_amount'], $data['data']);
 
-        match ($request->input('method')) {
+        $data = match ($request->input('method')) {
             PaymentMethod::MPESA->name => $repo->mpesa(),
             PaymentMethod::VOUCHER->name => $repo->voucher(),
             PaymentMethod::FLOAT->name => $repo->float(),
@@ -43,7 +43,7 @@ class PaymentController extends Controller
 
 //        PaymentCreated::dispatch($payment->toArray());
 
-        return $this->successResponse(message: "Payment Created!");
+        return $this->successResponse($data, "Payment Created!");
     }
 
     #[ArrayShape([
