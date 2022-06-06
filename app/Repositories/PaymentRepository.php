@@ -49,7 +49,8 @@ class PaymentRepository
         };
 
         try {
-            $stkResponse = mpesa_request($number, $this->amount, $reference, $this->transactions[0]["description"]);
+//            TODO: Change to actual amount on production
+            $stkResponse = mpesa_request($number, 1, $reference, $this->transactions[0]["description"]);
         } catch (MpesaException $e) {
 //            TODO: Inform customer of issue?
             Log::critical($e);
