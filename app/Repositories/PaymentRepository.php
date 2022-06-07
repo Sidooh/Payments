@@ -39,7 +39,7 @@ class PaymentRepository
 
     public function mpesa()
     {
-        $number = $this->data['mpesa_number'] ?? $this->data['payment_account']['phone'];
+        $number = $this->data['debit_account'] ?? $this->data['payment_account']['phone'];
 
         $reference = match ($this->data['product']) {
             "airtime" => MpesaReference::AIRTIME,
