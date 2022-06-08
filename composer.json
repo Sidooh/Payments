@@ -12,12 +12,12 @@
         "laravel/framework": "^9.13",
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.7",
-        "propaganistas/laravel-phone": "^4.3",
-        "vladimir-yuldashev/laravel-queue-rabbitmq": "^12.0"
+        "propaganistas/laravel-phone": "^4.3"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
         "fakerphp/faker": "^1.9.1",
+        "itsgoingd/clockwork": "^5.1",
         "laravel/sail": "^1.14.6",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
