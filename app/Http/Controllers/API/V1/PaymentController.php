@@ -10,6 +10,7 @@ use App\Repositories\PaymentRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\ArrayShape;
 use Throwable;
 
@@ -33,6 +34,8 @@ class PaymentController extends Controller
         $data = $request->all();
 
         $repo = new PaymentRepository($data['transactions'], $data['total_amount'], $data['data']);
+
+        Log::info('--- --- ---   ...[CONTROLLER - PAYMENT]: Invoke...   --- --- ---');
 
         $data = match ($request->input('method')) {
             PaymentMethod::MPESA->name => $repo->mpesa(),
