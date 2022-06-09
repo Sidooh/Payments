@@ -35,7 +35,7 @@ class PaymentController extends Controller
 
         $repo = new PaymentRepository($data['transactions'], $data['total_amount'], $data['data']);
 
-        Log::info('--- --- ---   ...[CONTROLLER - PAYMENT]: Invoke...   --- --- ---');
+        Log::info('--- --- ---   ...[CONTROLLER - PAYMENT]: Invoke...   --- --- ---', $data);
 
         $data = match ($request->input('method')) {
             PaymentMethod::MPESA->name => $repo->mpesa(),
