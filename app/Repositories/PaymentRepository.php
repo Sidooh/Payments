@@ -74,11 +74,7 @@ class PaymentRepository
             'type' => VoucherType::SIDOOH
         ]);
 
-        if($voucher) {
-            $bal = $voucher->balance;
-
-            if($bal < (int)$this->amount) throw new Exception("Insufficient voucher balance!");
-        }
+        if($voucher->balance < (int)$this->amount) throw new Exception("Insufficient voucher balance!");
 
         $paymentData = $this->getPaymentData($voucher->id, $voucher->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER);
 
@@ -107,6 +103,7 @@ class PaymentRepository
             }
         } else {
             Payment::wherePayableId($this->transactions[0]["id"])->update(["status" => Status::COMPLETED->name]);
+
             return $data;
 //            PaymentSuccessEvent::dispatch(Arr::pluck($this->transactions, 'id'), $data);
         }
