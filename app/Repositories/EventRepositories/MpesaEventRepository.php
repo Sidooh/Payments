@@ -62,7 +62,7 @@ class MpesaEventRepository extends EventRepository
             default => []
         };
 
-        $data = array_merge($purchaseData, $payments->get());
+        $data = array_merge($purchaseData, $payments->get()->toArray());
 
         if($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
             $accountId = SidoohAccounts::findByPhone($purchaseData['phone'])['id'];
