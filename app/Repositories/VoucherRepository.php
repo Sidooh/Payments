@@ -21,7 +21,7 @@ class VoucherRepository
 {
     use ApiResponse;
 
-    public static function credit(int $accountId, $amount, string $description, bool $notify = false): Model|Builder|Voucher
+    public static function credit(int $accountId, $amount, Description $description, bool $notify = false): Model|Builder|Voucher
     {
         $voucher = Voucher::firstOrCreate([
             "account_id" => $accountId,

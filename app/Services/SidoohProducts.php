@@ -15,7 +15,7 @@ class SidoohProducts extends SidoohService
      */
     public static function paymentCallback(int $payableId, string $payableType, Status $status)
     {
-        Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Payment Callback...   --- --- --- --- ---');
+        Log::info('--- --- ---   ...[SRV - PRODUCTS]: Payment Callback...   --- --- ---');
 
         $url = config("services.sidooh.services.products.url") . "/products/callback";
 
@@ -29,18 +29,12 @@ class SidoohProducts extends SidoohService
     /**
      * @throws RequestException
      */
-    public static function requestPurchase(array $transactionIds, array $data): PromiseInterface|Response
+    public static function requestPurchase(array $data): PromiseInterface|Response
     {
-        Log::info('--- --- --- --- ---   ...[SRV - PRODUCTS]: Request Purchase...   --- --- --- --- ---', [
-            "transaction_ids" => $transactionIds,
-            "data" => $data
-        ]);
+        Log::info('--- --- ---   ...[SRV - PRODUCTS]: Request Purchase...   --- --- ---', $data);
 
         $url = config("services.sidooh.services.products.url") . "/products/purchase";
 
-        return parent::http()->post($url, [
-            "transaction_ids" => $transactionIds,
-            "data" => $data
-        ])->throw();
+        return parent::http()->post($url, $data)->throw();
     }
 }

@@ -7,6 +7,7 @@ use App\Enums\MpesaReference;
 use App\Enums\PayableType;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
+use App\Enums\ProductType;
 use App\Enums\Status;
 use App\Enums\TransactionType;
 use App\Enums\VoucherType;
@@ -37,15 +38,19 @@ class PaymentRepository
         $this->data = $data;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function mpesa()
     {
         $number = $this->data['debit_account'] ?? $this->data['payment_account']['phone'];
 
-        $reference = match ($this->data['product']) {
-            "airtime" => MpesaReference::AIRTIME,
-            "voucher" => MpesaReference::PAY_VOUCHER,
-            "utility" => MpesaReference::PAY_UTILITY,
-            "subscription" => MpesaReference::AGENT_REGISTER
+        $reference = match (ProductType::from($this->transactions[0]["product_id"])) {
+            ProductType::AIRTIME => MpesaReference::AIRTIME,
+            ProductType::VOUCHER => MpesaReference::PAY_VOUCHER,
+            ProductType::UTILITY => MpesaReference::PAY_UTILITY,
+            ProductType::SUBSCRIPTION => MpesaReference::AGENT_REGISTER,
+            default => throw new \Exception('Unexpected match value')
         };
 
         try {
@@ -76,7 +81,7 @@ class PaymentRepository
 
         if($voucher->balance < (int)$this->amount) throw new Exception("Insufficient voucher balance!");
 
-        $paymentData = $this->getPaymentData($voucher->id, $voucher->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER);
+        $paymentData = $this->getPaymentData($voucher->id, $voucher->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER, Status::COMPLETED);
 
         $voucher->balance -= $this->amount;
         $voucher->save();
@@ -88,25 +93,20 @@ class PaymentRepository
 
         Payment::insert($paymentData);
 
-        $data = [
-            "payments" => $paymentData,
-            "product"  => $this->data["product"]
-        ];
+        $data["payments"] = $paymentData;
 
-        if($data["product"] === "utility") $data["provider"] = $this->data["provider"];
+        $productType = ProductType::from($this->transactions[0]["product_id"]);
+        if($productType === ProductType::UTILITY) $data["provider"] = $this->data["provider"];
 
-        if($data["product"] === "voucher") {
+        if($productType === ProductType::VOUCHER) {
             foreach($this->transactions as $trans) {
                 ["id" => $accountId] = SidoohAccounts::findByPhone($trans['destination']);
 
-                VoucherRepository::credit($accountId, $trans["amount"], Description::VOUCHER_PURCHASE->value, true);
+                $data["vouchers"][] = VoucherRepository::credit($accountId, $trans["amount"], Description::VOUCHER_PURCHASE, true);
             }
-        } else {
-            Payment::wherePayableId($this->transactions[0]["id"])->update(["status" => Status::COMPLETED->name]);
-
-            return $data;
-//            PaymentSuccessEvent::dispatch(Arr::pluck($this->transactions, 'id'), $data);
         }
+
+        return $data;
     }
 
     /**
@@ -140,7 +140,7 @@ class PaymentRepository
         return Payment::create($this->data);
     }
 
-    public function getPaymentData(int $providerId, string $providerType, PaymentType $type, PaymentSubtype $subtype): array
+    public function getPaymentData(int $providerId, string $providerType, PaymentType $type, PaymentSubtype $subtype, Status $status = null): array
     {
         return array_map(fn($transaction) => [
             'payable_type'  => PayableType::TRANSACTION->name,
@@ -148,7 +148,7 @@ class PaymentRepository
             'amount'        => $transaction["amount"],
             'type'          => $type->name,
             'subtype'       => $subtype->name,
-            'status'        => Status::PENDING->name,
+            'status'        => $status->name ?? Status::PENDING->name,
             'provider_id'   => $providerId,
             'provider_type' => $providerType,
             "created_at"    => now(),

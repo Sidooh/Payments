@@ -51,41 +51,25 @@ class MpesaEventRepository extends EventRepository
         $payments->update(["status" => Status::COMPLETED->name]);
 
         $purchaseData = match ($stkCallback->request->reference) {
-            MpesaReference::AIRTIME => [
-                'phone'   => count($otherPhone) > 1
-                    ? $otherPhone[1]
+            MpesaReference::AIRTIME, MpesaReference::PAY_VOUCHER => [
+                'phone' => count($otherPhone) > 1 ? $otherPhone[1]
                     : $stkCallback->PhoneNumber ?? $stkCallback->request->phone,
-                "product" => "airtime"
-            ],
-            MpesaReference::PAY_SUBSCRIPTION,
-            MpesaReference::PRE_AGENT_REGISTER_ASPIRING,
-            MpesaReference::PRE_AGENT_REGISTER_THRIVING,
-            MpesaReference::AGENT_REGISTER,
-            MpesaReference::AGENT_REGISTER_ASPIRING,
-            MpesaReference::AGENT_REGISTER_THRIVING => [
-                "product" => "subscription"
-            ],
-            MpesaReference::PAY_VOUCHER => [
-                'phone'   => count($otherPhone) > 1
-                    ? $otherPhone[1]
-                    : $stkCallback->PhoneNumber ?? $stkCallback->request->phone,
-                "product" => "voucher",
             ],
             MpesaReference::PAY_UTILITY => [
                 'account'  => $otherPhone[1],
                 'provider' => explode(" ", $stkCallback->request->description)[0],
-                'product'  => 'utility'
             ],
+            default => []
         };
 
-        if($purchaseData["product"] === "voucher") {
+        $data = array_merge($purchaseData, $payments->get());
+
+        if($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
             $accountId = SidoohAccounts::findByPhone($purchaseData['phone'])['id'];
 
-            VoucherRepository::credit($accountId, $stkCallback->amount, Description::VOUCHER_PURCHASE->value, true);
+            VoucherRepository::credit($accountId, $stkCallback->amount, Description::VOUCHER_PURCHASE, true);
         } else {
-            $purchaseData['amount'] = $stkCallback->amount;
-
-            SidoohProducts::requestPurchase($payments->pluck('payable_id')->toArray(), $purchaseData);
+            SidoohProducts::requestPurchase($data);
         }
     }
 }

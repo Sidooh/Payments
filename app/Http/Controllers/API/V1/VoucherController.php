@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Enums\Description;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VoucherRequest;
 use App\Models\Voucher;
@@ -37,7 +38,7 @@ class VoucherController extends Controller
 
         $accountId = $request->input("account_id");
         $amount = $request->input("amount");
-        $description = $request->input("description");
+        $description = Description::from($request->input("description"));
         $notify = $request->boolean("notify");
 
         return VoucherRepository::credit($accountId, $amount, $description, $notify);
