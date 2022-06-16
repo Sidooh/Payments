@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
-    Route::prefix('/payments')->group(function() {
+Route::middleware('auth.jwt')->prefix('/v1')->group(function () {
+    Route::prefix('/payments')->group(function () {
         Route::post('/', PaymentController::class);
         Route::post('/voucher/credit', [VoucherController::class, 'credit']);
         Route::post('/voucher/debit', [VoucherController::class, 'deposit']);
@@ -28,3 +28,9 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
     Route::get('/accounts/{accountId}/vouchers', [VoucherController::class, "getAccountVouchers"]);
     Route::get('/vouchers/{voucher}', [VoucherController::class, "show"]);
 });
+
+Route::middleware('throttle:3,60')->prefix('/v1')->group(function () {
+    Route::get('payments/mpesa/status/query', [PaymentController::class, "queryMpesaStatus"])->name('payments.mpesa.status.query');
+});
+
+

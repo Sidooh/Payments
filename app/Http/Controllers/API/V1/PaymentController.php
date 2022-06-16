@@ -10,6 +10,7 @@ use App\Repositories\PaymentRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\ArrayShape;
 use Throwable;
@@ -20,14 +21,14 @@ class PaymentController extends Controller
      * Handle the incoming request.
      *
      * @param Request $request
-     * @throws Throwable
      * @return JsonResponse
+     * @throws Throwable
      */
     public function __invoke(Request $request): JsonResponse
     {
         $request->validate([
             "transactions" => ['required', 'array'],
-            "data"         => ["required", "array"],
+            "data" => ["required", "array"],
             "total_amount" => "required|numeric"
         ]);
 
@@ -58,5 +59,12 @@ class PaymentController extends Controller
             "payment" => Payment::wherePayableId($transactionId)->first()->toArray(),
             "voucher" => Voucher::whereAccountId($accountId)->first()->toArray()
         ];
+    }
+
+    public function queryMpesaStatus(): JsonResponse
+    {
+        $exitCode = Artisan::call('mpesa:query_stk_status');
+
+        return response()->json(['Status' => $exitCode]);
     }
 }
