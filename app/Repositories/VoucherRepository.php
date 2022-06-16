@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\Enums\Description;
 use App\Enums\TransactionType;
 use App\Enums\VoucherType;
-use App\Events\VoucherPurchaseEvent;
 use App\Helpers\ApiResponse;
 use App\Models\FloatAccount;
 use App\Models\FloatAccountTransaction;
@@ -37,7 +36,8 @@ class VoucherRepository
             'description' => $description
         ]);
 
-        if($notify) VoucherPurchaseEvent::dispatch($voucher, $amount);
+//        Will handle notifications in products service
+//        if($notify) VoucherPurchaseEvent::dispatch($voucher, $amount);
 
         return $voucher;
     }

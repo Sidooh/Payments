@@ -94,6 +94,7 @@ class PaymentRepository
         Payment::insert($paymentData);
 
         $data["payments"] = $paymentData;
+        $data["vouchers"][] = $voucher;
 
         $productType = ProductType::from($this->transactions[0]["product_id"]);
         if($productType === ProductType::UTILITY) $data["provider"] = $this->data["provider"];
