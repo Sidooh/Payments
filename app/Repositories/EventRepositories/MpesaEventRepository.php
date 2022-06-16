@@ -29,6 +29,7 @@ class MpesaEventRepository extends EventRepository
         $p->status = Status::FAILED->name;
         $p->save();
 
+//        TODO: Refactor to pass data like success payment callback
         SidoohProducts::paymentCallback($p->payable_id, $p->payable_type, Status::FAILED);
 
         //  TODO: Can we inform the user of the actual issue?
@@ -69,7 +70,7 @@ class MpesaEventRepository extends EventRepository
 
             VoucherRepository::credit($accountId, $stkCallback->amount, Description::VOUCHER_PURCHASE, true);
         } else {
-            SidoohProducts::requestPurchase($data);
+            SidoohProducts::paymentCallback($data);
         }
     }
 }
