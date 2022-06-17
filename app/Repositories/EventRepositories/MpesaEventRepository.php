@@ -30,7 +30,7 @@ class MpesaEventRepository extends EventRepository
         $p->save();
 
 //        TODO: Refactor to pass data like success payment callback
-        SidoohProducts::paymentCallback($p->payable_id, $p->payable_type, Status::FAILED);
+        SidoohProducts::paymentCallback(["payments" => $p->get()->toArray()]);
 
         //  TODO: Can we inform the user of the actual issue?
         $message = match ($stkCallback->ResultCode) {
