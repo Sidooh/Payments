@@ -26,7 +26,7 @@ class VoucherPurchaseSuccess
      */
     public function handle(VoucherPurchaseEvent $event): void
     {
-        Log::info('--- --- --- --- ---   ...[EVENT]: Voucher Purchase Success...   --- --- --- --- ---');
+        Log::info('...[EVENT]: Voucher Purchase Success...');
 
         VoucherEventRepo::voucherPurchaseSuccess($event->voucher, $event->amount);
     }

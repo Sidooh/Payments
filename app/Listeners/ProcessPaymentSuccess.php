@@ -26,7 +26,7 @@ class ProcessPaymentSuccess
      */
     public function handle(PaymentSuccessEvent $event): void
     {
-        Log::info('--- --- --- --- ---   ...[EVENT]: Process Payment Success...   --- --- --- --- ---');
+        Log::info('...[EVENT]: Process Payment Success...');
 
         $response = SidoohProducts::requestPurchase($event->transactions, $event->data);
 

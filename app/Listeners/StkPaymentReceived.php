@@ -25,7 +25,7 @@ class StkPaymentReceived
      */
     public function handle(StkPushPaymentSuccessEvent $event): void
     {
-        Log::info('--- --- --- --- ---   ...[EVENT]: STK Payment Received...   --- --- --- --- ---');
+        Log::info('...[EVENT]: STK Payment Received...');
 
         MpesaEventRepository::stkPaymentReceived($event->stkCallback);
     }
