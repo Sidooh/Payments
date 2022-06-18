@@ -31,7 +31,7 @@ class SidoohProducts extends SidoohService
      */
     public static function paymentCallback(array $data): PromiseInterface|Response
     {
-        Log::info('--- --- ---   ...[SRV - PRODUCTS]: Payment Callback...   --- --- ---', $data);
+        Log::info('...[SRV - PRODUCTS]: Payment Callback...', $data);
 
         $url = config("services.sidooh.services.products.url") . "/payments/callback";
 

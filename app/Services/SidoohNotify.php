@@ -9,7 +9,7 @@ class SidoohNotify extends SidoohService
 {
     public static function notify(array $to, string $message, EventType $eventType)
     {
-        Log::info('--- --- --- --- ---   ...[SRV - NOTIFY]: Send Notification...   --- --- --- --- ---', [
+        Log::info('...[SRV - NOTIFY]: Send Notification...', [
             "channel"     => "sms",
             "event_type"  => $eventType->value,
             "destination" => implode(', ', $to),
@@ -25,7 +25,7 @@ class SidoohNotify extends SidoohService
             "content"     => $message
         ])->json();
 
-        Log::info('--- --- --- --- ---   ...[SRV - NOTIFY]: Notification Sent...   --- --- --- --- ---', $response);
+        Log::info('...[SRV - NOTIFY]: Notification Sent...', $response);
 
         return $response;
     }
