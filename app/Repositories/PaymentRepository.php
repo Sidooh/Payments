@@ -79,6 +79,7 @@ class PaymentRepository
             'type' => VoucherType::SIDOOH
         ]);
 
+        // TODO: Return proper response, rather than throwing error
         if($voucher->balance < (int)$this->amount) throw new Exception("Insufficient voucher balance!");
 
         $paymentData = $this->getPaymentData($voucher->id, $voucher->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER, Status::COMPLETED);

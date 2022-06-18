@@ -5,6 +5,7 @@ namespace App\Repositories\EventRepositories;
 use App\Enums\Description;
 use App\Enums\EventType;
 use App\Enums\MpesaReference;
+use App\Enums\PaymentSubtype;
 use App\Enums\Status;
 use App\Models\Payment;
 use App\Repositories\VoucherRepository;
@@ -22,7 +23,7 @@ class MpesaEventRepository extends EventRepository
     public static function stkPaymentFailed($stkCallback)
     {
         // TODO: Make into a transaction/try catch?
-        $p = Payment::whereProviderId($stkCallback->request->id)->whereSubtype('STK')->firstOrFail();
+        $p = Payment::whereProviderId($stkCallback->request->id)->whereSubtype(PaymentSubtype::STK->name)->firstOrFail();
 
         if($p->status == Status::FAILED->name) return;
 
@@ -30,7 +31,7 @@ class MpesaEventRepository extends EventRepository
         $p->save();
 
 //        TODO: Refactor to pass data like success payment callback
-        SidoohProducts::paymentCallback(["payments" => $p->get()->toArray()]);
+        SidoohProducts::paymentCallback(["payments" => $p->toArray()]);
 
         //  TODO: Can we inform the user of the actual issue?
         $message = match ($stkCallback->ResultCode) {
@@ -48,7 +49,7 @@ class MpesaEventRepository extends EventRepository
     {
         $otherPhone = explode(" - ", $stkCallback->request->description);
 
-        $payments = Payment::whereProviderId($stkCallback->request->id)->whereSubtype('STK');
+        $payments = Payment::whereProviderId($stkCallback->request->id)->whereSubtype(PaymentSubtype::STK->name);
         $payments->update(["status" => Status::COMPLETED->name]);
 
         $purchaseData = match ($stkCallback->request->reference) {
