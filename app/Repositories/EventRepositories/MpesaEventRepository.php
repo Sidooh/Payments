@@ -13,6 +13,7 @@ use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use App\Services\SidoohProducts;
 use DrH\Mpesa\Entities\MpesaStkCallback;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class MpesaEventRepository extends EventRepository
@@ -47,31 +48,35 @@ class MpesaEventRepository extends EventRepository
      */
     public static function stkPaymentReceived(MpesaStkCallback $stkCallback)
     {
-        $otherPhone = explode(" - ", $stkCallback->request->description);
+        $payment = Payment::whereProviderId($stkCallback->request->id)
+            ->whereSubtype(PaymentSubtype::STK->name)
+            ->firstOrFail();
+        $payment->update(["status" => Status::COMPLETED->name]);
 
-        $payments = Payment::whereProviderId($stkCallback->request->id)->whereSubtype(PaymentSubtype::STK->name);
-        $payments->update(["status" => Status::COMPLETED->name]);
+        Log::info('...[REPO]: Payment updated...', [$payment]);
 
         $purchaseData = match ($stkCallback->request->reference) {
             MpesaReference::AIRTIME, MpesaReference::PAY_VOUCHER => [
-                'phone' => count($otherPhone) > 1 ? $otherPhone[1]
-                    : $stkCallback->PhoneNumber ?? $stkCallback->request->phone,
+                'phone' => $payment->details,
             ],
             MpesaReference::PAY_UTILITY => [
-                'account'  => $otherPhone[1],
+                'account'  => $payment->details,
                 'provider' => explode(" ", $stkCallback->request->description)[0],
             ],
             default => []
         };
 
-        $data = array_merge($purchaseData, ["payments" => $payments->get()->toArray()]);
+        $data = array_merge($purchaseData, ["payments" => [$payment->toArray()]]);
 
         if($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
-            $accountId = SidoohAccounts::findByPhone($purchaseData['phone'])['id'];
+            // TODO: If you purchase for self using other MPESA, this fails!!!
+            $accountId = SidoohAccounts::findByPhone($payment->details)['id'];
 
-            VoucherRepository::credit($accountId, $stkCallback->amount, Description::VOUCHER_PURCHASE, true);
-        } else {
-            SidoohProducts::paymentCallback($data);
+            $voucher = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE, true);
+
+            $data['vouchers'] = [$voucher];
         }
+
+        SidoohProducts::paymentCallback($data);
     }
 }

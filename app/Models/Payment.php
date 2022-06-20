@@ -16,6 +16,7 @@ class Payment extends Model
         'payable_type',
         'payable_id',
         'amount',
+        'details',
         'status',
         'type',
         'subtype',
