@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Enums\PaymentMethod;
+use App\Enums\VoucherType;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Voucher;
@@ -45,8 +46,6 @@ class PaymentController extends Controller
             default => throw new Exception("Unsupported payment method!")
         };
 
-//        PaymentCreated::dispatch($payment->toArray());
-
         return $this->successResponse($data, "Payment Created!");
     }
 
@@ -57,7 +56,9 @@ class PaymentController extends Controller
     {
         return [
             "payment" => Payment::wherePayableId($transactionId)->first()->toArray(),
-            "voucher" => Voucher::whereAccountId($accountId)->first()->toArray()
+            "voucher" => Voucher::firstOrCreate(['account_id' => $accountId], [
+                'type' => VoucherType::SIDOOH
+            ])->toArray()
         ];
     }
 
