@@ -24,15 +24,15 @@ class MpesaEventRepository extends EventRepository
     public static function stkPaymentFailed($stkCallback)
     {
         // TODO: Make into a transaction/try catch?
-        $p = Payment::whereProviderId($stkCallback->request->id)->whereSubtype(PaymentSubtype::STK->name)->firstOrFail();
+        $payment = Payment::whereProviderId($stkCallback->request->id)->whereSubtype(PaymentSubtype::STK->name)->firstOrFail();
 
-        if($p->status == Status::FAILED->name) return;
+        if($payment->status == Status::FAILED->name) return;
 
-        $p->status = Status::FAILED->name;
-        $p->save();
+        $payment->status = Status::FAILED->name;
+        $payment->save();
 
 //        TODO: Refactor to pass data like success payment callback
-        SidoohProducts::paymentCallback(["payments" => $p->toArray()]);
+        SidoohProducts::paymentCallback(["payments" => [$payment->toArray()]]);
 
         //  TODO: Can we inform the user of the actual issue?
         $message = match ($stkCallback->ResultCode) {
