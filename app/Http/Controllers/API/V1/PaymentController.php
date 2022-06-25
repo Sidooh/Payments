@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Enums\PayableType;
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentSubtype;
 use App\Enums\VoucherType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PaymentResource;
@@ -25,6 +27,19 @@ class PaymentController extends Controller
         $payments = Payment::latest()->get();
 
         return PaymentResource::collection($payments);
+    }
+
+    public function getByTransactionId(Request $request, int $transactionId): JsonResponse
+    {
+        $payment = Payment::select(["id", "provider_id", "provider_type", "amount", "status", "type", "subtype"])
+            ->wherePayableType(PayableType::TRANSACTION->name)->wherePayableId($transactionId)->first();
+
+        if($payment->subtype === PaymentSubtype::STK->name) $payment->load([
+            "provider:id,status,reference,checkout_request_id",
+            "provider.response:id,checkout_request_id,result_desc,amount,transaction_date"
+        ]);
+
+        return response()->json($payment);
     }
 
     /**
