@@ -5,12 +5,14 @@ namespace App\Http\Controllers\API\V1;
 use App\Enums\PaymentMethod;
 use App\Enums\VoucherType;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
 use App\Models\Voucher;
 use App\Repositories\PaymentRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\ArrayShape;
@@ -18,18 +20,25 @@ use Throwable;
 
 class PaymentController extends Controller
 {
+    public function index(): AnonymousResourceCollection
+    {
+        $payments = Payment::latest()->get();
+
+        return PaymentResource::collection($payments);
+    }
+
     /**
      * Handle the incoming request.
      *
      * @param Request $request
-     * @return JsonResponse
      * @throws Throwable
+     * @return JsonResponse
      */
     public function __invoke(Request $request): JsonResponse
     {
         $request->validate([
             "transactions" => ['required', 'array'],
-            "data" => ["required", "array"],
+            "data"         => ["required", "array"],
             "total_amount" => "required|numeric"
         ]);
 
