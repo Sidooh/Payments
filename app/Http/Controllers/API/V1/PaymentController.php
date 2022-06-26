@@ -35,8 +35,8 @@ class PaymentController extends Controller
             ->wherePayableType(PayableType::TRANSACTION->name)->wherePayableId($transactionId)->first();
 
         if($payment->subtype === PaymentSubtype::STK->name) $payment->load([
-            "provider:id,status,reference,checkout_request_id",
-            "provider.response:id,checkout_request_id,result_desc,amount,transaction_date"
+            "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
+            "provider.response:id,checkout_request_id,result_desc,created_at"
         ]);
 
         return response()->json($payment);
