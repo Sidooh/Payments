@@ -104,7 +104,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $type
- * @property string $balance
+ * @property int $balance
  * @property int $account_id
  * @property int|null $enterprise_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -132,8 +132,8 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $type
- * @property string $amount
- * @property string $description
+ * @property int $amount
+ * @property \App\Enums\Description $description
  * @property int $voucher_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
