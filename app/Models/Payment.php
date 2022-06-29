@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @mixin IdeHelperPayment
@@ -23,4 +24,9 @@ class Payment extends Model
         'provider_type',
         'provider_id',
     ];
+
+    public function provider(): MorphTo
+    {
+        return $this->morphTo();
+    }
 }
