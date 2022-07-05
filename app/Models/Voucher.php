@@ -40,7 +40,7 @@ class Voucher extends Model
     /**
      * ---------------------------------------- Relationships ----------------------------------------
      */
-    public function voucherTransaction(): HasMany
+    public function voucherTransactions(): HasMany
     {
         return $this->hasMany(VoucherTransaction::class);
     }
