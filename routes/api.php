@@ -43,11 +43,7 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/vouchers/{voucher}', [VoucherController::class, "show"]);
     });
 
-    Route::prefix('/mpesa')->group(function() {
-        Route::get('/stk', [MpesaController::class, "getSTKPayments"]);
-        Route::get('/c2b', [MpesaController::class, "getC2BPayments"]);
-        Route::get('/b2c', [MpesaController::class, "getB2CPayments"]);
-    });
+    Route::get('/mpesa/{subType}/payments', [MpesaController::class, "getBySubType"]);
 });
 
 Route::middleware('throttle:3,60')->prefix('/v1')->group(function() {
