@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Admin;
 
-use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use Carbon\Carbon;
@@ -30,8 +29,6 @@ class DashboardController extends Controller
             "total_payments_today" => $paymentsToday->count(),
 
             "recent_payments"  => $payments->take(70),
-            "pending_payments" => $payments->filter(fn(Payment $payment) => $payment->status === Status::PENDING->name)
-                ->values(),
         ]);
     }
 }

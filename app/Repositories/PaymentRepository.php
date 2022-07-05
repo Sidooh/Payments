@@ -90,7 +90,7 @@ class PaymentRepository
 
         $voucher->balance -= $this->amount;
         $voucher->save();
-        $voucher->voucherTransaction()->create([
+        $voucher->voucherTransactions()->create([
             'amount' => $this->amount,
             'type' => TransactionType::DEBIT->name,
             'description' => $this->transactions[0]["description"]

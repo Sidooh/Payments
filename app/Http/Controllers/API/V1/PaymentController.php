@@ -29,7 +29,12 @@ class PaymentController extends Controller
         return PaymentResource::collection($payments);
     }
 
-    public function getByTransactionId(Request $request, int $transactionId): JsonResponse
+    public function show(Payment $payment): PaymentResource
+    {
+        return PaymentResource::make($payment);
+    }
+
+    public function getByTransactionId(int $transactionId): JsonResponse
     {
         $payment = Payment::select(["id", "provider_id", "provider_type", "amount", "status", "type", "subtype"])
             ->wherePayableType(PayableType::TRANSACTION->name)->wherePayableId($transactionId)->first();
