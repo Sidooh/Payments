@@ -40,7 +40,7 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
     Route::prefix('/vouchers')->group(function() {
         Route::get('/', [AdminVoucherController::class, "index"]);
         Route::get('/transactions', [AdminVoucherController::class, "getTransactions"]);
-        Route::get('/vouchers/{voucher}', [VoucherController::class, "show"]);
+        Route::get('/{voucher}', [VoucherController::class, "show"]);
     });
 
     Route::get('/mpesa/{subType}/payments', [MpesaController::class, "getBySubType"]);

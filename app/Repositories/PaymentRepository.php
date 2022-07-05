@@ -86,15 +86,15 @@ class PaymentRepository
         // TODO: Return proper response, rather than throwing error
         if ($voucher->balance < (int)$this->amount) throw new Exception("Insufficient voucher balance!");
 
-        $paymentData = $this->getPaymentData($voucher->id, $voucher->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER, Status::COMPLETED);
-
         $voucher->balance -= $this->amount;
         $voucher->save();
-        $voucher->voucherTransactions()->create([
+        $voucherTransaction = $voucher->voucherTransactions()->create([
             'amount' => $this->amount,
             'type' => TransactionType::DEBIT->name,
             'description' => $this->transactions[0]["description"]
         ]);
+
+        $paymentData = $this->getPaymentData($voucherTransaction->id, $voucherTransaction->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER, Status::COMPLETED);
 
         Payment::insert($paymentData);
 

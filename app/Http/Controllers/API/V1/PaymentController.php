@@ -29,9 +29,18 @@ class PaymentController extends Controller
         return PaymentResource::collection($payments);
     }
 
-    public function show(Payment $payment): PaymentResource
+    public function show(Payment $payment): JsonResponse
     {
-        return PaymentResource::make($payment);
+        if($payment->subtype === PaymentSubtype::STK->name) $payment->load([
+            "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
+            "provider.response:id,checkout_request_id,result_desc,created_at"
+        ]);
+        
+        if($payment->subtype === PaymentSubtype::VOUCHER->name) $payment->load([
+            "provider:id,type,amount,description,created_at",
+        ]);
+
+        return response()->json($payment);
     }
 
     public function getByTransactionId(int $transactionId): JsonResponse
