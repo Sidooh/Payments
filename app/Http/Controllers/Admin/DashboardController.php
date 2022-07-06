@@ -18,7 +18,7 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request): JsonResponse
     {
-        $payments = Payment::select(["id", "amount", "type", "subtype", "status", "created_at"])->latest()->get();
+        $payments = Payment::select(["id", "amount", "type", "subtype", "status", "created_at", "updated_at"])->latest()->get();
         $paymentsToday = Payment::select(["amount", "created_at"])->whereDate("created_at", Carbon::today());
 
         return response()->json([
