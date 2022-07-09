@@ -32,7 +32,7 @@ class SidoohService
             'password' => "12345678"
         ]);
 
-        if($response->successful()) return $response->json()["token"];
+        if($response->successful()) return $response->json()["access_token"];
 
         return $response->throw()->json();
     }
