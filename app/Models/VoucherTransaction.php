@@ -6,6 +6,7 @@ use App\Enums\Description;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * @mixin IdeHelperVoucherTransaction
@@ -30,5 +31,9 @@ class VoucherTransaction extends Model
     public function voucher(): BelongsTo
     {
         return $this->belongsTo(Voucher::class);
+    }
+
+    public function payment(): MorphOne {
+        return $this->morphOne(Payment::class, 'provider');
     }
 }

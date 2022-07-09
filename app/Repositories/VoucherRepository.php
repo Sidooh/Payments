@@ -30,7 +30,7 @@ class VoucherRepository
         $voucher->balance += (double)$amount;
         $voucher->save();
 
-        $voucher->voucherTransaction()->create([
+        $voucher->voucherTransactions()->create([
             'amount'      => (double)$amount,
             'type'        => TransactionType::CREDIT->name,
             'description' => $description

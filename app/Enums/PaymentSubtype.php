@@ -8,6 +8,7 @@ enum PaymentSubtype
     case C2B;
     case B2C;
     case CBA;
+    case B2C;
     case WALLET;
     case VOUCHER;
     case FLOAT;
