@@ -9,12 +9,27 @@ use Laravel\Sanctum\Guard;
 
 class JWT extends Guard
 {
-    static function verify($token): bool
+    static function decode($token) {
+        // split the token
+        $tokenParts = explode('.', $token);
+        $payload = base64_decode($tokenParts[1]);
+
+        return json_decode($payload, true);
+    }
+
+    static function expiry($token): Carbon
+    {
+        $payload = self::decode($token);
+
+        return Carbon::createFromTimestamp($payload["exp"]);
+    }
+
+    static function verify($token)
     {
         try {
-            $secret = env('JWT_KEY');
+            $secret = config('services.sidooh.jwt_key');
 
-            if(!isset($secret)) throw new Exception("Invalid JWT key!");
+            if(!isset($secret)) exit('Invalid JWT key!');
 
             // split the token
             $tokenParts = explode('.', $token);
@@ -33,6 +48,7 @@ class JWT extends Guard
             $base64UrlSignature = base_64_url_encode($signature);
 
             // verify it matches the signature provided in the token
+
             if($tokenExpired) Log::debug("Token has expired.");
             if($base64UrlSignature !== $signatureProvided) Log::debug("Token is invalid.");
 
