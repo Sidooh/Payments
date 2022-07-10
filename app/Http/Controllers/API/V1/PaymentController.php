@@ -34,12 +34,12 @@ class PaymentController extends Controller
             "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
             "provider.response:id,checkout_request_id,result_desc,created_at"
         ]);
-        
+
         if($payment->subtype === PaymentSubtype::VOUCHER->name) $payment->load([
             "provider:id,type,amount,description,created_at",
         ]);
 
-        return response()->json($payment);
+        return $this->successResponse($payment);
     }
 
     public function getByTransactionId(int $transactionId): JsonResponse
@@ -51,19 +51,6 @@ class PaymentController extends Controller
             "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
             "provider.response:id,checkout_request_id,result_desc,created_at"
         ]);
-
-        return $this->successResponse($payment);
-    }
-
-    public function find(Request $request, Payment $payment): JsonResponse
-    {
-//        $payment = Payment::select(["id", "provider_id", "provider_type", "amount", "status", "type", "subtype"])
-//            ->wherePayableType(PayableType::PERSONAL_SAVING->name)->wherePayableId($savingsId)->first();
-//
-//        if($payment->subtype === PaymentSubtype::STK->name) $payment->load([
-//            "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
-//            "provider.response:id,checkout_request_id,result_desc,created_at"
-//        ]);
 
         return $this->successResponse($payment);
     }
@@ -116,7 +103,7 @@ class PaymentController extends Controller
     {
         $exitCode = Artisan::call('mpesa:query_stk_status');
 
-        return response()->json(['Status' => $exitCode]);
+        return $this->successResponse(['Status' => $exitCode]);
     }
 
     public function disburse(Request $request): JsonResponse

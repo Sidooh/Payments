@@ -90,7 +90,7 @@ class MpesaEventRepository extends EventRepository
                 ->firstOrFail();
             $payment->update(["status" => Status::COMPLETED->name]);
 
-            Log::info('...[REPO]: Payment updated...', [$payment]);
+            Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
 
             SidoohSavings::paymentCallback($payment);
         } catch (\Exception $e) {
@@ -98,8 +98,21 @@ class MpesaEventRepository extends EventRepository
         }
     }
 
-    public static function b2cPaymentFailed(MpesaBulkPaymentResponse $mpesaBulkPaymentResponse)
+    public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse)
     {
 //        TODO: Complete this!!!!
+
+        try {
+            $payment = Payment::whereProviderId($paymentResponse->request->id)
+                ->whereSubtype(PaymentSubtype::B2C->name)
+                ->firstOrFail();
+            $payment->update(["status" => Status::FAILED->name]);
+
+            Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
+
+            SidoohSavings::paymentCallback($payment);
+        } catch (\Exception $e) {
+            Log::error($e);
+        }
     }
 }

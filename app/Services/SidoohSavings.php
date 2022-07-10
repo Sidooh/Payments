@@ -20,6 +20,6 @@ class SidoohSavings extends SidoohService
 
         $url = config("services.sidooh.services.savings.url") . "/payments/callback";
 
-        return parent::http()->post($url, $payment->toArray())->throw();
+        return parent::fetch($url, 'POST', $payment->toArray())->throw();
     }
 }

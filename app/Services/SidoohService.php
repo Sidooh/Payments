@@ -42,9 +42,10 @@ class SidoohService
      */
     static function fetch(string $url, string $method = "GET", array $data = [])
     {
-        Log::info('...[SRV - ACCOUNTS]: Fetch...', [
-            "method" => $method,
-            "data"   => $data
+        Log::info('...[SRV - SIDOOH]: Fetch...', [
+            'url' => $url,
+            'method' => $method,
+            'data'   => $data
         ]);
 
         $options = strtoupper($method) === "POST"
@@ -52,8 +53,10 @@ class SidoohService
             : [];
 
         try {
+            $t = microtime(true);
             $response = self::http()->send($method, $url, $options)->throw()->json();
-            Log::info('...[SRV - SIDOOH]: Response...', $response);
+            $latency = round((microtime(true) - $t) * 1000, 2);
+            Log::info('...[SRV - SIDOOH]: Response... ' . $latency . 'ms', [$response]);
             return $response;
         } catch (Exception $err) {
             Log::error($err);
