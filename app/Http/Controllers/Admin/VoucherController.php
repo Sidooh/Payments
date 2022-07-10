@@ -22,7 +22,13 @@ class VoucherController extends Controller
             $vouchers = $vouchers->with("voucherTransactions:id,voucher_id,type,amount,description,created_at");
         }
 
-        return VoucherResource::collection($vouchers->get());
+        $vouchers = $vouchers->get();
+
+        if(in_array("account", $relations)) {
+            $vouchers = withRelation("account", $vouchers, "account_id", "id");
+        }
+
+        return VoucherResource::collection($vouchers);
     }
 
     public function getTransactions(Request $request): JsonResponse
