@@ -136,10 +136,7 @@ return [
          * Go to https://developer.safaricom.co.ke/test_credentials and paste your initiator password to generate
          * security credential
          */
-        'security_credential' => 'GXiVXirQFaJvEFOQyn+VJ4Gp3Ccvpoq6aqzFiNgvH18UMU59Qxc+UTAX7Blzo6L0+tQG2wUJ1fKH4YlPagt' .
-            'zDHT37796uu0NysS85uPjxZMjnbGhPNeHnhJLzwyrjppl8mZpnmVg4CaVrEdcriuyifKIiF1hmc0A/RnjBMzY6yevbIV0kAgrn5cDvCN' .
-            '99O1rr1nl69GaVbP7a/6AWnRkVUldnalQmqQhfgLbOdxjGOVGU2arqjuvgQ6glo1uK9PUnp3UH2Vv66Lu99JglWyjlcWufZhJXUmFFB9' .
-            'tfoKAX2URnPGi4PvvJ6OgJNdsJmTsevnG2c/KKOa45rzdvwrwKA==',
+        'security_credential' => 'KcU4MlDi8VXJMxaYS71NSEWmvenjeleJdmEHSTr1+datoe62P5WtT9d6A69fvNccjQgcpCxpuy9MDuNE6/1cA36SidNmGYDBN8gNov6LKlZgGAKrOkBvmDU5xD2OIZ9FggVK1Y4ZuAm2QFQ5zgqaD6QQRUJNde2g9yRnPdFupoSt/wnG3ArDSFBdeWt7cyP7U23GqEnEj7wh5IkubrzkoF/BNGdVljJAW5kf5QmjT58qG/LE2YXXScqyOKGO76LQL4go1Vwm65ceBY63G+vyMg6louITzHWrK4c/i3BEPijJrk3IOS43KnbnY6kNBhUWdhnVhBnONMOe2avBV2LJwg==',
         /*
          * Notification URL for timeout
          */

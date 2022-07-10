@@ -12,6 +12,8 @@ use App\Repositories\VoucherRepository;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use App\Services\SidoohProducts;
+use App\Services\SidoohSavings;
+use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkCallback;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -78,5 +80,39 @@ class MpesaEventRepository extends EventRepository
         }
 
         SidoohProducts::paymentCallback($data);
+    }
+
+    public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse)
+    {
+        try {
+            $payment = Payment::whereProviderId($paymentResponse->request->id)
+                ->whereSubtype(PaymentSubtype::B2C->name)
+                ->firstOrFail();
+            $payment->update(["status" => Status::COMPLETED->name]);
+
+            Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
+
+            SidoohSavings::paymentCallback($payment);
+        } catch (\Exception $e) {
+            Log::error($e);
+        }
+    }
+
+    public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse)
+    {
+//        TODO: Complete this!!!!
+
+        try {
+            $payment = Payment::whereProviderId($paymentResponse->request->id)
+                ->whereSubtype(PaymentSubtype::B2C->name)
+                ->firstOrFail();
+            $payment->update(["status" => Status::FAILED->name]);
+
+            Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
+
+            SidoohSavings::paymentCallback($payment);
+        } catch (\Exception $e) {
+            Log::error($e);
+        }
     }
 }

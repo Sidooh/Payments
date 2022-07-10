@@ -7,14 +7,13 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\VoucherType;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
 use App\Models\Voucher;
 use App\Repositories\PaymentRepository;
+use App\Repositories\WithdrawalRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use JetBrains\PhpStorm\ArrayShape;
@@ -22,11 +21,11 @@ use Throwable;
 
 class PaymentController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(): JsonResponse
     {
         $payments = Payment::latest()->get();
 
-        return PaymentResource::collection($payments);
+        return $this->successResponse($payments);
     }
 
     public function show(Payment $payment): JsonResponse
@@ -35,12 +34,12 @@ class PaymentController extends Controller
             "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
             "provider.response:id,checkout_request_id,result_desc,created_at"
         ]);
-        
+
         if($payment->subtype === PaymentSubtype::VOUCHER->name) $payment->load([
             "provider:id,type,amount,description,created_at",
         ]);
 
-        return response()->json($payment);
+        return $this->successResponse($payment);
     }
 
     public function getByTransactionId(int $transactionId): JsonResponse
@@ -53,7 +52,7 @@ class PaymentController extends Controller
             "provider.response:id,checkout_request_id,result_desc,created_at"
         ]);
 
-        return response()->json($payment);
+        return $this->successResponse($payment);
     }
 
     /**
@@ -104,6 +103,15 @@ class PaymentController extends Controller
     {
         $exitCode = Artisan::call('mpesa:query_stk_status');
 
-        return response()->json(['Status' => $exitCode]);
+        return $this->successResponse(['Status' => $exitCode]);
+    }
+
+    public function disburse(Request $request): JsonResponse
+    {
+        $repo = new WithdrawalRepository($request->all());
+
+        $response = $repo->mpesa();
+
+        return $this->successResponse($response);
     }
 }

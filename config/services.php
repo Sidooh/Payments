@@ -53,6 +53,10 @@ return [
             'products' => [
                 'enabled' => true,
                 'url'     => env("SIDOOH_PRODUCTS_API_URL")
+            ],
+            'savings' => [
+                'enabled' => true,
+                'url'     => env("SIDOOH_SAVINGS_API_URL")
             ]
         ],
     ],
