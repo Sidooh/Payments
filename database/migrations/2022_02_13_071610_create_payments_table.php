@@ -11,18 +11,17 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('payments', function(Blueprint $table) {
             $table->id();
 
-            $table->morphs('payable');
-            $table->decimal('amount');
-            $table->string('details');
-            $table->string('status', 15); // PENDING or COMPLETED
-            $table->string('type', 15); // ['MOBILE', 'SIDOOH', 'BANK', 'PAYPAL', 'OTHER'] payment methods?
-            $table->string('subtype', 15); // 'STK', 'C2B', 'CBA', 'WALLET', 'BONUS'
-            $table->morphs('provider');
+            $table->decimal("amount");
+            $table->string("details");
+            $table->string("status", 15); // PENDING or COMPLETED
+            $table->string("type", 15); // ['MOBILE', 'SIDOOH', 'BANK', 'PAYPAL', 'OTHER'] payment methods?
+            $table->string("subtype", 15); // 'STK', 'C2B', 'CBA', 'WALLET', 'BONUS'
+            $table->morphs("providable");
 
             $table->timestamps();
         });
@@ -33,7 +32,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('payments');
     }

@@ -7,8 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\VoucherRequest;
 use App\Models\Voucher;
 use App\Repositories\VoucherRepository;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -27,7 +25,7 @@ class VoucherController extends Controller
         return $vouchers->toArray();
     }
 
-    public function credit(Request $request): Model|Builder|Voucher
+    public function credit(Request $request): array
     {
         $request->validate([
             'account_id'  => ['required'],
