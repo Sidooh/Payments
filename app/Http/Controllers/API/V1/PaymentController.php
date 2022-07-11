@@ -25,7 +25,7 @@ class PaymentController extends Controller
     {
         $payments = Payment::latest()->get();
 
-        return $this->successResponse($payments);
+        return response()->json($payments);
     }
 
     public function show(Payment $payment): JsonResponse
@@ -39,7 +39,7 @@ class PaymentController extends Controller
             "provider:id,type,amount,description,created_at",
         ]);
 
-        return $this->successResponse($payment);
+        return response()->json($payment);
     }
 
     public function getByTransactionId(int $transactionId): JsonResponse
@@ -52,7 +52,7 @@ class PaymentController extends Controller
             "provider.response:id,checkout_request_id,result_desc,created_at"
         ]);
 
-        return $this->successResponse($payment);
+        return response()->json($payment);
     }
 
     /**
