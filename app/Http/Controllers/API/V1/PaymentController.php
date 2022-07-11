@@ -21,6 +21,37 @@ use Throwable;
 
 class PaymentController extends Controller
 {
+    /**
+     * Handle the incoming request.
+     *
+     * @param Request $request
+     * @throws Throwable
+     * @return JsonResponse
+     */
+    public function __invoke(Request $request): JsonResponse
+    {
+        $request->validate([
+            "transactions" => ['required', 'array'],
+            "data"         => ["required", "array"],
+            "total_amount" => "required|numeric"
+        ]);
+
+        $data = $request->all();
+
+        $repo = new PaymentRepository($data['transactions'], $data['total_amount'], $data['data']);
+
+        Log::info('...[CONTROLLER - PAYMENT]: Invoke...', $data);
+
+        $data = match ($request->input('method')) {
+            PaymentMethod::MPESA->name => $repo->mpesa(),
+            PaymentMethod::VOUCHER->name => $repo->voucher(),
+            PaymentMethod::FLOAT->name => $repo->float(),
+            default => throw new Exception("Unsupported payment method!")
+        };
+
+        return $this->successResponse($data, "Payment Created!");
+    }
+
     public function index(): JsonResponse
     {
         $payments = Payment::latest()->get();
@@ -53,37 +84,6 @@ class PaymentController extends Controller
         ]);
 
         return response()->json($payment);
-    }
-
-    /**
-     * Handle the incoming request.
-     *
-     * @param Request $request
-     * @throws Throwable
-     * @return JsonResponse
-     */
-    public function __invoke(Request $request): JsonResponse
-    {
-        $request->validate([
-            "transactions" => ['required', 'array'],
-            "data"         => ["required", "array"],
-            "total_amount" => "required|numeric"
-        ]);
-
-        $data = $request->all();
-
-        $repo = new PaymentRepository($data['transactions'], $data['total_amount'], $data['data']);
-
-        Log::info('...[CONTROLLER - PAYMENT]: Invoke...', $data);
-
-        $data = match ($request->input('method')) {
-            PaymentMethod::MPESA->name => $repo->mpesa(),
-            PaymentMethod::VOUCHER->name => $repo->voucher(),
-            PaymentMethod::FLOAT->name => $repo->float(),
-            default => throw new Exception("Unsupported payment method!")
-        };
-
-        return $this->successResponse($data, "Payment Created!");
     }
 
     #[ArrayShape([
