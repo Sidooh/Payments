@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\MpesaController;
-use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
+use App\Http\Controllers\API\V1\DashboardController;
+use App\Http\Controllers\API\V1\MpesaController;
 use App\Http\Controllers\API\V1\PaymentController;
 use App\Http\Controllers\API\V1\VoucherController;
 use Illuminate\Support\Facades\Route;
@@ -39,8 +38,8 @@ Route::middleware("auth.jwt")->prefix('/v1')->group(function() {
     Route::get('/dashboard', DashboardController::class);
 
     Route::prefix('/vouchers')->group(function() {
-        Route::get('/', [AdminVoucherController::class, "index"]);
-        Route::get('/transactions', [AdminVoucherController::class, "getTransactions"]);
+        Route::get('/', [VoucherController::class, "index"]);
+        Route::get('/transactions', [VoucherController::class, "getTransactions"]);
         Route::get('/{voucher}', [VoucherController::class, "show"]);
     });
 
