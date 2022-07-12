@@ -23,7 +23,7 @@ class Payment extends Model
         'subtype',
     ];
 
-    public function provider(): MorphTo
+    public function providable(): MorphTo
     {
         return $this->morphTo();
     }

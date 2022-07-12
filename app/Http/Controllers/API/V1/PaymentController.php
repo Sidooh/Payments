@@ -65,12 +65,12 @@ class PaymentController extends Controller
     public function show(Payment $payment): JsonResponse
     {
         if($payment->subtype === PaymentSubtype::STK->name) $payment->load([
-            "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
-            "provider.response:id,checkout_request_id,result_desc,created_at"
+            "providable:id,status,reference,checkout_request_id,amount,phone,created_at",
+            "providable.response:id,checkout_request_id,result_desc,created_at"
         ]);
 
         if($payment->subtype === PaymentSubtype::VOUCHER->name) $payment->load([
-            "provider:id,type,amount,description,created_at",
+            "providable:id,type,amount,description,created_at",
         ]);
 
         return response()->json($payment);
