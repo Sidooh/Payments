@@ -42,14 +42,18 @@ class PaymentController extends Controller
 
         Log::info('...[CONTROLLER - PAYMENT]: Invoke...', $data);
 
-        $data = match ($request->input('method')) {
-            PaymentMethod::MPESA->name => $repo->mpesa(),
-            PaymentMethod::VOUCHER->name => $repo->voucher(),
-            PaymentMethod::FLOAT->name => $repo->float(),
-            default => throw new Exception("Unsupported payment method!")
-        };
+        try {
+            $data = match ($request->input('method')) {
+                PaymentMethod::MPESA->name => $repo->mpesa(),
+                PaymentMethod::VOUCHER->name => $repo->voucher(),
+                PaymentMethod::FLOAT->name => $repo->float(),
+                default => throw new Exception("Unsupported payment method!")
+            };
 
-        return $this->successResponse($data, "Payment Created!");
+            return $this->successResponse($data, "Payment Created!");
+        } catch (Exception $err) {
+            return $this->errorResponse($err->getMessage(), $err->getCode());
+        }
     }
 
     public function index(): JsonResponse
