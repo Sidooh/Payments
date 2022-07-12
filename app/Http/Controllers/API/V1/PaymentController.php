@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API\V1;
 
-use App\Enums\PayableType;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\VoucherType;
@@ -42,14 +41,18 @@ class PaymentController extends Controller
 
         Log::info('...[CONTROLLER - PAYMENT]: Invoke...', $data);
 
-        $data = match ($request->input('method')) {
-            PaymentMethod::MPESA->name => $repo->mpesa(),
-            PaymentMethod::VOUCHER->name => $repo->voucher(),
-            PaymentMethod::FLOAT->name => $repo->float(),
-            default => throw new Exception("Unsupported payment method!")
-        };
+        try {
+            $data = match ($request->input('method')) {
+                PaymentMethod::MPESA->name => $repo->mpesa(),
+                PaymentMethod::VOUCHER->name => $repo->voucher(),
+                PaymentMethod::FLOAT->name => $repo->float(),
+                default => throw new Exception("Unsupported payment method!")
+            };
 
-        return $this->successResponse($data, "Payment Created!");
+            return $this->successResponse($data, "Payment Created!");
+        } catch (Exception $err) {
+            return $this->errorResponse($err->getMessage(), $err->getCode());
+        }
     }
 
     public function index(): JsonResponse
@@ -76,7 +79,7 @@ class PaymentController extends Controller
     public function getByTransactionId(int $transactionId): JsonResponse
     {
         $payment = Payment::select(["id", "provider_id", "provider_type", "amount", "status", "type", "subtype"])
-            ->wherePayableType(PayableType::TRANSACTION->name)->wherePayableId($transactionId)->first();
+            ->whereProvidableId($transactionId)->first();
 
         if($payment->subtype === PaymentSubtype::STK->name) $payment->load([
             "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
@@ -89,10 +92,10 @@ class PaymentController extends Controller
     #[ArrayShape([
         "payment" => "array",
         "voucher" => "array"
-    ])] public function findDetails(int $transactionId, int $accountId): array
+    ])] public function findDetails(int $paymentId, int $accountId): array
     {
         return [
-            "payment" => Payment::wherePayableId($transactionId)->first()->toArray(),
+            "payment" => Payment::find($paymentId),
             "voucher" => Voucher::firstOrCreate(['account_id' => $accountId], [
                 'type' => VoucherType::SIDOOH
             ])->toArray()

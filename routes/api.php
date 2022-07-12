@@ -28,7 +28,7 @@ Route::middleware("auth.jwt")->prefix('/v1')->group(function() {
         Route::post('/voucher/credit', [VoucherController::class, 'credit']);
         Route::post('/voucher/disburse', [VoucherController::class, 'disburse']);
 
-        Route::get("/details/{transactionId}/{accountId}", [PaymentController::class, "findDetails"]);
+        Route::get("/{transactionId}/details/{accountId}", [PaymentController::class, "findDetails"]);
 
         Route::post("/disburse", [PaymentController::class, 'disburse']);
     });
