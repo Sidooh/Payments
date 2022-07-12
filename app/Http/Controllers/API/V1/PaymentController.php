@@ -109,6 +109,9 @@ class PaymentController extends Controller
         return $this->successResponse(['Status' => $exitCode]);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function disburse(Request $request): JsonResponse
     {
         $repo = new WithdrawalRepository($request->all());
