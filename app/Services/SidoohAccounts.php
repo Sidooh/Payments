@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Log;
 class SidoohAccounts extends SidoohService
 {
     /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
+    static function getAll(): array
+    {
+        Log::info('...[SRV - ACCOUNTS]: Get All...');
+
+        $url = config('services.sidooh.services.accounts.url') . "/accounts";
+
+        return parent::fetch($url);
+    }
+    
+    /**
      * @throws Exception
      */
     static function find($id): array

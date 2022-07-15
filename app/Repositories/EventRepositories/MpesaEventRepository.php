@@ -26,7 +26,7 @@ class MpesaEventRepository extends EventRepository
     public static function stkPaymentFailed($stkCallback)
     {
         // TODO: Make into a transaction/try catch?
-        $payment = Payment::whereProviderId($stkCallback->request->id)->whereSubtype(PaymentSubtype::STK->name)->firstOrFail();
+        $payment = Payment::whereProvidableId($stkCallback->request->id)->whereSubtype(PaymentSubtype::STK->name)->firstOrFail();
 
         if($payment->status == Status::FAILED->name) return;
 
@@ -50,7 +50,7 @@ class MpesaEventRepository extends EventRepository
      */
     public static function stkPaymentReceived(MpesaStkCallback $stkCallback)
     {
-        $payment = Payment::whereProviderId($stkCallback->request->id)
+        $payment = Payment::whereProvidableId($stkCallback->request->id)
             ->whereSubtype(PaymentSubtype::STK->name)
             ->firstOrFail();
         $payment->update(["status" => Status::COMPLETED->name]);
@@ -85,7 +85,7 @@ class MpesaEventRepository extends EventRepository
     public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse)
     {
         try {
-            $payment = Payment::whereProviderId($paymentResponse->request->id)
+            $payment = Payment::whereProvidableId($paymentResponse->request->id)
                 ->whereSubtype(PaymentSubtype::B2C->name)
                 ->firstOrFail();
             $payment->update(["status" => Status::COMPLETED->name]);
@@ -103,7 +103,7 @@ class MpesaEventRepository extends EventRepository
 //        TODO: Complete this!!!!
 
         try {
-            $payment = Payment::whereProviderId($paymentResponse->request->id)
+            $payment = Payment::whereProvidableId($paymentResponse->request->id)
                 ->whereSubtype(PaymentSubtype::B2C->name)
                 ->firstOrFail();
             $payment->update(["status" => Status::FAILED->name]);

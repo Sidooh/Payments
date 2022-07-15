@@ -14,18 +14,16 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'payable_type',
-        'payable_id',
+        'providable_type',
+        'providable_id',
         'amount',
         'details',
         'status',
         'type',
         'subtype',
-        'provider_type',
-        'provider_id',
     ];
 
-    public function provider(): MorphTo
+    public function providable(): MorphTo
     {
         return $this->morphTo();
     }

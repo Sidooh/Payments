@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\API\V1;
 
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;

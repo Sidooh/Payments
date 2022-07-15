@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Helpers\ApiResponse;
 use App\Helpers\JWT;
+use Cache;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +29,8 @@ class JWTAuth
         $token = $request->bearerToken();
 
         if(!JWT::verify($token)) throw new AuthenticationException();
+
+        Cache::put('auth_token', $token, JWT::expiry($token)->diffInMinutes());
 
         return $next($request);
     }

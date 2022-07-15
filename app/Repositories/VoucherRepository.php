@@ -11,8 +11,6 @@ use App\Models\FloatAccountTransaction;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -20,7 +18,7 @@ class VoucherRepository
 {
     use ApiResponse;
 
-    public static function credit(int $accountId, $amount, Description $description, bool $notify = false): Model|Builder|Voucher
+    public static function credit(int $accountId, $amount, Description $description, bool $notify = false): array
     {
         $voucher = Voucher::firstOrCreate([
             "account_id" => $accountId,
@@ -39,7 +37,7 @@ class VoucherRepository
 //        Will handle notifications in products service
 //        if($notify) VoucherPurchaseEvent::dispatch($voucher, $amount);
 
-        return $voucher;
+        return $voucher->only(["type", "balance", "account_id"]);
     }
 
     /**

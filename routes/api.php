@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\MpesaController;
-use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
+use App\Http\Controllers\API\V1\DashboardController;
+use App\Http\Controllers\API\V1\MpesaController;
 use App\Http\Controllers\API\V1\PaymentController;
 use App\Http\Controllers\API\V1\VoucherController;
 use Illuminate\Support\Facades\Route;
@@ -18,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
+Route::middleware("auth.jwt")->prefix('/v1')->group(function() {
     Route::prefix('/payments')->group(function() {
         Route::get('/', [PaymentController::class, "index"]);
         Route::get('/{payment}', [PaymentController::class, "show"]);
@@ -26,10 +25,9 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
 
         Route::post('/', PaymentController::class);
         Route::post('/voucher/credit', [VoucherController::class, 'credit']);
-//        Route::post('/voucher/debit', [VoucherController::class, 'deposit']);
         Route::post('/voucher/disburse', [VoucherController::class, 'disburse']);
 
-        Route::get("/details/{transactionId}/{accountId}", [PaymentController::class, "findDetails"]);
+        Route::get("/{transactionId}/details/{accountId}", [PaymentController::class, "findDetails"]);
 
         Route::post("/disburse", [PaymentController::class, 'disburse']);
     });
@@ -40,8 +38,8 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
     Route::get('/dashboard', DashboardController::class);
 
     Route::prefix('/vouchers')->group(function() {
-        Route::get('/', [AdminVoucherController::class, "index"]);
-        Route::get('/transactions', [AdminVoucherController::class, "getTransactions"]);
+        Route::get('/', [VoucherController::class, "index"]);
+        Route::get('/transactions', [VoucherController::class, "getTransactions"]);
         Route::get('/{voucher}', [VoucherController::class, "show"]);
     });
 
@@ -52,5 +50,3 @@ Route::middleware('throttle:3,60')->prefix('/v1')->group(function() {
     Route::get('payments/mpesa/status/query', [PaymentController::class, "queryMpesaStatus"])
         ->name('payments.mpesa.status.query');
 });
-
-

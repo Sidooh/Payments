@@ -31,6 +31,7 @@ return [
     ],
 
     'sidooh' => [
+        "jwt_key" => env("JWT_KEY"),
         'tagline'            => 'Sidooh, Makes You Money with Every Purchase.',
         'mpesa'              => [
             'env' => 'local',
