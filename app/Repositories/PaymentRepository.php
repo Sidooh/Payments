@@ -61,14 +61,17 @@ class PaymentRepository
         } catch (MpesaException $e) {
 //            TODO: Inform customer of issue?
             Log::critical($e);
-            return null;
+            return [];
         }
 
         $paymentData = $this->getPaymentData($stkResponse->id, $stkResponse->getMorphClass(), PaymentType::MPESA, PaymentSubtype::STK);
         if ($productType == ProductType::VOUCHER)
             $paymentData[0]['details'] = $this->transactions[0]['destination'];
 
-        Payment::insert($paymentData);
+//        TODO: Use create and return msema ukweli data from db
+        $payment = Payment::create($paymentData[0]);
+        $data["payments"] = [$payment];
+        return $data;
     }
 
     /**
@@ -96,6 +99,7 @@ class PaymentRepository
 
         $paymentData = $this->getPaymentData($voucherTransaction->id, $voucherTransaction->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER, Status::COMPLETED);
 
+//        TODO: Use create and return msema ukweli data from db
         Payment::insert($paymentData);
 
         $data["payments"] = $paymentData;
