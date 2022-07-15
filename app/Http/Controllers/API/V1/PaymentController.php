@@ -51,7 +51,8 @@ class PaymentController extends Controller
 
             return $this->successResponse($data, "Payment Created!");
         } catch (Exception $err) {
-            return $this->errorResponse($err->getMessage(), $err->getCode());
+            Log::error($err);
+            return $this->errorResponse("Failed to create payment");
         }
     }
 
