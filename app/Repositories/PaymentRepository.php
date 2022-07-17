@@ -56,7 +56,7 @@ class PaymentRepository
 
         try {
 //            TODO: Change to actual amount on production
-            $stkResponse = mpesa_request($number, 1, $reference, $this->transactions[0]["description"]);
+            $stkResponse = mpesa_request($number, 1, $reference);
 
             $paymentData = $this->getPaymentData($stkResponse->id, $stkResponse->getMorphClass(), PaymentType::MPESA, PaymentSubtype::STK);
             if($productType == ProductType::VOUCHER) $paymentData[0]['details'] = $this->transactions[0]['destination'];

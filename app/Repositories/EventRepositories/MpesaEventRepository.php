@@ -57,18 +57,7 @@ class MpesaEventRepository extends EventRepository
 
         Log::info('...[REPO]: Payment updated...', [$payment]);
 
-        $purchaseData = match ($stkCallback->request->reference) {
-            MpesaReference::AIRTIME, MpesaReference::PAY_VOUCHER => [
-                'phone' => $payment->details,
-            ],
-            MpesaReference::PAY_UTILITY => [
-                'account'  => $payment->details,
-                'provider' => explode(" ", $stkCallback->request->description)[0],
-            ],
-            default => []
-        };
-
-        $data = array_merge($purchaseData, ["payments" => [$payment->toArray()]]);
+        $data['payments'] = [$payment->toArray()];
 
         if($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
             // TODO: If you purchase for self using other MPESA, this fails!!!
