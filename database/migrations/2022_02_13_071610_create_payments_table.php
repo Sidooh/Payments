@@ -17,11 +17,12 @@ return new class extends Migration
             $table->id();
 
             $table->decimal("amount");
-            $table->string("details");
             $table->string("status", 15); // PENDING or COMPLETED
             $table->string("type", 15); // ['MOBILE', 'SIDOOH', 'BANK', 'PAYPAL', 'OTHER'] payment methods?
             $table->string("subtype", 15); // 'STK', 'C2B', 'CBA', 'WALLET', 'BONUS'
             $table->morphs("providable");
+            $table->string("description")->nullable();
+            $table->string('reference')->nullable(); // external party reference
 
             $table->timestamps();
         });

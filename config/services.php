@@ -41,6 +41,7 @@ return [
                 'max_amount' => '70000',
             ],
         ],
+        'country_code' => env('COUNTRY_CODE', 'KE'),
         'services'           => [
             'notify'   => [
                 'enabled' => true,

@@ -18,26 +18,48 @@ class VoucherRepository
 {
     use ApiResponse;
 
-    public static function credit(int $accountId, $amount, Description $description, bool $notify = false): array
+    public static function credit(int $accountId, float $amount, Description $description): array
     {
         $voucher = Voucher::firstOrCreate([
             "account_id" => $accountId,
             "type" => VoucherType::SIDOOH
         ]);
 
-        $voucher->balance += (double)$amount;
+        $voucher->balance += $amount;
         $voucher->save();
 
-        $voucher->voucherTransactions()->create([
-            'amount'      => (double)$amount,
-            'type'        => TransactionType::CREDIT->name,
+        $transaction = $voucher->voucherTransactions()->create([
+            'amount'      => $amount,
+            'type'        => TransactionType::CREDIT,
             'description' => $description
         ]);
 
-//        Will handle notifications in products service
-//        if($notify) VoucherPurchaseEvent::dispatch($voucher, $amount);
+        return [$voucher->only(["type", "balance", "account_id"]), $transaction];
+    }
 
-        return $voucher->only(["type", "balance", "account_id"]);
+    /**
+     * @throws Exception
+     */
+    public static function debit(int $accountId, float $amount, Description $description): array
+    {
+        $voucher = Voucher::firstOrCreate([
+            "account_id" => $accountId,
+            "type" => VoucherType::SIDOOH
+        ]);
+
+        // TODO: Return proper response/ create specific error type, rather than throwing error
+        if ($voucher->balance < $amount) throw new Exception("Insufficient voucher balance.", 422);
+
+        $voucher->balance -= $amount;
+        $voucher->save();
+
+        $transaction = $voucher->voucherTransactions()->create([
+            'amount'      => $amount,
+            'type'        => TransactionType::CREDIT,
+            'description' => $description
+        ]);
+
+        return [$voucher->only(["type", "balance", "account_id"]), $transaction];
     }
 
     /**

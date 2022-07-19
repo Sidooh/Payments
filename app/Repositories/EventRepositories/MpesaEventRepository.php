@@ -15,6 +15,7 @@ use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkCallback;
 use Exception;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -48,17 +49,21 @@ class MpesaEventRepository extends EventRepository
             ->firstOrFail();
         $payment->update(["status" => Status::COMPLETED->name]);
 
-        Log::info('...[REPO]: Payment updated...', [$payment]);
+        Log::info('...[REP - MPESA]: Payment updated...', [$payment->id, $payment->status]);
 
-        $data['payments'] = [$payment->toArray()];
+        $data['payments'] = [Arr::only(
+            $payment->toArray(),
+            ['id', 'amount', 'type', 'subtype', 'status', 'reference']
+        )];
 
         if($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
             // TODO: If you purchase for self using other MPESA, this fails!!!
-            $accountId = SidoohAccounts::findByPhone($payment->details)['id'];
+            $destination = explode(' - ', $payment->description)[1];
+            $accountId = SidoohAccounts::findByPhone($destination)['id'];
 
-            $voucher = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE, true);
+            [$voucher, ] = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE);
 
-            $data['vouchers'] = [$voucher];
+            $data['credit_vouchers'] = [$voucher];
         }
 
         SidoohProducts::paymentCallback($data);

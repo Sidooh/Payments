@@ -19,17 +19,17 @@ class SidoohAccounts extends SidoohService
 
         return parent::fetch($url);
     }
-    
+
     /**
      * @throws Exception
      */
-    static function find($id): array
+    static function find(int|string $id): array
     {
         Log::info('...[SRV - ACCOUNTS]: Find...', ['id' => $id]);
 
         $url = config('services.sidooh.services.accounts.url') . "/accounts/$id";
 
-        $acc = Cache::remember($id, (60 * 60 * 24), fn() => parent::http()->get($url)->json());
+        $acc = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));
 
         if(!$acc) throw new Exception("Account doesn't exist!");
 
@@ -39,13 +39,13 @@ class SidoohAccounts extends SidoohService
     /**
      * @throws Exception
      */
-    public static function findByPhone($phone)
+    public static function findByPhone(int|string $phone)
     {
         Log::info('...[SRV - ACCOUNTS]: Find By Phone...', ['phone' => $phone]);
 
         $url = config('services.sidooh.services.accounts.url') . "/accounts/phone/$phone";
 
-        $acc = Cache::remember($phone, now()->addDay(), fn() => parent::fetch($url));
+        $acc = parent::fetch($url)/*Cache::remember($phone, (60 * 60 * 24), fn() => parent::fetch($url))*/;
 
         if(!$acc) throw new Exception("Account doesn't exist!");
 
