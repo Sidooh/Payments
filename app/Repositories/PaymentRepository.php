@@ -4,75 +4,89 @@ namespace App\Repositories;
 
 use App\Enums\Description;
 use App\Enums\MpesaReference;
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Enums\ProductType;
 use App\Enums\Status;
-use App\Enums\TransactionType;
-use App\Enums\VoucherType;
-use App\Models\FloatAccount;
 use App\Models\Payment;
-use App\Models\Voucher;
 use App\Services\SidoohAccounts;
 use Arr;
-use DrH\Mpesa\Exceptions\MpesaException;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class PaymentRepository
 {
-    private array $data, $transactions;
-    private string $amount;
+    private float $totalAmount;
+
+    private mixed $firstTransaction;
 
     /**
-     * @param array  $transactions
-     * @param string $amount
-     * @param array  $data
+     * @param Collection $transactions
+     * @param PaymentMethod $method
+     * @param string $debit_account
      */
-    public function __construct(array $transactions, string $amount, array $data)
+    public function __construct(
+        private readonly Collection    $transactions,
+        private readonly PaymentMethod $method,
+        private readonly string        $debit_account)
     {
-        $this->transactions = $transactions;
-        $this->amount = $amount;
-        $this->data = $data;
+//            TODO: Change to actual amount on production
+//        $this->totalAmount = $transactions->sum("amount");
+        $this->totalAmount = 1;
+        $this->firstTransaction = $this->transactions->first();
     }
 
     /**
-     * @throws \Exception
+     * @throws Throwable
      */
-    public function mpesa(): ?array
+    public function process(): array
     {
-        $number = $this->data['debit_account'] ?? $this->data['payment_account']['phone'];
+        $pass = $this->transactions->every(fn($t) => $t['product_id'] === $this->firstTransaction['product_id']);
+        if (!$pass) {
+            throw new Exception("Transactions mismatch on product", 422);
+        }
 
-        $productType = ProductType::from($this->transactions[0]["product_id"]);
+        return match ($this->method) {
+            PaymentMethod::MPESA => $this->mpesa(),
+            PaymentMethod::VOUCHER => $this->voucher(),
+//            PaymentMethod::FLOAT->name => $this->float(),
+            default => throw new Exception("Unsupported payment method!")
+        };
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function mpesa(): array
+    {
+        // TODO: Ensure debit_acc is valid phone. May not be necessary since library validates
+        $number = $this->debit_account;
+
+        $productType = ProductType::from($this->firstTransaction['product_id']);
         $reference = match ($productType) {
             ProductType::AIRTIME => MpesaReference::AIRTIME,
             ProductType::VOUCHER => MpesaReference::PAY_VOUCHER,
             ProductType::UTILITY => MpesaReference::PAY_UTILITY,
             ProductType::SUBSCRIPTION => MpesaReference::SUBSCRIPTION,
-            default => throw new \Exception('Unexpected match value')
+            default => throw new Exception('Unexpected match value')
         };
 
-        try {
-//            TODO: Change to actual amount on production
-            $stkResponse = mpesa_request($number, 1, $reference, $this->transactions[0]["description"]);
+        $stkResponse = mpesa_request($number, $this->totalAmount, $reference);
 
-            $paymentData = $this->getPaymentData($stkResponse->id, $stkResponse->getMorphClass(), PaymentType::MPESA, PaymentSubtype::STK);
-            if($productType == ProductType::VOUCHER) $paymentData[0]['details'] = $this->transactions[0]['destination'];
+        $paymentData = $this->getPaymentData($stkResponse->id, $stkResponse->getMorphClass(), PaymentType::MPESA, PaymentSubtype::STK);
 
-            $data["payments"] = [];
-            foreach($paymentData as $payment) $data["payments"][] = [
-                ...Arr::only($payment, ["transaction_id", "status"]),
-                "payment_id"     => Payment::create($payment)->id,
-            ];
+        // TODO: Improve with: Payment insert with return
+        $data['payments'] = $paymentData->map(
+            fn($data) => Arr::only(
+                Payment::create($data)->toArray(),
+                ['id', 'amount', 'type', 'subtype', 'status', 'reference']
+            )
+        );
 
-            return $data;
-        } catch (MpesaException $e) {
-//            TODO: Inform customer of issue?
-            Log::critical($e);
-            return null;
-        }
+        return $data;
     }
 
     /**
@@ -80,90 +94,103 @@ class PaymentRepository
      */
     public function voucher(): array
     {
-        $account = $this->data['payment_account'];
+        // TODO: Ensure debit_acc is valid id
+        $id = $this->debit_account;
+        SidoohAccounts::find($id);
 
-        $voucher = Voucher::firstOrCreate(['account_id' => $account['id']], [
-            ...$account,
-            'type' => VoucherType::SIDOOH
-        ]);
+        $productType = ProductType::from($this->firstTransaction['product_id']);
+        $description = match ($productType) {
+            ProductType::AIRTIME => Description::AIRTIME_PURCHASE,
+            ProductType::VOUCHER => Description::VOUCHER_PURCHASE,
+            ProductType::UTILITY => Description::UTILITY_PURCHASE,
+            ProductType::SUBSCRIPTION => Description::SUBSCRIPTION_PURCHASE,
+            default => throw new Exception('Unexpected match value')
+        };
 
-        if($voucher->balance < (int)$this->amount) throw new Exception("Insufficient voucher balance!", 422);
-
-        $voucher->balance -= $this->amount;
-        $voucher->save();
-        $voucherTransaction = $voucher->voucherTransactions()->create([
-            'amount'      => $this->amount,
-            'type'        => TransactionType::DEBIT->name,
-            'description' => $this->transactions[0]["description"]
-        ]);
-
-        $paymentData = $this->getPaymentData($voucherTransaction->id, $voucherTransaction->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER, Status::COMPLETED);
-
-        $data["payments"] = [];
-        foreach($paymentData as $payment) $data["payments"][] = [
-            ...Arr::only($payment, ["transaction_id", "status"]),
-            "payment_id"     => Payment::create($payment)->id,
-        ];
-
-        $data["vouchers"][] = $voucher->only(["type", "balance", "account_id"]);
-
-        $productType = ProductType::from($this->transactions[0]["product_id"]);
-        if($productType === ProductType::UTILITY) $data["provider"] = $this->data["provider"];
-
-        if($productType === ProductType::VOUCHER) {
-            foreach($this->transactions as $trans) {
-                ["id" => $accountId] = SidoohAccounts::findByPhone($trans['destination']);
-
-                $data["vouchers"][] = VoucherRepository::credit($accountId, $trans["amount"], Description::VOUCHER_PURCHASE, true);
+        if ($productType === ProductType::VOUCHER) {
+            $pass = $this->transactions->every(fn($t) => isset($t['destination']) && SidoohAccounts::findByPhone($t['destination']));
+            if (!$pass) {
+                throw new Exception("Transactions need destination to be valid", 422);
             }
         }
 
-        return $data;
+        return DB::transaction(function () use ($id, $description, $productType) {
+
+            [$voucher, $voucherTransaction] = VoucherRepository::debit($id, $this->totalAmount, $description);
+
+            $data["debit_voucher"] = $voucher;
+
+            if ($productType === ProductType::VOUCHER) {
+                foreach ($this->transactions as $transaction) {
+                    $account = SidoohAccounts::findByPhone($transaction['destination']);
+                    [$voucher,] = VoucherRepository::credit($account['id'], $transaction["amount"], Description::VOUCHER_PURCHASE);
+                    $data["credit_vouchers"][] = $voucher;
+                }
+            }
+
+            $paymentData = $this->getPaymentData($voucherTransaction->id, $voucherTransaction->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::VOUCHER, Status::COMPLETED);
+
+            // TODO: Improve with: Payment insert with return
+            $data['payments'] = $paymentData->map(
+                fn($data) => Arr::only(
+                    Payment::create($data)->toArray(),
+                    ['id', 'amount', 'type', 'subtype', 'status', 'reference']
+                )
+            );
+
+
+//        TODO: Test this
+//        if ($productType === ProductType::UTILITY) $data["provider"] = $this->data["provider"];
+
+            return $data;
+        }, 3);
     }
 
     /**
      * @throws Throwable
      */
-    public function float(): Model|Payment
+//    public function float(): Model|Payment
+//    {
+//        $float = FloatAccount::firstOrCreate([
+//            'accountable_id' => $this->data['enterprise_id'],
+//            'accountable_type' => "ENTERPRISE"
+//        ]);
+//
+//        if ($float) {
+//            $bal = $float->balance;
+//
+//            if ($bal < (int)$this->data['amount']) throw new Exception("Insufficient float balance!");
+//        }
+//
+//        $float->balance -= $this->data['amount'];
+//        $float->save();
+//
+//        $paymentData = $this->getPaymentData($float->id, $float->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::FLOAT);
+//
+//        $float->floatAccountTransaction()->create([
+//            'amount' => $this->data['amount'],
+//            'type' => TransactionType::DEBIT,
+//            'description' => $this->transactions[0]["description"]
+//        ]);
+//
+//        $this->data += $paymentData;
+//
+//        return Payment::create($this->data);
+//    }
+
+    public function getPaymentData(int $providableId, string $providableType, PaymentType $type, PaymentSubtype $subtype, Status $status = null): Collection
     {
-        $float = FloatAccount::firstOrCreate([
-            'accountable_id'   => $this->data['enterprise_id'],
-            'accountable_type' => "ENTERPRISE"
-        ]);
-
-        if($float) {
-            $bal = $float->balance;
-
-            if($bal < (int)$this->data['amount']) throw new Exception("Insufficient float balance!");
-        }
-
-        $float->balance -= $this->data['amount'];
-        $float->save();
-
-        $paymentData = $this->getPaymentData($float->id, $float->getMorphClass(), PaymentType::SIDOOH, PaymentSubtype::FLOAT);
-
-        $float->floatAccountTransaction()->create([
-            'amount'      => $this->data['amount'],
-            'type'        => TransactionType::DEBIT,
-            'description' => $this->transactions[0]["description"]
-        ]);
-
-        $this->data += $paymentData;
-
-        return Payment::create($this->data);
-    }
-
-    public function getPaymentData(int $providableId, string $providableType, PaymentType $type, PaymentSubtype $subtype, Status $status = null): array
-    {
-        return array_map(fn($transaction) => [
-            "transaction_id"  => $transaction["id"],
-            "amount"          => $transaction["amount"],
-            "details"         => $transaction["destination"],
-            "type"            => $type->name,
-            "subtype"         => $subtype->name,
-            "status"          => $status->name ?? Status::PENDING->name,
-            "providable_id"   => $providableId,
+        return $this->transactions->map(fn($transaction) => [
+            "amount" => $transaction["amount"],
+            "type" => $type->name,
+            "subtype" => $subtype->name,
+            "status" => $status->name ?? Status::PENDING->name,
+            "providable_id" => $providableId,
             "providable_type" => $providableType,
-        ], $this->transactions);
+            "reference" => $transaction["reference"] ?? null,
+            "description" => $transaction["description"] . ' - ' . $transaction["destination"],
+        ]);
     }
+
+
 }

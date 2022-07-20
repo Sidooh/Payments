@@ -76,9 +76,8 @@ class VoucherController extends Controller
         $accountId = $request->input("account_id");
         $amount = $request->input("amount");
         $description = Description::from($request->input("description"));
-        $notify = $request->boolean("notify");
 
-        return VoucherRepository::credit($accountId, $amount, $description, $notify);
+        return VoucherRepository::credit($accountId, $amount, $description);
     }
 
     /**

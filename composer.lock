@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d1e83f9e3d12d8e36d5e946234d5f015",
+    "content-hash": "54a4ee2d8c4df455e3c71fa9c87398a8",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -768,16 +768,16 @@
         },
         {
             "name": "drh/mpesa",
-            "version": "v2.0.4",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/mpesa.git",
-                "reference": "91ff21a53441e4aca068fa373cfbd72450647e2f"
+                "reference": "8cb3b2114d6535d26798cff855d50efa36441768"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/91ff21a53441e4aca068fa373cfbd72450647e2f",
-                "reference": "91ff21a53441e4aca068fa373cfbd72450647e2f",
+                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/8cb3b2114d6535d26798cff855d50efa36441768",
+                "reference": "8cb3b2114d6535d26798cff855d50efa36441768",
                 "shasum": ""
             },
             "require": {
@@ -835,9 +835,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/mpesa/issues",
-                "source": "https://github.com/DrH97/mpesa/tree/v2.0.4"
+                "source": "https://github.com/DrH97/mpesa/tree/v2.1.0"
             },
-            "time": "2022-07-09T22:41:18+00:00"
+            "time": "2022-07-15T11:16:37+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -1571,16 +1571,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v9.19.0",
+            "version": "v9.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "bbce25bd823133f6a5a724f2d62680b711f1d0df"
+                "reference": "c99868f1c9bf2f5d250993121838db905591864f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/bbce25bd823133f6a5a724f2d62680b711f1d0df",
-                "reference": "bbce25bd823133f6a5a724f2d62680b711f1d0df",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/c99868f1c9bf2f5d250993121838db905591864f",
+                "reference": "c99868f1c9bf2f5d250993121838db905591864f",
                 "shasum": ""
             },
             "require": {
@@ -1746,7 +1746,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-06-28T14:33:19+00:00"
+            "time": "2022-07-13T13:26:22+00:00"
         },
         {
             "name": "laravel/sanctum",

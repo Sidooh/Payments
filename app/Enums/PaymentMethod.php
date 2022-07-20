@@ -2,10 +2,10 @@
 
 namespace App\Enums;
 
-enum PaymentMethod
+enum PaymentMethod: string
 {
-    case MPESA;
-    case VOUCHER;
-    case FLOAT;
-    case SIDOOH_POINTS;
+    case MPESA = "MPESA";
+    case VOUCHER = 'VOUCHER';
+//    case FLOAT;
+//    case SIDOOH_POINTS;
 }

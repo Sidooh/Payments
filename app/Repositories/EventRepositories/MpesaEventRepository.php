@@ -3,46 +3,40 @@
 namespace App\Repositories\EventRepositories;
 
 use App\Enums\Description;
-use App\Enums\EventType;
 use App\Enums\MpesaReference;
 use App\Enums\PaymentSubtype;
 use App\Enums\Status;
 use App\Models\Payment;
 use App\Repositories\VoucherRepository;
 use App\Services\SidoohAccounts;
-use App\Services\SidoohNotify;
 use App\Services\SidoohProducts;
 use App\Services\SidoohSavings;
 use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkCallback;
+use Exception;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class MpesaEventRepository extends EventRepository
 {
     /**
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
-    public static function stkPaymentFailed($stkCallback)
+    public static function stkPaymentFailed(MpesaStkCallback $stkCallback)
     {
         // TODO: Make into a transaction/try catch?
-        $payment = Payment::whereProvidableId($stkCallback->request->id)->whereSubtype(PaymentSubtype::STK->name)->firstOrFail();
+        $payment = Payment::whereProvidableId($stkCallback->request->id)
+            ->whereSubtype(PaymentSubtype::STK->name)
+            ->firstOrFail();
 
         if($payment->status == Status::FAILED->name) return;
 
         $payment->status = Status::FAILED->name;
         $payment->save();
 
-//        TODO: Refactor to pass data like success payment callback
-        SidoohProducts::paymentCallback(["payments" => [$payment->toArray()]]);
-
-        //  TODO: Can we inform the user of the actual issue?
-        $message = match ($stkCallback->ResultCode) {
-            1 => "You have insufficient Mpesa Balance for this transaction. Kindly top up your Mpesa and try again.",
-            default => "Sorry! We failed to complete your transaction. No amount was deducted from your account. We apologize for the inconvenience. Please try again.",
-        };
-//        TODO: Should this be sent to the transaction initiator in the case of using other mpesa no.?
-        SidoohNotify::notify([$stkCallback->request->phone], $message, EventType::PAYMENT_FAILURE);
+        SidoohProducts::paymentCallback(["payments" => [[...$payment->toArray(), 'stk_result_code' => $stkCallback->result_code]]]);
     }
 
     /**
@@ -55,28 +49,21 @@ class MpesaEventRepository extends EventRepository
             ->firstOrFail();
         $payment->update(["status" => Status::COMPLETED->name]);
 
-        Log::info('...[REPO]: Payment updated...', [$payment]);
+        Log::info('...[REP - MPESA]: Payment updated...', [$payment->id, $payment->status]);
 
-        $purchaseData = match ($stkCallback->request->reference) {
-            MpesaReference::AIRTIME, MpesaReference::PAY_VOUCHER => [
-                'phone' => $payment->details,
-            ],
-            MpesaReference::PAY_UTILITY => [
-                'account'  => $payment->details,
-                'provider' => explode(" ", $stkCallback->request->description)[0],
-            ],
-            default => []
-        };
-
-        $data = array_merge($purchaseData, ["payments" => [$payment->toArray()]]);
+        $data['payments'] = [Arr::only(
+            $payment->toArray(),
+            ['id', 'amount', 'type', 'subtype', 'status', 'reference']
+        )];
 
         if($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
             // TODO: If you purchase for self using other MPESA, this fails!!!
-            $accountId = SidoohAccounts::findByPhone($payment->details)['id'];
+            $destination = explode(' - ', $payment->description)[1];
+            $accountId = SidoohAccounts::findByPhone($destination)['id'];
 
-            $voucher = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE, true);
+            [$voucher, ] = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE);
 
-            $data['vouchers'] = [$voucher];
+            $data['credit_vouchers'] = [$voucher];
         }
 
         SidoohProducts::paymentCallback($data);
@@ -93,15 +80,13 @@ class MpesaEventRepository extends EventRepository
             Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
 
             SidoohSavings::paymentCallback($payment);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error($e);
         }
     }
 
     public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse)
     {
-//        TODO: Complete this!!!!
-
         try {
             $payment = Payment::whereProvidableId($paymentResponse->request->id)
                 ->whereSubtype(PaymentSubtype::B2C->name)
@@ -111,7 +96,7 @@ class MpesaEventRepository extends EventRepository
             Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
 
             SidoohSavings::paymentCallback($payment);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error($e);
         }
     }

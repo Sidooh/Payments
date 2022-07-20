@@ -17,10 +17,11 @@ class Payment extends Model
         'providable_type',
         'providable_id',
         'amount',
-        'details',
         'status',
         'type',
         'subtype',
+        'reference',
+        'description'
     ];
 
     public function providable(): MorphTo
