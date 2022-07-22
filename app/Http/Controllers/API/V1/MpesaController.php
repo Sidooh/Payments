@@ -22,8 +22,8 @@ class MpesaController extends Controller
 
         $payments = Payment::whereType(PaymentType::MPESA->name)
             ->when($subType, fn(Builder $qry) => $qry->whereSubtype($subType->name))->with([
-            "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
-            "provider.response:id,checkout_request_id,result_desc,created_at"
+            "providable:id,status,reference,checkout_request_id,amount,phone,created_at",
+            "providable.response:id,checkout_request_id,result_desc,created_at"
         ])->get();
 
         return $this->successResponse($payments);
