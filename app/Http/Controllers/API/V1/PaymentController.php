@@ -5,10 +5,8 @@ namespace App\Http\Controllers\API\V1;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\ProductType;
-use App\Enums\VoucherType;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
-use App\Models\Voucher;
 use App\Repositories\PaymentRepository;
 use App\Repositories\WithdrawalRepository;
 use App\Rules\SidoohAccountExists;
@@ -20,7 +18,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
-use JetBrains\PhpStorm\ArrayShape;
 use Throwable;
 
 class PaymentController extends Controller
@@ -51,7 +48,6 @@ class PaymentController extends Controller
             'transactions.*.amount'      => ['required', 'integer'],
             'transactions.*.destination' => ['required', 'numeric'],
             'transactions.*.description' => ['required', 'string'],
-
         ]);
 
         Log::info('...[CTRL - PAYMENT]: Invoke...', $request->all());
@@ -75,14 +71,13 @@ class PaymentController extends Controller
             Log::error($err);
             return $this->errorResponse("Failed to process payment request.");
         }
-
     }
 
     public function index(): JsonResponse
     {
         $payments = Payment::latest()->get();
 
-        return response()->json($payments);
+        return $this->successResponse($payments);
     }
 
     public function show(Payment $payment): JsonResponse
@@ -96,20 +91,7 @@ class PaymentController extends Controller
             "providable:id,type,amount,description,created_at",
         ]);
 
-        return response()->json($payment);
-    }
-
-    #[ArrayShape([
-        "payment" => "array",
-        "voucher" => "array"
-    ])] public function findDetails(int $paymentId, int $accountId): array
-    {
-        return [
-            "payment" => Payment::find($paymentId),
-            "voucher" => Voucher::firstOrCreate(['account_id' => $accountId], [
-                'type' => VoucherType::SIDOOH
-            ])->toArray()
-        ];
+        return $this->successResponse($payment);
     }
 
     public function queryMpesaStatus(): JsonResponse

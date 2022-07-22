@@ -26,6 +26,6 @@ class MpesaController extends Controller
             "provider.response:id,checkout_request_id,result_desc,created_at"
         ])->get();
 
-        return response()->json($payments);
+        return $this->successResponse($payments);
     }
 }
