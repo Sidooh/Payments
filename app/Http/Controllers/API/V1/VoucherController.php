@@ -5,18 +5,16 @@ namespace App\Http\Controllers\API\V1;
 use App\Enums\Description;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VoucherRequest;
-use App\Http\Resources\VoucherResource;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use App\Repositories\VoucherRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Throwable;
 
 class VoucherController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
         $relations = explode(",", $request->query("with"));
 
@@ -32,7 +30,7 @@ class VoucherController extends Controller
             $vouchers = withRelation("account", $vouchers, "account_id", "id");
         }
 
-        return VoucherResource::collection($vouchers);
+        return $this->successResponse($vouchers);
     }
 
     public function getTransactions(Request $request): JsonResponse
@@ -49,19 +47,19 @@ class VoucherController extends Controller
             $transactions = $transactions->with("payment:id,providable_id,providable_type,status");
         }
 
-        return response()->json($transactions->get());
+        return $this->successResponse($transactions->get());
     }
 
-    public function show(Voucher $voucher): array
+    public function show(Voucher $voucher): JsonResponse
     {
-        return $voucher->toArray();
+        return $this->successResponse($voucher->toArray());
     }
 
-    public function getAccountVouchers(int $accountId): array
+    public function getAccountVouchers(int $accountId): JsonResponse
     {
         $vouchers = Voucher::select(["id", "type", "balance"])->whereAccountId($accountId)->get();
 
-        return $vouchers->toArray();
+        return $this->successResponse($vouchers);
     }
 
     public function credit(Request $request): array

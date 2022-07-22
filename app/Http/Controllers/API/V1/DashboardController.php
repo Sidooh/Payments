@@ -21,7 +21,7 @@ class DashboardController extends Controller
         $payments = Payment::select(["id", "amount", "type", "subtype", "status", "created_at", "updated_at"])->latest()->get();
         $paymentsToday = Payment::select(["amount", "created_at"])->whereDate("created_at", Carbon::today());
 
-        return response()->json([
+        return $this->successResponse([
             "total_revenue"       => $payments->sum("amount"),
             "total_revenue_today" => Payment::whereDate("created_at", Carbon::today())->sum("amount"),
 
