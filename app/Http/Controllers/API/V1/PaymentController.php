@@ -96,6 +96,11 @@ class PaymentController extends Controller
             "providable:id,type,amount,description,created_at",
         ]);
 
+        if ($payment->subtype === PaymentSubtype::B2C->name) $payment->load([
+            "providable:id,amount,phone,remarks,conversation_id",
+            'providable.response'
+        ]);
+
         return response()->json($payment);
     }
 

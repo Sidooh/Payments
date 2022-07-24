@@ -98,7 +98,7 @@ class VoucherRepository
                     'voucher_id'  => $voucher->id,
                     'type'        => TransactionType::CREDIT,
                     'amount'      => $voucher->voucher_top_up_amount,
-                    'description' => Description::VOUCHER_DISBURSEMENT
+                    'description' => Description::VOUCHER_DISBURSEMENT->name
                 ];
             })->toArray();
 
@@ -107,7 +107,7 @@ class VoucherRepository
                     'float_account_id' => $floatAccount->id,
                     'type'             => TransactionType::DEBIT,
                     'amount'           => $voucher->voucher_top_up_amount,
-                    'description'      => Description::VOUCHER_DISBURSEMENT
+                    'description'      => Description::VOUCHER_DISBURSEMENT->name
                 ];
             })->toArray();
 

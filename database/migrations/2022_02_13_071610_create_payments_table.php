@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string("status", 15); // PENDING or COMPLETED
             $table->string("type", 15); // ['MOBILE', 'SIDOOH', 'BANK', 'PAYPAL', 'OTHER'] payment methods?
             $table->string("subtype", 15); // 'STK', 'C2B', 'CBA', 'WALLET', 'BONUS'
-            $table->morphs("providable");
+            $table->unsignedBigInteger("provider_id");
             $table->string("description")->nullable();
             $table->string('reference')->nullable(); // external party reference
 
