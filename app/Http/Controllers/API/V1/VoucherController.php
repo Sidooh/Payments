@@ -44,7 +44,7 @@ class VoucherController extends Controller
         }
 
         if(in_array("payment", $relations)) {
-            $transactions = $transactions->with("payment:id,providable_id,providable_type,status");
+            $transactions = $transactions->with("payment:id,provider_id,subtype,status");
         }
 
         return $this->successResponse($transactions->get());

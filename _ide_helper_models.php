@@ -65,7 +65,10 @@ namespace App\Models{
 }
 
 namespace App\Models{
-/**
+
+    use App\Enums\PaymentSubtype;
+
+    /**
  * App\Models\Payment
  *
  * @property int $id
@@ -74,8 +77,7 @@ namespace App\Models{
  * @property string $status
  * @property string $type
  * @property string $subtype
- * @property string $providable_type
- * @property int $providable_id
+ * @property int $provider_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $provider
@@ -87,8 +89,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDetails($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvidableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvidableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProviderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvider(PaymentSubtype $subtype, int $providerId)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereSubtype($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereType($value)

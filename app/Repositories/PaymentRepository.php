@@ -178,14 +178,14 @@ class PaymentRepository
 //        return Payment::create($this->data);
 //    }
 
-    public function getPaymentData(int $providableId, PaymentType $type, PaymentSubtype $subtype, Status $status = null): Collection
+    public function getPaymentData(int $providerId, PaymentType $type, PaymentSubtype $subtype, Status $status = null): Collection
     {
         return $this->transactions->map(fn($transaction) => [
             "amount" => $transaction["amount"],
             "type" => $type->name,
             "subtype" => $subtype->name,
             "status" => $status->name ?? Status::PENDING->name,
-            "provider_id" => $providableId,
+            "provider_id" => $providerId,
             "reference" => $transaction["reference"] ?? null,
             "description" => $transaction["description"] . ' - ' . $transaction["destination"],
         ]);

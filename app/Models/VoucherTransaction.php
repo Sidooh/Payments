@@ -34,6 +34,6 @@ class VoucherTransaction extends Model
     }
 
     public function payment(): MorphOne {
-        return $this->morphOne(Payment::class, 'providable');
+        return $this->morphOne(Payment::class, 'provider');
     }
 }

@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
+use Error;
 use Exception;
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -58,16 +59,25 @@ class SidoohService
             $latency = round((microtime(true) - $t) * 1000, 2);
             Log::info('...[SRV - SIDOOH]: RES... ' . $latency . 'ms', [$response]);
             return $response;
+
+        } catch (ConnectionException $e) {
+            $latency = round((microtime(true) - $t) * 1000, 2);
+            Log::critical('...[SRV - SIDOOH]: ERR... ' . $latency . 'ms', [$e]);
+            throw new Error('Something went wrong, please try again later.');
         } catch (Exception|RequestException $err) {
             $latency = round((microtime(true) - $t) * 1000, 2);
-            if(str_starts_with($err->getCode(), 4)) {
+
+            if ($err->getCode() === 401) {
                 Log::error('...[SRV - SIDOOH]: ERR... ' . $latency . 'ms', $err->response->json());
+                throw new Error('Something went wrong, please try again later.');
+            }
+
+            if (str_starts_with($err->getCode(), 4)) {
                 throw new HttpResponseException(response()->json($err->response->json(), $err->getCode()));
             }
 
-            if($err->getCode() === 401) throw new AuthenticationException();
-            Log::error('...[SRV - SIDOOH]: ERR... ' . $latency . 'ms', [$err]);
-            return null;
+            Log::critical('...[SRV - SIDOOH]: ERR... ' . $latency . 'ms', [$err]);
+            throw new Error('Something went wrong, please try again later.');
         }
     }
 }
