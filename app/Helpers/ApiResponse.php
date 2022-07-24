@@ -16,11 +16,11 @@ trait ApiResponse
         return response()->json($res, $code);
     }
 
-//    TODO: update these methods to have code first
     protected function errorResponse($message = null, $code = 500): JsonResponse
     {
         return response()->json([
-            'errors'  => [
+            "code" => $code,
+            "errors"  => [
                 [
                     'message' => $message
                 ]
