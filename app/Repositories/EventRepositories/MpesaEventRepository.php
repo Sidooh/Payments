@@ -19,7 +19,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class MpesaEventRepository extends EventRepository
+class MpesaEventRepository
 {
     /**
      * @throws RequestException

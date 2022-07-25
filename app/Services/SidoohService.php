@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Error;
 use Exception;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -57,13 +56,9 @@ class SidoohService
         try {
             $response = self::http()->send($method, $url, $options)->throw()->json();
             $latency = round((microtime(true) - $t) * 1000, 2);
+
             Log::info('...[SRV - SIDOOH]: RES... ' . $latency . 'ms', [$response]);
             return $response;
-
-        } catch (ConnectionException $e) {
-            $latency = round((microtime(true) - $t) * 1000, 2);
-            Log::critical('...[SRV - SIDOOH]: ERR... ' . $latency . 'ms', [$e]);
-            throw new Error('Something went wrong, please try again later.');
         } catch (Exception|RequestException $err) {
             $latency = round((microtime(true) - $t) * 1000, 2);
 
