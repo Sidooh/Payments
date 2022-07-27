@@ -2,31 +2,67 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Enums\Description;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VoucherRequest;
 use App\Models\Voucher;
+use App\Models\VoucherTransaction;
 use App\Repositories\VoucherRepository;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
 
 class VoucherController extends Controller
 {
-    public function show(Voucher $voucher): array
+    public function index(Request $request): JsonResponse
     {
-        return $voucher->toArray();
+        $relations = explode(",", $request->query("with"));
+
+        $vouchers = Voucher::latest();
+
+        if(in_array("voucher_transactions", $relations)) {
+            $vouchers = $vouchers->with("voucherTransactions:id,voucher_id,type,amount,description,created_at");
+        }
+
+        $vouchers = $vouchers->get();
+
+        if(in_array("account", $relations)) {
+            $vouchers = withRelation("account", $vouchers, "account_id", "id");
+        }
+
+        return $this->successResponse($vouchers);
     }
 
-    public function getAccountVouchers(int $accountId): array
+    public function getTransactions(Request $request): JsonResponse
+    {
+        $relations = explode(",", $request->query("with"));
+
+        $transactions = VoucherTransaction::latest();
+
+        if(in_array("voucher", $relations)) {
+            $transactions = $transactions->with("voucher:id,account_id,type,balance");
+        }
+
+        if(in_array("payment", $relations)) {
+            $transactions = $transactions->with("payment:id,provider_id,subtype,status");
+        }
+
+        return $this->successResponse($transactions->get());
+    }
+
+    public function show(Voucher $voucher): JsonResponse
+    {
+        return $this->successResponse($voucher->toArray());
+    }
+
+    public function getAccountVouchers(int $accountId): JsonResponse
     {
         $vouchers = Voucher::select(["id", "type", "balance"])->whereAccountId($accountId)->get();
 
-        return $vouchers->toArray();
+        return $this->successResponse($vouchers);
     }
 
-    public function credit(Request $request): Model|Builder|Voucher
+    public function credit(Request $request): array
     {
         $request->validate([
             'account_id'  => ['required'],
@@ -37,10 +73,9 @@ class VoucherController extends Controller
 
         $accountId = $request->input("account_id");
         $amount = $request->input("amount");
-        $description = $request->input("description");
-        $notify = $request->boolean("notify");
+        $description = Description::from($request->input("description"));
 
-        return VoucherRepository::credit($accountId, $amount, $description, $notify);
+        return VoucherRepository::credit($accountId, $amount, $description);
     }
 
     /**

@@ -3,35 +3,48 @@
 namespace App\Repositories\EventRepositories;
 
 use App\Enums\Description;
-use App\Enums\EventType;
 use App\Enums\MpesaReference;
+use App\Enums\PaymentSubtype;
 use App\Enums\Status;
 use App\Models\Payment;
 use App\Repositories\VoucherRepository;
 use App\Services\SidoohAccounts;
-use App\Services\SidoohNotify;
 use App\Services\SidoohProducts;
+use App\Services\SidoohSavings;
+use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkCallback;
+use Exception;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class MpesaEventRepository extends EventRepository
+class MpesaEventRepository
 {
-    public static function stkPaymentFailed($stkCallback)
+    /**
+     * @throws RequestException
+     */
+    public static function stkPaymentFailed(MpesaStkCallback $stkCallback)
     {
         // TODO: Make into a transaction/try catch?
-        $p = Payment::whereProviderId($stkCallback->request->id)->whereSubtype('STK')->firstOrFail();
+//        $payment = Payment::whereProviderId($stkCallback->request->id)
+//            ->whereSubtype(PaymentSubtype::STK->name)
+//            ->firstOrFail();
 
-        if($p->status == 'FAILED') return;
+        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
+        if ($payment->status !== Status::PENDING->name) throw new \Error("Payment is not pending... - $payment->id");
 
-        $p->status = Status::FAILED->name;
-        $p->save();
+        $payment->update(["status" => Status::FAILED->name]);
 
-        SidoohProducts::paymentCallback($p->payable_id, $p->payable_type, Status::FAILED);
-
-        //  TODO: Can we inform the user of the actual issue?
-        $message = "Sorry! We failed to complete your transaction. No amount was deducted from your account. We apologize for the inconvenience. Please try again.";
-
-        SidoohNotify::notify([$stkCallback->request->phone], $message, EventType::PAYMENT_FAILURE);
+        SidoohProducts::paymentCallback([
+            "payments" => [
+                ...Arr::only(
+                    $payment->toArray(),
+                    ['id', 'amount', 'type', 'subtype', 'status', 'reference']
+                ),
+                'stk_result_code' => $stkCallback->result_code
+            ]
+        ]);
     }
 
     /**
@@ -39,47 +52,61 @@ class MpesaEventRepository extends EventRepository
      */
     public static function stkPaymentReceived(MpesaStkCallback $stkCallback)
     {
-        $otherPhone = explode(" - ", $stkCallback->request->description);
+        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
+        if ($payment->status !== Status::PENDING->name) throw new \Error("Payment is not pending... - $payment->id");
 
-        $payments = Payment::whereProviderId($stkCallback->request->id)->whereSubtype('STK');
-        $payments->update(["status" => Status::COMPLETED->name]);
+        $payment->update(["status" => Status::COMPLETED->name]);
 
-        $purchaseData = match ($stkCallback->request->reference) {
-            MpesaReference::AIRTIME => [
-                'phone'   => count($otherPhone) > 1
-                    ? $otherPhone[1]
-                    : $stkCallback->PhoneNumber ?? $stkCallback->request->phone,
-                "product" => "airtime"
-            ],
-            MpesaReference::PAY_SUBSCRIPTION,
-            MpesaReference::PRE_AGENT_REGISTER_ASPIRING,
-            MpesaReference::PRE_AGENT_REGISTER_THRIVING,
-            MpesaReference::AGENT_REGISTER,
-            MpesaReference::AGENT_REGISTER_ASPIRING,
-            MpesaReference::AGENT_REGISTER_THRIVING => [
-                "product" => "subscription"
-            ],
-            MpesaReference::PAY_VOUCHER => [
-                'phone'   => count($otherPhone) > 1
-                    ? $otherPhone[1]
-                    : $stkCallback->PhoneNumber ?? $stkCallback->request->phone,
-                "product" => "voucher",
-            ],
-            MpesaReference::PAY_UTILITY => [
-                'account'  => $otherPhone[1],
-                'provider' => explode(" ", $stkCallback->request->description)[0],
-                'product'  => 'utility'
-            ],
-        };
+        Log::info('...[REP - MPESA]: Payment updated...', [$payment->id, $payment->status]);
 
-        if($purchaseData["product"] === "voucher") {
-            $accountId = SidoohAccounts::findByPhone($purchaseData['phone'])['id'];
+        $data['payments'] = [Arr::only(
+            $payment->toArray(),
+            ['id', 'amount', 'type', 'subtype', 'status', 'reference']
+        )];
 
-            VoucherRepository::credit($accountId, $stkCallback->amount, Description::VOUCHER_PURCHASE->value, true);
-        } else {
-            $purchaseData['amount'] = $stkCallback->amount;
+        if ($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
+            // TODO: If you purchase for self using other MPESA, this fails!!!
+            $destination = explode(' - ', $payment->description)[1];
+            $accountId = SidoohAccounts::findByPhone($destination)['id'];
 
-            SidoohProducts::requestPurchase($payments->pluck('payable_id')->toArray(), $purchaseData);
+            [$voucher,] = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE);
+
+            $data['credit_vouchers'] = [$voucher];
+        }
+
+        SidoohProducts::paymentCallback($data);
+    }
+
+    public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse)
+    {
+        try {
+            $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
+            if ($payment->status !== Status::PENDING->name) throw new \Error("Payment is not pending... - $payment->id");
+
+            $payment->update(["status" => Status::COMPLETED->name]);
+
+            Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
+
+            SidoohSavings::paymentCallback($payment);
+        } catch (Exception $e) {
+            Log::error($e);
+        }
+    }
+
+    public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse)
+    {
+        try {
+            $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
+
+            if ($payment->status !== Status::PENDING->name) throw new \Error("Payment is not pending... - $payment->id");
+
+            $payment->update(["status" => Status::FAILED->name]);
+
+            Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
+
+            SidoohSavings::paymentCallback($payment);
+        } catch (Exception $e) {
+            Log::error($e);
         }
     }
 }

@@ -4,15 +4,13 @@ namespace App\Repositories;
 
 use App\Enums\Description;
 use App\Enums\TransactionType;
-use App\Events\VoucherPurchaseEvent;
+use App\Enums\VoucherType;
 use App\Helpers\ApiResponse;
 use App\Models\FloatAccount;
 use App\Models\FloatAccountTransaction;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -20,22 +18,48 @@ class VoucherRepository
 {
     use ApiResponse;
 
-    public static function credit(int $accountId, $amount, string $description, bool $notify = false): Model|Builder|Voucher
+    public static function credit(int $accountId, float $amount, Description $description): array
     {
-        $voucher = Voucher::whereAccountId($accountId)->firstOrFail();
+        $voucher = Voucher::firstOrCreate([
+            "account_id" => $accountId,
+            "type" => VoucherType::SIDOOH
+        ]);
 
-        $voucher->balance += (double)$amount;
+        $voucher->balance += $amount;
         $voucher->save();
 
-        $voucher->voucherTransaction()->create([
-            'amount'      => (double)$amount,
-            'type'        => TransactionType::CREDIT->name,
+        $transaction = $voucher->voucherTransactions()->create([
+            'amount'      => $amount,
+            'type'        => TransactionType::CREDIT,
             'description' => $description
         ]);
 
-        if($notify) VoucherPurchaseEvent::dispatch($voucher, $amount);
+        return [$voucher->only(["type", "balance", "account_id"]), $transaction];
+    }
 
-        return $voucher;
+    /**
+     * @throws Exception
+     */
+    public static function debit(int $accountId, float $amount, Description $description): array
+    {
+        $voucher = Voucher::firstOrCreate([
+            "account_id" => $accountId,
+            "type" => VoucherType::SIDOOH
+        ]);
+
+        // TODO: Return proper response/ create specific error type, rather than throwing error
+        if ($voucher->balance < $amount) throw new Exception("Insufficient voucher balance.", 422);
+
+        $voucher->balance -= $amount;
+        $voucher->save();
+
+        $transaction = $voucher->voucherTransactions()->create([
+            'amount'      => $amount,
+            'type'        => TransactionType::CREDIT,
+            'description' => $description
+        ]);
+
+        return [$voucher->only(["type", "balance", "account_id"]), $transaction];
     }
 
     /**
@@ -74,7 +98,7 @@ class VoucherRepository
                     'voucher_id'  => $voucher->id,
                     'type'        => TransactionType::CREDIT,
                     'amount'      => $voucher->voucher_top_up_amount,
-                    'description' => Description::VOUCHER_DISBURSEMENT
+                    'description' => Description::VOUCHER_DISBURSEMENT->name
                 ];
             })->toArray();
 
@@ -83,7 +107,7 @@ class VoucherRepository
                     'float_account_id' => $floatAccount->id,
                     'type'             => TransactionType::DEBIT,
                     'amount'           => $voucher->voucher_top_up_amount,
-                    'description'      => Description::VOUCHER_DISBURSEMENT
+                    'description'      => Description::VOUCHER_DISBURSEMENT->name
                 ];
             })->toArray();
 

@@ -65,31 +65,32 @@ namespace App\Models{
 }
 
 namespace App\Models{
-/**
+
+    use App\Enums\PaymentSubtype;
+
+    /**
  * App\Models\Payment
  *
  * @property int $id
- * @property string $payable_type
- * @property int $payable_id
  * @property string $amount
+ * @property string $details
  * @property string $status
  * @property string $type
  * @property string $subtype
- * @property string $provider_type
  * @property int $provider_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $provider
  * @method static \Database\Factories\PaymentFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment query()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDetails($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment wherePayableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment wherePayableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProviderId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProviderType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvider(PaymentSubtype $subtype, int $providerId)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereSubtype($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereType($value)
@@ -104,13 +105,13 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $type
- * @property string $balance
+ * @property int $balance
  * @property int $account_id
  * @property int|null $enterprise_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VoucherTransaction[] $voucherTransaction
- * @property-read int|null $voucher_transaction_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VoucherTransaction[] $voucherTransactions
+ * @property-read int|null $voucher_transactions_count
  * @method static \Database\Factories\VoucherFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher newQuery()
@@ -132,11 +133,12 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $type
- * @property string $amount
- * @property string $description
+ * @property int $amount
+ * @property \App\Enums\Description $description
  * @property int $voucher_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Payment|null $payment
  * @property-read \App\Models\Voucher $voucher
  * @method static \Database\Factories\VoucherTransactionFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|VoucherTransaction newModelQuery()

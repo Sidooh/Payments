@@ -149,4 +149,17 @@ return [
          */
         'result_url' => env('APP_URL') . '/payments/callbacks/result/',
     ],
+
+
+    'logging' => [
+        'enabled' => env('MPESA_ENABLE_LOGGING', false),
+        'channels' => [
+            'syslog',
+            'single' => [
+                'driver' => 'single',
+                'path' => storage_path('logs/mpesa.log'),
+                'level' => env('LOG_LEVEL', 'debug'),
+            ],
+        ]
+    ]
 ];

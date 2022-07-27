@@ -2,12 +2,12 @@
 
 namespace App\Enums;
 
-enum TransactionType
+enum TransactionType: string
 {
-    case PAYMENT;
-    case WITHDRAWAL;
-    case TRANSFER;
+    case PAYMENT = 'PAYMENT';
+    case WITHDRAWAL = 'WITHDRAWAL';
+    case TRANSFER = 'TRANSFER';
 
-    case DEBIT;
-    case CREDIT;
+    case DEBIT = 'DEBIT';
+    case CREDIT = 'CREDIT';
 }

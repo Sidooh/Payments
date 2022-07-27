@@ -5,9 +5,10 @@ namespace App\Listeners;
 use App\Events\PaymentSuccessEvent;
 use App\Services\SidoohProducts;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Log;
 
-class ProcessPaymentSuccess implements ShouldQueue
+class ProcessPaymentSuccess
 {
     /**
      * Create the event listener.
@@ -19,13 +20,13 @@ class ProcessPaymentSuccess implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param \App\Events\PaymentSuccessEvent $event
+     * @param PaymentSuccessEvent $event
      * @return void
-     * @throws \Illuminate\Http\Client\RequestException
+     * @throws RequestException
      */
-    public function handle(PaymentSuccessEvent $event)
+    public function handle(PaymentSuccessEvent $event): void
     {
-        Log::info('--- --- --- --- ---   ...[EVENT]: Process Payment Success...   --- --- --- --- ---');
+        Log::info('...[EVENT]: Process Payment Success...');
 
         $response = SidoohProducts::requestPurchase($event->transactions, $event->data);
 

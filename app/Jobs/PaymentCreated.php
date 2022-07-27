@@ -8,7 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class PaymentCreated implements ShouldQueue
+class PaymentCreated
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
