@@ -37,7 +37,7 @@ class VoucherController extends Controller
     {
         $relations = explode(",", $request->query("with"));
 
-        $transactions = VoucherTransaction::latest();
+        $transactions = VoucherTransaction::query();
 
         if(in_array("voucher", $relations)) {
             $transactions = $transactions->with("voucher:id,account_id,type,balance");
