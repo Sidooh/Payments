@@ -21,7 +21,7 @@ class VoucherController extends Controller
         $vouchers = Voucher::latest();
 
         if(in_array("voucher_transactions", $relations)) {
-            $vouchers = $vouchers->with("voucherTransactions:id,voucher_id,type,amount,description,created_at");
+            $vouchers = $vouchers->with("voucherTransactions:id,voucher_id,type,amount,description,created_at")->limit(50);
         }
 
         $vouchers = $vouchers->get();
@@ -46,6 +46,8 @@ class VoucherController extends Controller
         if(in_array("payment", $relations)) {
             $transactions = $transactions->with("payment:id,provider_id,subtype,status");
         }
+
+        $transactions->orderBy('id', 'desc')->limit(100);
 
         return $this->successResponse($transactions->get());
     }
