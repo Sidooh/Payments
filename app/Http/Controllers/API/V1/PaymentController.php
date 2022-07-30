@@ -75,7 +75,7 @@ class PaymentController extends Controller
 
     public function index(): JsonResponse
     {
-        $payments = Payment::latest()->get();
+        $payments = Payment::latest()->limit(100)->get();
 
         return $this->successResponse($payments);
     }
@@ -83,8 +83,8 @@ class PaymentController extends Controller
     public function show(Payment $payment): JsonResponse
     {
         if ($payment->subtype === PaymentSubtype::STK->name) $payment->load([
-            "provider:id,status,reference,checkout_request_id,amount,phone,created_at",
-            "provider.response:id,checkout_request_id,result_desc,created_at"
+            "provider:id,status,reference,description,checkout_request_id,amount,phone,created_at",
+            "provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at"
         ]);
 
         if ($payment->subtype === PaymentSubtype::VOUCHER->name) $payment->load([
