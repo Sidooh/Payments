@@ -33,9 +33,7 @@ class PaymentRepository
         private readonly PaymentMethod $method,
         private readonly string        $debit_account)
     {
-//            TODO: Change to actual amount on production
-//        $this->totalAmount = $transactions->sum("amount");
-        $this->totalAmount = 1;
+        $this->totalAmount = $transactions->sum("amount");
         $this->firstTransaction = $this->transactions->first();
     }
 
