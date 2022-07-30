@@ -32,18 +32,24 @@ class MpesaEventRepository
 //            ->whereSubtype(PaymentSubtype::STK->name)
 //            ->firstOrFail();
 
-        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
-        if ($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
+        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)
+            ->firstOrFail();
+        if ($payment->status !== Status::PENDING->name) {
+            Log::error("Payment is not pending...", [$payment, $stkCallback->request]);
+            return;
+        }
 
         $payment->update(["status" => Status::FAILED->name]);
 
         SidoohProducts::paymentCallback([
             "payments" => [
-                ...Arr::only(
-                    $payment->toArray(),
-                    ['id', 'amount', 'type', 'subtype', 'status', 'reference']
-                ),
-                'stk_result_code' => $stkCallback->result_code
+                [
+                    ...Arr::only(
+                        $payment->toArray(),
+                        ['id', 'amount', 'type', 'subtype', 'status', 'reference']
+                    ),
+                    'stk_result_code' => $stkCallback->result_code
+                ]
             ]
         ]);
     }
