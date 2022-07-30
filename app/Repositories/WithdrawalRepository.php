@@ -21,7 +21,7 @@ class WithdrawalRepository
     public function __construct(private readonly array $transaction) { }
 
     /**
-     * @throws \Exception
+     * @throws \Exception|Throwable
      */
     public function mpesa()
     {
@@ -32,8 +32,8 @@ class WithdrawalRepository
         $reference = $productType . ' - ' . $number;
 
         try {
-//            TODO: Change to actual amount on production
-            $b2cResponse = mpesa_send($number, 10, $reference);
+            //TODO: Check amount here is less than available, make a b2c query call and/or check the b2c table
+            $b2cResponse = mpesa_send($number, $this->transaction['amount'], $reference);
         } catch (MpesaException $e) {
 //            TODO: Inform customer of issue?
             Log::critical($e);

@@ -13,6 +13,7 @@ use App\Services\SidoohProducts;
 use App\Services\SidoohSavings;
 use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkCallback;
+use Error;
 use Exception;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Arr;
@@ -32,7 +33,7 @@ class MpesaEventRepository
 //            ->firstOrFail();
 
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
-        if ($payment->status !== Status::PENDING->name) throw new \Error("Payment is not pending... - $payment->id");
+        if ($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
 
         $payment->update(["status" => Status::FAILED->name]);
 
@@ -53,7 +54,7 @@ class MpesaEventRepository
     public static function stkPaymentReceived(MpesaStkCallback $stkCallback)
     {
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
-        if ($payment->status !== Status::PENDING->name) throw new \Error("Payment is not pending... - $payment->id");
+        if ($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
 
         $payment->update(["status" => Status::COMPLETED->name]);
 
@@ -81,7 +82,7 @@ class MpesaEventRepository
     {
         try {
             $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
-            if ($payment->status !== Status::PENDING->name) throw new \Error("Payment is not pending... - $payment->id");
+            if ($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
 
             $payment->update(["status" => Status::COMPLETED->name]);
 
@@ -98,7 +99,7 @@ class MpesaEventRepository
         try {
             $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
 
-            if ($payment->status !== Status::PENDING->name) throw new \Error("Payment is not pending... - $payment->id");
+            if ($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
 
             $payment->update(["status" => Status::FAILED->name]);
 
