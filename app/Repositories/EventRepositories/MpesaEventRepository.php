@@ -39,11 +39,13 @@ class MpesaEventRepository
 
         SidoohProducts::paymentCallback([
             "payments" => [
-                ...Arr::only(
-                    $payment->toArray(),
-                    ['id', 'amount', 'type', 'subtype', 'status', 'reference']
-                ),
-                'stk_result_code' => $stkCallback->result_code
+                [
+                    ...Arr::only(
+                        $payment->toArray(),
+                        ['id', 'amount', 'type', 'subtype', 'status', 'reference']
+                    ),
+                    'stk_result_code' => $stkCallback->result_code
+                ]
             ]
         ]);
     }
