@@ -62,7 +62,7 @@ class VoucherController extends Controller
         return $this->successResponse($vouchers);
     }
 
-    public function credit(Request $request): array
+    public function credit(Request $request): JsonResponse
     {
         $request->validate([
             'account_id'  => ['required'],
@@ -75,7 +75,9 @@ class VoucherController extends Controller
         $amount = $request->input("amount");
         $description = Description::from($request->input("description"));
 
-        return VoucherRepository::credit($accountId, $amount, $description);
+        $response = VoucherRepository::credit($accountId, $amount, $description);
+
+        return $this->successResponse($response);
     }
 
     /**
