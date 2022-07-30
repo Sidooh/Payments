@@ -32,9 +32,10 @@ class MpesaEventRepository
 //            ->whereSubtype(PaymentSubtype::STK->name)
 //            ->firstOrFail();
 
-        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
+        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)
+            ->firstOrFail();
         if ($payment->status !== Status::PENDING->name) {
-            Log::error("Payment is not pending...", $payment->toArray());
+            Log::error("Payment is not pending...", [$payment, $stkCallback->request]);
             return;
         }
 
