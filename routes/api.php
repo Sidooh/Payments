@@ -33,6 +33,7 @@ Route::middleware("auth.jwt")->prefix('/v1')->group(function() {
 
     //  DASHBOARD ROUTES
     Route::get('/dashboard', DashboardController::class);
+    Route::get('/dashboard/revenue-chart', [DashboardController::class, "revenueChart"]);
 
     Route::prefix('/vouchers')->group(function() {
         Route::get('/', [VoucherController::class, "index"]);
