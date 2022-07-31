@@ -2,33 +2,50 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Enums\PaymentSubtype;
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
     /**
      * Handle the incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
     public function __invoke(Request $request): JsonResponse
     {
-        $payments = Payment::select(["id", "amount", "type", "subtype", "status", "created_at", "updated_at"])->latest()->get();
-        $paymentsToday = Payment::select(["amount", "created_at"])->whereDate("created_at", Carbon::today());
+        $totalPayments = Cache::remember('total_payments', 60 * 60 * 24, function () {
+            return Payment::count();
+        });
+        $totalPaymentsToday = Cache::remember('total_payments_today', 60 * 60, function () {
+            return Payment::whereDate('created_at', Carbon::today())->count();
+        });
+
+        $totalRevenue = Cache::remember('total_revenue', 60 * 60 * 24, function () {
+            return round(Payment::whereStatus(Status::COMPLETED->name)
+                ->whereNotIn('subtype', [PaymentSubtype::B2C->name, PaymentSubtype::VOUCHER->name])
+                ->sum("amount"));
+        });
+        $totalRevenueToday = Cache::remember('total_revenue_today', 60 * 60, function () {
+            return round(Payment::whereStatus(Status::COMPLETED->name)
+                ->whereNotIn('subtype', [PaymentSubtype::B2C->name, PaymentSubtype::VOUCHER->name])
+                ->whereDate('created_at', Carbon::today())
+                ->sum("amount"));
+        });
 
         return $this->successResponse([
-            "total_revenue"       => $payments->sum("amount"),
-            "total_revenue_today" => Payment::whereDate("created_at", Carbon::today())->sum("amount"),
+            "total_payments" => $totalPayments,
+            "total_payments_today" => $totalPaymentsToday,
 
-            "total_payments"       => $payments->count(),
-            "total_payments_today" => $paymentsToday->count(),
-
-            "recent_payments"  => $payments->take(70),
+            "total_revenue" => $totalRevenue,
+            "total_revenue_today" => $totalRevenueToday,
         ]);
     }
 }

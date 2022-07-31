@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\ProductType;
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Repositories\PaymentRepository;
@@ -73,9 +74,20 @@ class PaymentController extends Controller
         }
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $payments = Payment::latest()->limit(100)->get();
+        $payments = Payment::latest()->limit(100);
+
+        if ($request->has('status') && $status = Status::tryFrom($request->status)) {
+            $payments->whereStatus($status);
+            if ($status !== Status::PENDING) {
+                $payments->limit(100); // Other statuses will have too many records
+            }
+        } else {
+            $payments->limit(100);
+        }
+
+        $payments = $payments->latest()->get();
 
         return $this->successResponse($payments);
     }

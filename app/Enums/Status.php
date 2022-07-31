@@ -2,10 +2,10 @@
 
 namespace App\Enums;
 
-enum Status
+enum Status: string
 {
-    case COMPLETED;
-    case FAILED;
-    case PENDING;
-    case REFUNDED;
+    case COMPLETED = 'COMPLETED';
+    case FAILED = 'FAILED';
+    case PENDING = 'PENDING';
+    case REFUNDED = 'REFUNDED';
 }
