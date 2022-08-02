@@ -12,7 +12,8 @@
         "laravel/framework": "^9.9",
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.7",
-        "propaganistas/laravel-phone": "^4.3"
+        "propaganistas/laravel-phone": "^4.3",
+        "sentry/sentry-laravel": "^2.13"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
