@@ -57,10 +57,13 @@ class MpesaEventRepository
     /**
      * @throws Throwable
      */
-    public static function stkPaymentReceived(MpesaStkCallback $stkCallback)
+    public static function stkPaymentReceived(MpesaStkCallback $stkCallback): void
     {
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
-        if ($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
+        if ($payment->status !== Status::PENDING->name) {
+            Log::error("Payment is not pending...", [$payment, $stkCallback->request]);
+            return;
+        }
 
         $payment->update(["status" => Status::COMPLETED->name]);
 

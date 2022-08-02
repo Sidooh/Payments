@@ -48,9 +48,15 @@ return [
     */
 
     'channels' => [
+        'gcp' => [
+            'driver' => 'stack',
+            'channels' => ['syslog', 'sentry'],
+            'ignore_exceptions' => false,
+        ],
+
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily', 'stderr', 'slack'],
+            'channels' => ['daily', 'slack'],
             'ignore_exceptions' => false,
         ],
 
