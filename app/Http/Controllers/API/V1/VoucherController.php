@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Enums\Description;
+use App\Enums\VoucherType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VoucherRequest;
 use App\Models\Voucher;
@@ -21,7 +22,8 @@ class VoucherController extends Controller
         $vouchers = Voucher::latest();
 
         if(in_array("voucher_transactions", $relations)) {
-            $vouchers = $vouchers->with("voucherTransactions:id,voucher_id,type,amount,description,created_at")->limit(50);
+            $vouchers = $vouchers->with("voucherTransactions:id,voucher_id,type,amount,description,created_at")
+                ->limit(50);
         }
 
         $vouchers = $vouchers->get();
@@ -60,6 +62,10 @@ class VoucherController extends Controller
     public function getAccountVouchers(int $accountId): JsonResponse
     {
         $vouchers = Voucher::select(["id", "type", "balance"])->whereAccountId($accountId)->get();
+
+        if($vouchers->isEmpty()) {
+            $vouchers = [Voucher::create(["account_id" => $accountId, "type" => VoucherType::SIDOOH])];
+        }
 
         return $this->successResponse($vouchers);
     }
