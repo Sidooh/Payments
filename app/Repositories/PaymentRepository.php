@@ -113,7 +113,6 @@ class PaymentRepository
         }
 
         return DB::transaction(function () use ($id, $description, $productType) {
-
             [$voucher, $voucherTransaction] = VoucherRepository::debit($id, $this->totalAmount, $description);
 
             $data["debit_voucher"] = $voucher;
