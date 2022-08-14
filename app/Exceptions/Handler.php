@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -49,10 +50,11 @@ class Handler extends ExceptionHandler
         return match (true) {
             $e instanceof MethodNotAllowedHttpException => $this->errorResponse('The specified method for the request is invalid', 405),
             $e instanceof NotFoundHttpException => $this->errorResponse('The specified URL cannot be found', 404),
-            $e instanceof ValidationException => $this->errorResponse($e->getMessage(), 422),
+            $e instanceof ValidationException => $this->errorResponse("The request is invalid", 422, $e->errors()),
             $e instanceof ModelNotFoundException => $this->errorResponse('The specified resource cannot be found', 404),
-            $e instanceof AuthenticationException => $this->errorResponse("Not Authorized", 401),
-            default => $this->errorResponse($e->getMessage())
+            $e instanceof HttpException => $this->errorResponse($e->getMessage(), $e->getStatusCode()),
+            $e instanceof AuthenticationException => $this->errorResponse($e->getMessage(), 401),
+            default => $this->errorResponse("Something went wrong, please contact support")
         };
     }
 }
