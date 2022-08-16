@@ -9,6 +9,7 @@ use App\Http\Requests\VoucherRequest;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use App\Repositories\VoucherRepository;
+use App\Services\SidoohAccounts;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -54,8 +55,19 @@ class VoucherController extends Controller
         return $this->successResponse($transactions->get());
     }
 
-    public function show(Voucher $voucher): JsonResponse
+    public function show(Request $request, Voucher $voucher): JsonResponse
     {
+        $relations = explode(",", $request->query("with"));
+
+        if(in_array("transactions", $relations)) {
+            $voucher->load("voucherTransactions:id,voucher_id,type,amount,description,created_at")->latest()
+                ->limit(100);
+        }
+
+        if(in_array("account", $relations)) {
+            $voucher->account = SidoohAccounts::find($voucher->account_id, true);
+        }
+
         return $this->successResponse($voucher->toArray());
     }
 
