@@ -65,19 +65,17 @@ namespace App\Models{
 }
 
 namespace App\Models{
-
-    use App\Enums\PaymentSubtype;
-
-    /**
+/**
  * App\Models\Payment
  *
  * @property int $id
  * @property string $amount
- * @property string $details
  * @property string $status
  * @property string $type
  * @property string $subtype
  * @property int $provider_id
+ * @property string|null $description
+ * @property string|null $reference
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $provider
@@ -87,10 +85,11 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Payment query()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDetails($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvider(\App\Enums\PaymentSubtype $subtype, int $providerId)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProviderId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvider(PaymentSubtype $subtype, int $providerId)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereSubtype($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereType($value)
@@ -132,9 +131,9 @@ namespace App\Models{
  * App\Models\VoucherTransaction
  *
  * @property int $id
- * @property string $type
+ * @property \App\Enums\TransactionType $type
  * @property int $amount
- * @property \App\Enums\Description $description
+ * @property string $description
  * @property int $voucher_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
