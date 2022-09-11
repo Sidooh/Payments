@@ -43,7 +43,7 @@ class FloatAccountRepository
     {
         $floatAccount->balance += $amount;
         $floatAccount->save();
-        
+
         return [
             "float_account" => $floatAccount->only(["floatable_id", "balance", "floatable_type"]),
             "transaction"   => $floatAccount->floatAccountTransaction()->create([
