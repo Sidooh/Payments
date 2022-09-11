@@ -6,7 +6,9 @@ use App\Enums\Description;
 use App\Enums\MpesaReference;
 use App\Enums\PaymentSubtype;
 use App\Enums\Status;
+use App\Models\FloatAccount;
 use App\Models\Payment;
+use App\Repositories\FloatAccountRepository;
 use App\Repositories\VoucherRepository;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohProducts;
@@ -25,16 +27,11 @@ class MpesaEventRepository
     /**
      * @throws RequestException
      */
-    public static function stkPaymentFailed(MpesaStkCallback $stkCallback)
+    public static function stkPaymentFailed(MpesaStkCallback $stkCallback): void
     {
-        // TODO: Make into a transaction/try catch?
-//        $payment = Payment::whereProviderId($stkCallback->request->id)
-//            ->whereSubtype(PaymentSubtype::STK->name)
-//            ->firstOrFail();
+        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
-        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)
-            ->firstOrFail();
-        if ($payment->status !== Status::PENDING->name) {
+        if($payment->status !== Status::PENDING->name) {
             Log::error("Payment is not pending...", [$payment, $stkCallback->request]);
             return;
         }
@@ -44,10 +41,7 @@ class MpesaEventRepository
         SidoohProducts::paymentCallback([
             "payments" => [
                 [
-                    ...Arr::only(
-                        $payment->toArray(),
-                        ['id', 'amount', 'type', 'subtype', 'status', 'reference']
-                    ),
+                    ...Arr::only($payment->toArray(), ['id', 'amount', 'type', 'subtype', 'status', 'reference']),
                     'stk_result_code' => $stkCallback->result_code
                 ]
             ]
@@ -60,7 +54,8 @@ class MpesaEventRepository
     public static function stkPaymentReceived(MpesaStkCallback $stkCallback): void
     {
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
-        if ($payment->status !== Status::PENDING->name) {
+
+        if($payment->status !== Status::PENDING->name) {
             Log::error("Payment is not pending...", [$payment, $stkCallback->request]);
             return;
         }
@@ -69,19 +64,24 @@ class MpesaEventRepository
 
         Log::info('...[REP - MPESA]: Payment updated...', [$payment->id, $payment->status]);
 
-        $data['payments'] = [Arr::only(
-            $payment->toArray(),
-            ['id', 'amount', 'type', 'subtype', 'status', 'reference']
-        )];
+        $data['payments'] = [
+            Arr::only($payment->toArray(), ['id', 'amount', 'type', 'subtype', 'status', 'reference'])
+        ];
 
-        if ($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
+        if($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
             // TODO: If you purchase for self using other MPESA, this fails!!!
             $destination = explode(' - ', $payment->description)[1];
             $accountId = SidoohAccounts::findByPhone($destination)['id'];
 
-            [$voucher,] = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE);
+            [$voucher] = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE);
 
             $data['credit_vouchers'] = [$voucher];
+        } else if($stkCallback->request->reference === MpesaReference::FLOAT) {
+            $floatAccount = FloatAccount::find(explode(' - ', $payment->description)[1]);
+
+            FloatAccountRepository::credit($floatAccount, $payment->amount, Description::FLOAT_PURCHASE);
+
+            return;
         }
 
         SidoohProducts::paymentCallback($data);
@@ -91,7 +91,7 @@ class MpesaEventRepository
     {
         try {
             $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
-            if ($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
+            if($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
 
             $payment->update(["status" => Status::COMPLETED->name]);
 
@@ -108,7 +108,7 @@ class MpesaEventRepository
         try {
             $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
 
-            if ($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
+            if($payment->status !== Status::PENDING->name) throw new Error("Payment is not pending... - $payment->id");
 
             $payment->update(["status" => Status::FAILED->name]);
 

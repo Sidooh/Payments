@@ -9,4 +9,5 @@ enum MpesaReference: string
     const PAY_UTILITY = 'UTILITY';
     const SUBSCRIPTION = 'SUBSCRIPTION';
 
+    const FLOAT = 'FLOAT';
 }

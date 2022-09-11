@@ -32,10 +32,10 @@ class SidoohProducts extends SidoohService
 
         $url = config('services.sidooh.services.products.url') . "/enterprises/$id";
 
-        $enterprise = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));
+        $response = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));
 
-        if(!$enterprise) throw new Exception("Enterprise doesn't exist!");
+        if(!$response) throw new Exception("Enterprise doesn't exist!");
 
-        return $enterprise;
+        return $response;
     }
 }
