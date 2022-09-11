@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\V1\DashboardController;
+use App\Http\Controllers\API\V1\FloatAccountController;
 use App\Http\Controllers\API\V1\MpesaController;
 use App\Http\Controllers\API\V1\PaymentController;
 use App\Http\Controllers\API\V1\VoucherController;
@@ -42,6 +43,12 @@ Route::middleware("auth.jwt")->prefix('/v1')->group(function() {
     });
 
     Route::get('/mpesa/payments', [MpesaController::class, "getBySubType"]);
+
+    Route::prefix('/float-accounts')->group(function () {
+        Route::get('/', [FloatAccountController::class, "index"]);
+        Route::post('/', [FloatAccountController::class, "store"]);
+
+    });
 });
 
 Route::middleware('throttle:3,60')->prefix('/v1')->group(function() {
