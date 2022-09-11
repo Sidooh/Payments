@@ -2,15 +2,24 @@
 
 namespace App\Repositories;
 
+use App\Enums\Initiator;
 use App\Models\FloatAccount;
+use Exception;
 
 class FloatAccountRepository
 {
-    public function store(int $accountId, string $accountType): FloatAccount
+    /**
+     * @throws \Exception
+     */
+    public function store(Initiator $initiator, ?int $accountId, ?int $enterpriseId): FloatAccount
     {
         return FloatAccount::create([
-            'accountable_id' => $accountId,
-            'accountable_type' => $accountType
+            'floatable_id'   => match ($initiator) {
+                Initiator::ENTERPRISE => $enterpriseId,
+                Initiator::AGENT => $accountId,
+                default => throw new Exception('Unexpected initiator value.'),
+            },
+            'floatable_type' => $initiator
         ]);
     }
 }

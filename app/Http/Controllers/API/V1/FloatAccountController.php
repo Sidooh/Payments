@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Enums\Initiator;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FloatAccountRequest;
+use App\Http\Requests\FloatRequest;
 use App\Models\FloatAccount;
 use App\Repositories\FloatAccountRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class FloatAccountController extends Controller
 {
-    public function __construct(private FloatAccountRepository $repo){}
+    public function __construct(private readonly FloatAccountRepository $repo) { }
 
     public function index(Request $request): JsonResponse
     {
@@ -20,9 +23,26 @@ class FloatAccountController extends Controller
         return $this->successResponse($floatAccounts);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function store(FloatAccountRequest $request): JsonResponse
     {
-        $account = $this->repo->store(...$request->toArray());
-        return $this->errorResponse($account);
+        $initiator = $request->enum("initiator", Initiator::class);
+        $accountId = $request->validated("account_id");
+        $enterpriseId = $request->validated("enterprise_id");
+
+        $account = $this->repo->store($initiator, $accountId, $enterpriseId);
+
+        return $this->successResponse($account);
+    }
+
+    public function topUp(FloatRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+
+        Log::info('...[CTRL - FLOAT ACCOUNT]: Process Float Request...', $data);
+
+        return $this->successResponse("Success");
     }
 }

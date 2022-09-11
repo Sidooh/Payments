@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\SidoohAccountExists;
+use App\Rules\SidoohEnterpriseExists;
 use Illuminate\Foundation\Http\FormRequest;
 
 class FloatAccountRequest extends FormRequest
@@ -14,10 +16,9 @@ class FloatAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'initiator' => ['in:ENTERPRISE,AGENT',],
-//            'account_id'    => 'integer',
-            'agent_id' => ['required_if:initiator,AGENT', 'exists:agents,id'],
-            'enterprise_id' => ['required_if:initiator,ENTERPRISE', 'exists:enterprises,id'],
+            'initiator'     => 'required|in:ENTERPRISE,AGENT',
+            'account_id'    => ['required_if:initiator,AGENT', new SidoohAccountExists],
+            'enterprise_id' => ['required_if:initiator,ENTERPRISE', new SidoohEnterpriseExists],
         ];
     }
 

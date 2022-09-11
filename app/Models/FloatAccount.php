@@ -15,17 +15,17 @@ class FloatAccount extends Model
     use HasFactory;
 
     protected $fillable = [
-        'accountable_id',
-        'accountable_type',
+        'floatable_id',
+        'floatable_type',
     ];
 
     /**
      * ---------------------------------------- Relationships ----------------------------------------
      */
     /**
-     * Get the parent accountable model (agent or enterprise).
+     * Get the parent floatable model (agent or enterprise).
      */
-    public function accountable(): MorphTo
+    public function floatable(): MorphTo
     {
         return $this->morphTo();
     }
