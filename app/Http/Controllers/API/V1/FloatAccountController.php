@@ -37,12 +37,22 @@ class FloatAccountController extends Controller
         return $this->successResponse($account);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function topUp(FloatRequest $request): JsonResponse
     {
         $data = $request->validated();
 
         Log::info('...[CTRL - FLOAT ACCOUNT]: Process Float Request...', $data);
 
-        return $this->successResponse("Success");
+        $initiator = $request->enum("initiator", Initiator::class);
+        $amount = $request->validated("amount");
+        $accountId = $request->validated("account_id");
+        $enterpriseId = $request->validated("enterprise_id");
+
+        $floatAccount = $this->repo->topUp($initiator, $amount, $accountId, $enterpriseId);
+
+        return $this->successResponse($floatAccount);
     }
 }

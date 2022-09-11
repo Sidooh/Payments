@@ -59,19 +59,19 @@ class PaymentController extends Controller
 
         try {
             $data = $repo->process();
-            return $this->successResponse($data, "Payment Created.");
 
+            return $this->successResponse($data, "Payment Created.");
         } catch (MpesaException $e) {
             Log::critical($e);
-            return $this->errorResponse("Failed to process payment request.");
-
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
             }
+
             Log::error($err);
-            return $this->errorResponse("Failed to process payment request.");
         }
+
+        return $this->errorResponse("Failed to process payment request.");
     }
 
     public function index(Request $request): JsonResponse
