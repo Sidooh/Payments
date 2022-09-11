@@ -41,7 +41,7 @@ Route::middleware("auth.jwt")->prefix('/v1')->group(function() {
         Route::get('/{voucher}', [VoucherController::class, "show"]);
     });
 
-    Route::get('/mpesa/{subType}/payments', [MpesaController::class, "getBySubType"]);
+    Route::get('/mpesa/payments', [MpesaController::class, "getBySubType"]);
 });
 
 Route::middleware('throttle:3,60')->prefix('/v1')->group(function() {
