@@ -26,11 +26,13 @@ class SidoohProducts extends SidoohService
     /**
      * @throws \Exception
      */
-    public static function findEnterprise($id)
+    public static function findEnterprise($id, $with = [])
     {
         Log::info('...[SRV - PRODUCTS]: Find Enterprise...', ['id' => $id]);
 
         $url = config('services.sidooh.services.products.url') . "/enterprises/$id";
+
+        if(in_array("enterprise_accounts", $with)) $url .= "?with=enterprise_accounts";
 
         $response = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));
 

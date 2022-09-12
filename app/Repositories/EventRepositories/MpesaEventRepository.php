@@ -87,7 +87,7 @@ class MpesaEventRepository
         SidoohProducts::paymentCallback($data);
     }
 
-    public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse)
+    public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
             $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
@@ -103,7 +103,7 @@ class MpesaEventRepository
         }
     }
 
-    public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse)
+    public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
             $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();

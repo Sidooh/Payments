@@ -38,22 +38,22 @@ class FloatAccountRepository
      */
     public function topUp(Initiator $initiator, $amount, ?int $accountId, ?int $enterpriseId): Payment|Model
     {
-        switch($initiator) {
-            case Initiator::AGENT:
-                $number = SidoohAccounts::find($accountId)["phone"];
-                $floatableId = $accountId;
-                break;
-            case Initiator::ENTERPRISE:
-                $number = SidoohProducts::findEnterprise($enterpriseId)["admin"]["account"]["phone"];
-                $floatableId = $enterpriseId;
-                break;
-            default:
-                throw new Exception('Unexpected initiator value.');
-        }
+        $payParams = match ($initiator) {
+            Initiator::AGENT => [
+                "phone"        => SidoohAccounts::find($accountId)["phone"],
+                "floatable_id" => $accountId
+            ],
+            Initiator::ENTERPRISE => [
+                "phone"        => SidoohProducts::findEnterprise($enterpriseId)["admin"]["account"]["phone"],
+                "floatable_id" => $enterpriseId
+            ],
+            default => throw new Exception('Unexpected initiator value.')
+        };
 
-        $floatAccount = FloatAccount::whereFloatableType($initiator)->whereFloatableId($floatableId)->first();
+        $floatAccount = FloatAccount::whereFloatableType($initiator)->whereFloatableId($payParams["floatable_id"])
+            ->firstOrFail();
 
-        return $this->pay($floatAccount->id, 254110039317, $amount);
+        return $this->pay($floatAccount->id, $payParams["phone"], $amount);
     }
 
     public function pay(int $floatAccountId, $number, $amount): Model|Payment

@@ -8,9 +8,11 @@ trait ApiResponse
 {
     protected function successResponse($data = [], $message = null, $code = 200): JsonResponse
     {
-        $res["result"] = 1;
+        $res = [
+            "result" => 1,
+            "data"   => $data
+        ];
 
-        if($data) $res["data"] = $data;
         if($message) $res["message"] = $message;
 
         return response()->json($res, $code);
