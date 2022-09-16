@@ -24,41 +24,27 @@ class FloatAccountRepository
     public function store(Initiator $initiator, ?int $accountId, ?int $enterpriseId): FloatAccount
     {
         return FloatAccount::create([
-            'floatable_id'   => match ($initiator) {
+            "floatable_id"   => match ($initiator) {
                 Initiator::ENTERPRISE => $enterpriseId,
                 Initiator::AGENT => $accountId,
                 default => throw new Exception('Unexpected initiator value.'),
             },
-            'floatable_type' => $initiator
+            "floatable_type" => $initiator
         ]);
     }
 
     /**
      * @throws \Exception
      */
-    public function topUp(Initiator $initiator, $amount, ?int $accountId, ?int $enterpriseId): Payment|Model
+    public function topUp(FloatAccount $floatAccount, Initiator $initiator, $amount): Payment|Model
     {
-        $payParams = match ($initiator) {
-            Initiator::AGENT => [
-                "phone"        => SidoohAccounts::find($accountId)["phone"],
-                "floatable_id" => $accountId
-            ],
-            Initiator::ENTERPRISE => [
-                "phone"        => SidoohProducts::findEnterprise($enterpriseId)["admin"]["account"]["phone"],
-                "floatable_id" => $enterpriseId
-            ],
+        $phone = match ($floatAccount->floatable_type) {
+            Initiator::AGENT->value => SidoohAccounts::find($floatAccount->floatable_id)["phone"],
+            Initiator::ENTERPRISE->value => SidoohProducts::findEnterprise($floatAccount->floatable_id)["admin"]["account"]["phone"],
             default => throw new Exception('Unexpected initiator value.')
         };
 
-        $floatAccount = FloatAccount::whereFloatableType($initiator)->whereFloatableId($payParams["floatable_id"])
-            ->firstOrFail();
-
-        return $this->pay($floatAccount->id, $payParams["phone"], $amount);
-    }
-
-    public function pay(int $floatAccountId, $number, $amount): Model|Payment
-    {
-        $stkResponse = mpesa_request($number, 1, MpesaReference::FLOAT);
+        $stkResponse = mpesa_request($phone, 1, MpesaReference::FLOAT);
 
         return Payment::create([
             "amount"      => $amount,
@@ -66,7 +52,7 @@ class FloatAccountRepository
             "subtype"     => PaymentSubtype::STK,
             "status"      => Status::PENDING->name,
             "provider_id" => $stkResponse->id,
-            "description" => Description::FLOAT_PURCHASE->value . ' - ' . $floatAccountId,
+            "description" => Description::FLOAT_PURCHASE->value . ' - ' . $floatAccount->floatable_id,
         ]);
     }
 
@@ -77,10 +63,10 @@ class FloatAccountRepository
 
         return [
             "float_account" => $floatAccount->only(["floatable_id", "balance", "floatable_type"]),
-            "transaction"   => $floatAccount->floatAccountTransaction()->create([
-                'amount'      => $amount,
-                'type'        => TransactionType::CREDIT,
-                'description' => $description
+            "transaction"   => $floatAccount->floatAccountTransactions()->create([
+                "amount"      => $amount,
+                "type"        => TransactionType::CREDIT,
+                "description" => $description
             ])
         ];
     }

@@ -47,8 +47,10 @@ Route::middleware("auth.jwt")->prefix('/v1')->group(function() {
     Route::prefix('/float-accounts')->group(function () {
         Route::get('/', [FloatAccountController::class, "index"]);
         Route::post('/', [FloatAccountController::class, "store"]);
+        Route::get('/transactions', [FloatAccountController::class, "getTransactions"]);
+        Route::get('/{floatAccount}', [FloatAccountController::class, "show"]);
 
-        Route::post('/top-up', [FloatAccountController::class, 'topUp']);
+        Route::post('/{floatAccount}/top-up', [FloatAccountController::class, 'topUp']);
     });
 });
 

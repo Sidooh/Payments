@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\FloatAccountTransaction;
 use App\Models\VoucherTransaction;
 use DrH\Mpesa\Entities\MpesaBulkPaymentRequest;
 use DrH\Mpesa\Entities\MpesaStkRequest;
@@ -35,9 +36,11 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(!app()->isProduction());
 
         Relation::enforceMorphMap([
-            'STK' => MpesaStkRequest::class,
-            'VOUCHER' => VoucherTransaction::class,
-            'B2C' => MpesaBulkPaymentRequest::class,
+            "STK" => MpesaStkRequest::class,
+            "VOUCHER" => VoucherTransaction::class,
+            "B2C" => MpesaBulkPaymentRequest::class,
+
+            "FLOAT" => FloatAccountTransaction::class,
         ]);
     }
 }
