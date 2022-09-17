@@ -21,14 +21,10 @@ class FloatAccountRepository
     /**
      * @throws \Exception
      */
-    public function store(Initiator $initiator, ?int $accountId, ?int $enterpriseId): FloatAccount
+    public function store(Initiator $initiator, int $floatableId): FloatAccount
     {
         return FloatAccount::create([
-            "floatable_id"   => match ($initiator) {
-                Initiator::ENTERPRISE => $enterpriseId,
-                Initiator::AGENT => $accountId,
-                default => throw new Exception('Unexpected initiator value.'),
-            },
+            "floatable_id"   => $floatableId,
             "floatable_type" => $initiator
         ]);
     }

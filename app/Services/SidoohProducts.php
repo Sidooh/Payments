@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Log;
 
 class SidoohProducts extends SidoohService
 {
+    static function baseUrl()
+    {
+        return config("services.sidooh.services.products.url");
+    }
+
     /**
      * @throws RequestException
      */
@@ -18,9 +23,7 @@ class SidoohProducts extends SidoohService
     {
         Log::info('...[SRV - PRODUCTS]: Payment Callback...', $data);
 
-        $url = config("services.sidooh.services.products.url") . "/payments/callback";
-
-        return parent::http()->post($url, $data)->throw();
+        return parent::http()->post(self::baseUrl() . "/payments/callback", $data)->throw();
     }
 
     /**
@@ -30,7 +33,7 @@ class SidoohProducts extends SidoohService
     {
         Log::info('...[SRV - PRODUCTS]: Find Enterprise...', ['id' => $id]);
 
-        $url = config('services.sidooh.services.products.url') . "/enterprises/$id";
+        $url = self::baseUrl() . "/enterprises/$id";
 
         if(in_array("enterprise_accounts", $with)) $url .= "?with=enterprise_accounts";
 
