@@ -12,7 +12,7 @@ class SidoohNotify extends SidoohService
     public static function notify(array $to, string $message, EventType $eventType)
     {
         Log::info('...[SRV - NOTIFY]: Send Notification...', [
-            "channel"     => "sms",
+            "channel"     => "SMS",
             "event_type"  => $eventType->value,
             "destination" => implode(', ', $to),
             "content"     => $message

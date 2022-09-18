@@ -33,15 +33,14 @@ class Payment extends Model
     /**
      * Scope a query to fetch specific provider.
      *
-     * @param Builder $query
+     * @param Builder        $query
      * @param PaymentSubtype $subtype
-     * @param int $providerId
+     * @param int            $providerId
      * @return Builder
      */
     public function scopeWhereProvider(Builder $query, PaymentSubtype $subtype, int $providerId): Builder
     {
-        return $query->whereSubtype($subtype->name)
-            ->whereProviderId($providerId);
+        return $query->whereSubtype($subtype->name)->whereProviderId($providerId);
     }
 
 }

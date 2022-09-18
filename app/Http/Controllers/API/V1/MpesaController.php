@@ -8,12 +8,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class MpesaController extends Controller
 {
-    public function getBySubType(string $subType = null): JsonResponse
+    public function getBySubType(Request $request): JsonResponse
     {
-        $subType = match ($subType) {
+        $subType = match ($request->query('sub-type')) {
             "stk" => PaymentSubtype::STK,
             "c2b" => PaymentSubtype::C2B,
             "b2c" => PaymentSubtype::B2C,

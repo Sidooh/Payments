@@ -24,7 +24,6 @@ class Voucher extends Model
     public function voucherTopUpAmount(): Attribute
     {
         return new Attribute(get: function($value, $attributes) {
-
             $disburseType = match (VoucherType::from($this->type)) {
                 VoucherType::ENTERPRISE_LUNCH => 'lunch',
                 VoucherType::ENTERPRISE_GENERAL => 'general',

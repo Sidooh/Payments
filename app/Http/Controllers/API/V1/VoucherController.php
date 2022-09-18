@@ -5,11 +5,12 @@ namespace App\Http\Controllers\API\V1;
 use App\Enums\Description;
 use App\Enums\VoucherType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\VoucherRequest;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use App\Repositories\VoucherRepository;
 use App\Services\SidoohAccounts;
+use App\Services\SidoohProducts;
+use Arr;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
@@ -103,10 +104,41 @@ class VoucherController extends Controller
     /**
      * @throws Throwable
      */
-    public function disburse(VoucherRequest $request): JsonResponse
+    public function disburse(Request $request): JsonResponse
     {
-        $response = VoucherRepository::disburse($request->input('enterprise_id'), $request->input('data'));
+        $data = $request->validate([
+            "disburse_type" => "in:LUNCH,GENERAL",
+            "enterprise_id" => "required|integer",
+            "amount"        => "numeric",
+            "accounts"      => "array",
+        ], [
+            'disburse_type.in' => 'invalid :attribute. allowed values are: [LUNCH, GENERAL]'
+        ]);
 
-        return $this->successResponse($response);
+        $enterpriseId = $data['enterprise_id'];
+        $voucherType = VoucherType::tryFrom("ENTERPRISE_{$data["disburse_type"]}");
+
+        $enterprise = SidoohProducts::findEnterprise($enterpriseId, ["enterprise_accounts"]);
+
+        if($request->isNotFilled("amount")) {
+            $data['amount'] = match ($data['disburse_type']) {
+                "LUNCH" => $enterprise["max_lunch"],
+                "GENERAL" => $enterprise["max_general"]
+            };
+
+            if(!isset($data['amount'])) {
+                return $this->errorResponse("Amount is required! default amount for {$data['disburse_type']} voucher not set");
+            }
+        }
+
+        if($request->isNotFilled("accounts")) {
+            $data['accounts'] = Arr::pluck($enterprise["enterprise_accounts"], "account_id");
+        }
+
+        $floatAccount = VoucherRepository::disburse($enterprise, $data["accounts"], $data['amount'], $voucherType);
+
+        $message = "{$data['disburse_type']} Voucher Disburse Request Successful";
+
+        return $this->successResponse($floatAccount, $message);
     }
 }

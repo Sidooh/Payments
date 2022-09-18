@@ -16,21 +16,21 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $balance
- * @property string $accountable_type
- * @property int $accountable_id
+ * @property string $floatable_type
+ * @property int $floatable_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $accountable
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FloatAccountTransaction[] $floatAccountTransaction
  * @property-read int|null $float_account_transaction_count
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $floatable
  * @method static \Database\Factories\FloatAccountFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount query()
- * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereAccountableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereAccountableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereFloatableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereFloatableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereUpdatedAt($value)
  */
