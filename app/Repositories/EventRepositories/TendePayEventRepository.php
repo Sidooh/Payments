@@ -33,6 +33,7 @@ class TendePayEventRepository
         ]);
     }
 
+
     public static function b2bPaymentSent(TendePayCallback $callback): void
     {
         $payment = Payment::whereProvider(PaymentSubtype::STK, $callback->request->id)->firstOrFail();
@@ -53,4 +54,5 @@ class TendePayEventRepository
 
         SidoohProducts::paymentCallback($data);
     }
+
 }

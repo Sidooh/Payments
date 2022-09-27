@@ -8,4 +8,5 @@ enum PaymentMethod: string
     case VOUCHER = 'VOUCHER';
 //    case FLOAT;
 //    case SIDOOH_POINTS;
+
 }
