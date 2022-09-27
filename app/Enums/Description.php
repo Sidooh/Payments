@@ -14,4 +14,5 @@ enum Description: string
     case FLOAT_PURCHASE = 'Float Purchase';
 
     case SUBSCRIPTION_PURCHASE = 'Subscription Purchase';
+    case MERCHANT_PAYMENT = 'Merchant Payment';
 }

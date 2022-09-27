@@ -54,7 +54,7 @@ class VoucherRepository
 
         $transaction = $voucher->voucherTransactions()->create([
             'amount' => $amount,
-            'type' => TransactionType::CREDIT,
+            'type' => TransactionType::DEBIT,
             'description' => $description,
         ]);
 
