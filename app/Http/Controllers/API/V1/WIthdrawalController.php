@@ -16,22 +16,21 @@ class WIthdrawalController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
+     *
      * @throws Throwable
      */
     public function __invoke(Request $request): JsonResponse
     {
         // TODO: Validate this process, why no checks?
         $request->validate([
-//            "transactions" => ['required', 'array'],
-//            "data"         => ["required", "array"],
-            ""
+            //            "transactions" => ['required', 'array'],
+            //            "data"         => ["required", "array"],
+            '',
         ]);
 
         $data = $request->all();
-
-
 
         $repo = new WithdrawalRepository($data['transactions'], $data['total_amount'], $data['data']);
 
@@ -40,9 +39,9 @@ class WIthdrawalController extends Controller
         $data = match ($request->input('method')) {
             PaymentMethod::MPESA->name => $repo->mpesa(),
 //            PaymentMethod::VOUCHER->name => $repo->voucher(),
-            default => throw new Exception("Unsupported payment method!")
+            default => throw new Exception('Unsupported payment method!')
         };
 
-        return $this->successResponse($data, "Payment Created!");
+        return $this->successResponse($data, 'Payment Created!');
     }
 }

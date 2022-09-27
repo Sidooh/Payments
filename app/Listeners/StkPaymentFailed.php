@@ -13,18 +13,20 @@ class StkPaymentFailed
      *
      * @return void
      */
-    public function __construct() { }
+    public function __construct()
+    {
+    }
 
     /**
      * Handle the event.
      *
-     * @param StkPushPaymentFailedEvent $event
+     * @param  StkPushPaymentFailedEvent  $event
      * @return void
      */
     public function handle(StkPushPaymentFailedEvent $event)
     {
         Log::info('...[EVENT]: STK Payment Failed...', [
-            "result_description" => $event->stkCallback->result_desc
+            'result_description' => $event->stkCallback->result_desc,
         ]);
 
         MpesaEventRepository::stkPaymentFailed($event->stkCallback);

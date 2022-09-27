@@ -14,10 +14,10 @@ class FloatAccountTransaction extends Model
 {
     use HasFactory;
 
-    protected $fillable= [
+    protected $fillable = [
         'amount',
         'type',
-        'description'
+        'description',
     ];
 
     /**
@@ -28,7 +28,8 @@ class FloatAccountTransaction extends Model
         return $this->belongsTo(FloatAccount::class);
     }
 
-    public function payment(): MorphOne {
+    public function payment(): MorphOne
+    {
         return $this->morphOne(Payment::class, 'provider', 'subtype');
     }
 }

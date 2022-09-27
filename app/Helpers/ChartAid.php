@@ -15,10 +15,15 @@ class ChartAid
      * @var mixed|string
      */
     private Frequency $frequency;
+
     private Period $period;
+
     private Collection $models;
+
     private string $aggregateType;
+
     private ?string $aggregateColumn;
+
     private bool $showFuture = false;
 
     public function __construct(Period $period, Frequency $frequency, string $aggregateType = 'count', ?string $aggregateColumn = null)
@@ -29,18 +34,17 @@ class ChartAid
         $this->aggregateColumn = $aggregateColumn;
     }
 
-
     /**
-     * @param Collection $models
-     * @param null       $frequencyCount
+     * @param  Collection  $models
+     * @param  null  $frequencyCount
      * @return array
      */
-    #[ArrayShape(['labels' => "array", 'datasets' => "array"])]
+    #[ArrayShape(['labels' => 'array', 'datasets' => 'array'])]
     public function chartDataSet(Collection $models, $frequencyCount = null): array
     {
         $this->models = $models;
 
-        if(is_null($frequencyCount)) {
+        if (is_null($frequencyCount)) {
             $frequencyCount = match ($this->period) {
                 Period::TODAY => 24,
                 Period::LAST_SEVEN_DAYS => 7,
@@ -63,7 +67,7 @@ class ChartAid
         $date = new Carbon;
 
         $data = collect();
-        for($i = 0; $i < $frequencyCount; $i++) {
+        for ($i = 0; $i < $frequencyCount; $i++) {
             $dateString = self::chartDateFormat($date);
 
             $data[$dateString] = $this->aggregate($dateString);
@@ -92,13 +96,13 @@ class ChartAid
 
 //        dd($data);
 
-        if($this->showFuture) {
+        if ($this->showFuture) {
             $data = $data->sortKeys();
         } else {
             $data = $data->reverse();
         }
 
-        foreach($data as $key => $value) {
+        foreach ($data as $key => $value) {
             $date = self::parseCarbonDate($key);
 
             $name = self::getLabelName($date);
@@ -108,8 +112,8 @@ class ChartAid
         }
 
         return [
-            'labels'   => $data->keys()->toArray(),
-            'datasets' => $data->values()->toArray()
+            'labels' => $data->keys()->toArray(),
+            'datasets' => $data->values()->toArray(),
         ];
     }
 
@@ -140,43 +144,43 @@ class ChartAid
     {
         $freq = $this->frequency->value;
 
-        if($freq === 'yearly') {
-            if($date->isCurrentYear()) {
+        if ($freq === 'yearly') {
+            if ($date->isCurrentYear()) {
                 $name = 'This year';
-            } else if($date->isLastYear()) {
+            } elseif ($date->isLastYear()) {
                 $name = 'Last year';
             } else {
                 $name = $date->year;
             }
-        } else if($freq === 'quarterly') {
+        } elseif ($freq === 'quarterly') {
             $endDate = $date->isCurrentMonth()
-                ? "Current Month"
+                ? 'Current Month'
                 : $date->shortMonthName;
             $startDate = $date->subMonths(2)->shortMonthName;
 
             $name = "$startDate - $endDate";
-        } else if($freq === 'monthly') {
-            if($date->isCurrentMonth()) {
+        } elseif ($freq === 'monthly') {
+            if ($date->isCurrentMonth()) {
                 $name = 'This month';
-            } else if($date->isLastMonth()) {
+            } elseif ($date->isLastMonth()) {
                 $name = 'Last month';
             } else {
                 $name = $date->shortMonthName;
             }
-        } else if($freq === 'weekly') {
-            if($date->isCurrentWeek()) {
+        } elseif ($freq === 'weekly') {
+            if ($date->isCurrentWeek()) {
                 $name = 'This week';
-            } else if($date->isLastWeek()) {
+            } elseif ($date->isLastWeek()) {
                 $name = 'Last week';
             } else {
-                $name = "{$date->diffInWeeks()} week" . ($date->diffInWeeks() > 1
+                $name = "{$date->diffInWeeks()} week".($date->diffInWeeks() > 1
                         ? 's'
-                        : '') . " ago";
+                        : '').' ago';
             }
-        } else if($freq === 'daily') {
-            if($date->isCurrentDay()) {
+        } elseif ($freq === 'daily') {
+            if ($date->isCurrentDay()) {
                 $name = 'Today';
-            } else if($date->isYesterday()) {
+            } elseif ($date->isYesterday()) {
                 $name = 'Yesterday';
             } else {
                 $name = $this->period === Period::LAST_SEVEN_DAYS
@@ -184,9 +188,9 @@ class ChartAid
                     : $date->format('dS');
             }
         } else {
-            if($date->isCurrentHour()) {
+            if ($date->isCurrentHour()) {
                 $name = 'Current hour';
-            } else if($date->isLastHour()) {
+            } elseif ($date->isLastHour()) {
                 $name = 'Last hour';
             } else {
                 $name = $date->format('Hi \h\r\s');
@@ -200,7 +204,6 @@ class ChartAid
     {
         $this->showFuture = $showFuture;
     }
-
 
     /** chart   */
     public function chartDateFormat($date): string

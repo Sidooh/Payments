@@ -93,16 +93,16 @@ return [
         /*
          * Stk callback URL
          */
-        'stk_callback' => env('APP_URL') . '/payments/callbacks/stk-callback',
+        'stk_callback' => env('APP_URL').'/payments/callbacks/stk-callback',
         /*
          * Data is sent to this URL for successful payment
          */
-        'confirmation_url' => env('APP_URL') . '/payments/callbacks/c2b-confirmation',
+        'confirmation_url' => env('APP_URL').'/payments/callbacks/c2b-confirmation',
         /*
          * Mpesa validation URL.
          * NOTE: You need to email MPESA to enable validation
          */
-        'validation_url' => env('APP_URL') . '/payments/callbacks/c2b-validation',
+        'validation_url' => env('APP_URL').'/payments/callbacks/c2b-validation',
     ],
     /*
       |--------------------------------------------------------------------------
@@ -136,20 +136,21 @@ return [
          * Go to https://developer.safaricom.co.ke/test_credentials and paste your initiator password to generate
          * security credential
          */
-        'security_credential' => 'GXiVXirQFaJvEFOQyn+VJ4Gp3Ccvpoq6aqzFiNgvH18UMU59Qxc+UTAX7Blzo6L0+tQG2wUJ1fKH4YlPagt' .
-            'zDHT37796uu0NysS85uPjxZMjnbGhPNeHnhJLzwyrjppl8mZpnmVg4CaVrEdcriuyifKIiF1hmc0A/RnjBMzY6yevbIV0kAgrn5cDvCN' .
-            '99O1rr1nl69GaVbP7a/6AWnRkVUldnalQmqQhfgLbOdxjGOVGU2arqjuvgQ6glo1uK9PUnp3UH2Vv66Lu99JglWyjlcWufZhJXUmFFB9' .
+        'security_credential' => 'GXiVXirQFaJvEFOQyn+VJ4Gp3Ccvpoq6aqzFiNgvH18UMU59Qxc+UTAX7Blzo6L0+tQG2wUJ1fKH4YlPagt'.
+            'zDHT37796uu0NysS85uPjxZMjnbGhPNeHnhJLzwyrjppl8mZpnmVg4CaVrEdcriuyifKIiF1hmc0A/RnjBMzY6yevbIV0kAgrn5cDvCN'.
+            '99O1rr1nl69GaVbP7a/6AWnRkVUldnalQmqQhfgLbOdxjGOVGU2arqjuvgQ6glo1uK9PUnp3UH2Vv66Lu99JglWyjlcWufZhJXUmFFB9'.
             'tfoKAX2URnPGi4PvvJ6OgJNdsJmTsevnG2c/KKOa45rzdvwrwKA==',
         /*
          * Notification URL for timeout
          */
-        'timeout_url' => env('APP_URL') . '/payments/callbacks/timeout/',
+        'timeout_url' => env('APP_URL').'/payments/callbacks/timeout/',
         /**
          * Result URL
          */
-        'result_url' => env('APP_URL') . '/payments/callbacks/result/',
+        'result_url' => env('APP_URL').'/payments/callbacks/result/',
     ],
 
+    'test_amount' => env('MPESA_SANDBOX_AMOUNT', 0),
 
     'logging' => [
         'enabled' => env('MPESA_ENABLE_LOGGING', false),
@@ -160,6 +161,6 @@ return [
                 'path' => storage_path('logs/mpesa.log'),
                 'level' => env('LOG_LEVEL', 'debug'),
             ],
-        ]
-    ]
+        ],
+    ],
 ];

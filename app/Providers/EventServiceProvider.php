@@ -18,7 +18,8 @@ class EventServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
 //        $this->app->bind(PaymentCreated::class."@handle", fn($job) => $job->handle());
     }
 

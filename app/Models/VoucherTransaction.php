@@ -33,7 +33,8 @@ class VoucherTransaction extends Model
         return $this->belongsTo(Voucher::class);
     }
 
-    public function payment(): MorphOne {
+    public function payment(): MorphOne
+    {
         return $this->morphOne(Payment::class, 'provider', 'subtype');
     }
 }

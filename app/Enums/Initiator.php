@@ -6,5 +6,5 @@ enum Initiator: string
 {
     case CONSUMER = 'CONSUMER';
     case AGENT = 'AGENT';
-    case ENTERPRISE = "ENTERPRISE";
+    case ENTERPRISE = 'ENTERPRISE';
 }

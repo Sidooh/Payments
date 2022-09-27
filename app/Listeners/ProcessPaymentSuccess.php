@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Events\PaymentSuccessEvent;
 use App\Services\SidoohProducts;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Log;
 
@@ -15,13 +14,16 @@ class ProcessPaymentSuccess
      *
      * @return void
      */
-    public function __construct() { }
+    public function __construct()
+    {
+    }
 
     /**
      * Handle the event.
      *
-     * @param PaymentSuccessEvent $event
+     * @param  PaymentSuccessEvent  $event
      * @return void
+     *
      * @throws RequestException
      */
     public function handle(PaymentSuccessEvent $event): void

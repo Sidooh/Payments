@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\Log;
 
 class FloatAccountController extends Controller
 {
-    public function __construct(private readonly FloatAccountRepository $repo) { }
+    public function __construct(private readonly FloatAccountRepository $repo)
+    {
+    }
 
     public function index(Request $request): JsonResponse
     {
@@ -29,19 +31,19 @@ class FloatAccountController extends Controller
      */
     public function store(FloatAccountRequest $request): JsonResponse
     {
-        $initiator = $request->enum("initiator", Initiator::class);
+        $initiator = $request->enum('initiator', Initiator::class);
 
-        $account = $this->repo->store($initiator, $request->validated("floatable_id"));
+        $account = $this->repo->store($initiator, $request->validated('floatable_id'));
 
         return $this->successResponse($account);
     }
 
     public function show(Request $request, FloatAccount $floatAccount): JsonResponse
     {
-        $relations = explode(",", $request->query("with"));
+        $relations = explode(',', $request->query('with'));
 
-        if(in_array("transactions", $relations)) {
-            $floatAccount->load("floatAccountTransactions:id,float_account_id,type,amount,description,created_at")
+        if (in_array('transactions', $relations)) {
+            $floatAccount->load('floatAccountTransactions:id,float_account_id,type,amount,description,created_at')
                 ->latest()->limit(100);
         }
 
@@ -57,8 +59,8 @@ class FloatAccountController extends Controller
 
         Log::info('...[CTRL - FLOAT ACCOUNT]: Process Float Request...', $data);
 
-        $initiator = $request->enum("initiator", Initiator::class);
-        $amount = $request->validated("amount");
+        $initiator = $request->enum('initiator', Initiator::class);
+        $amount = $request->validated('amount');
 
         $floatAccount = $this->repo->topUp($floatAccount, $initiator, $amount);
 
@@ -67,23 +69,23 @@ class FloatAccountController extends Controller
 
     public function getTransactions(Request $request): JsonResponse
     {
-        $relations = explode(",", $request->query("with"));
+        $relations = explode(',', $request->query('with'));
 
         $transactions = FloatAccountTransaction::query()->select([
-            "id",
-            "type",
-            "amount",
-            "description",
-            "float_account_id",
-            "created_at"
+            'id',
+            'type',
+            'amount',
+            'description',
+            'float_account_id',
+            'created_at',
         ]);
 
-        if(in_array("float-account", $relations)) {
-            $transactions = $transactions->with("floatAccount:id,floatable_id,floatable_type,balance");
+        if (in_array('float-account', $relations)) {
+            $transactions = $transactions->with('floatAccount:id,floatable_id,floatable_type,balance');
         }
 
-        if(in_array("payment", $relations)) {
-            $transactions = $transactions->with("payment:id,provider_id,subtype,status");
+        if (in_array('payment', $relations)) {
+            $transactions = $transactions->with('payment:id,provider_id,subtype,status');
         }
 
         $transactions->orderBy('id', 'desc')->limit(100);

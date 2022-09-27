@@ -18,12 +18,12 @@ class Voucher extends Model
 
     protected $fillable = [
         'account_id',
-        'type'
+        'type',
     ];
 
     public function voucherTopUpAmount(): Attribute
     {
-        return new Attribute(get: function($value, $attributes) {
+        return new Attribute(get: function ($value, $attributes) {
             $disburseType = match (VoucherType::from($this->type)) {
                 VoucherType::ENTERPRISE_LUNCH => 'lunch',
                 VoucherType::ENTERPRISE_GENERAL => 'general',

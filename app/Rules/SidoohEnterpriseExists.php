@@ -21,7 +21,7 @@ class SidoohEnterpriseExists implements InvokableRule
         try {
             $account = SidoohProducts::findEnterprise($value);
 
-            if (!isset($account['id'])) {
+            if (! isset($account['id'])) {
                 $fail('The :attribute must be an existing enterprise.');
             }
         } catch (Exception) {

@@ -30,7 +30,8 @@ class FloatAccount extends Model
         return $this->morphTo();
     }
 
-    public function floatAccountTransactions():HasMany {
+    public function floatAccountTransactions(): HasMany
+    {
         return $this->hasMany(FloatAccountTransaction::class);
     }
 }

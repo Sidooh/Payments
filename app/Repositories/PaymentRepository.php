@@ -24,16 +24,16 @@ class PaymentRepository
     private mixed $firstTransaction;
 
     /**
-     * @param Collection $transactions
-     * @param PaymentMethod $method
-     * @param string $debit_account
+     * @param  Collection  $transactions
+     * @param  PaymentMethod  $method
+     * @param  string  $debit_account
      */
     public function __construct(
-        private readonly Collection    $transactions,
+        private readonly Collection $transactions,
         private readonly PaymentMethod $method,
-        private readonly string        $debit_account)
+        private readonly string $debit_account)
     {
-        $this->totalAmount = $transactions->sum("amount");
+        $this->totalAmount = $transactions->sum('amount');
         $this->firstTransaction = $this->transactions->first();
     }
 
@@ -42,16 +42,16 @@ class PaymentRepository
      */
     public function process(): array
     {
-        $pass = $this->transactions->every(fn($t) => $t['product_id'] === $this->firstTransaction['product_id']);
-        if (!$pass) {
-            throw new Exception("Transactions mismatch on product", 422);
+        $pass = $this->transactions->every(fn ($t) => $t['product_id'] === $this->firstTransaction['product_id']);
+        if (! $pass) {
+            throw new Exception('Transactions mismatch on product', 422);
         }
 
         return match ($this->method) {
             PaymentMethod::MPESA => $this->mpesa(),
             PaymentMethod::VOUCHER => $this->voucher(),
 //            PaymentMethod::FLOAT->name => $this->float(),
-            default => throw new Exception("Unsupported payment method!")
+            default => throw new Exception('Unsupported payment method!')
         };
     }
 
@@ -78,7 +78,7 @@ class PaymentRepository
 
         // TODO: Improve with: Payment insert with return
         $data['payments'] = $paymentData->map(
-            fn($data) => Arr::only(
+            fn ($data) => Arr::only(
                 Payment::create($data)->toArray(),
                 ['id', 'amount', 'type', 'subtype', 'status', 'reference']
             )
@@ -106,22 +106,22 @@ class PaymentRepository
         };
 
         if ($productType === ProductType::VOUCHER) {
-            $pass = $this->transactions->every(fn($t) => isset($t['destination']) && SidoohAccounts::findByPhone($t['destination']));
-            if (!$pass) {
-                throw new Exception("Transactions need destination to be valid", 422);
+            $pass = $this->transactions->every(fn ($t) => isset($t['destination']) && SidoohAccounts::findByPhone($t['destination']));
+            if (! $pass) {
+                throw new Exception('Transactions need destination to be valid', 422);
             }
         }
 
         return DB::transaction(function () use ($id, $description, $productType) {
             [$voucher, $voucherTransaction] = VoucherRepository::debit($id, $this->totalAmount, $description);
 
-            $data["debit_voucher"] = $voucher;
+            $data['debit_voucher'] = $voucher;
 
             if ($productType === ProductType::VOUCHER) {
                 foreach ($this->transactions as $transaction) {
                     $account = SidoohAccounts::findByPhone($transaction['destination']);
-                    [$voucher,] = VoucherRepository::credit($account['id'], $transaction["amount"], Description::VOUCHER_PURCHASE);
-                    $data["credit_vouchers"][] = $voucher;
+                    [$voucher] = VoucherRepository::credit($account['id'], $transaction['amount'], Description::VOUCHER_PURCHASE);
+                    $data['credit_vouchers'][] = $voucher;
                 }
             }
 
@@ -129,12 +129,11 @@ class PaymentRepository
 
             // TODO: Improve with: Payment insert with return
             $data['payments'] = $paymentData->map(
-                fn($data) => Arr::only(
+                fn ($data) => Arr::only(
                     Payment::create($data)->toArray(),
                     ['id', 'amount', 'type', 'subtype', 'status', 'reference']
                 )
             );
-
 
 //        TODO: Test this
 //        if ($productType === ProductType::UTILITY) $data["provider"] = $this->data["provider"];
@@ -177,16 +176,14 @@ class PaymentRepository
 
     public function getPaymentData(int $providerId, PaymentType $type, PaymentSubtype $subtype, Status $status = null): Collection
     {
-        return $this->transactions->map(fn($transaction) => [
-            "amount" => $transaction["amount"],
-            "type" => $type->name,
-            "subtype" => $subtype->name,
-            "status" => $status->name ?? Status::PENDING->name,
-            "provider_id" => $providerId,
-            "reference" => $transaction["reference"] ?? null,
-            "description" => $transaction["description"] . ' - ' . $transaction["destination"],
+        return $this->transactions->map(fn ($transaction) => [
+            'amount' => $transaction['amount'],
+            'type' => $type->name,
+            'subtype' => $subtype->name,
+            'status' => $status->name ?? Status::PENDING->name,
+            'provider_id' => $providerId,
+            'reference' => $transaction['reference'] ?? null,
+            'description' => $transaction['description'].' - '.$transaction['destination'],
         ]);
     }
-
-
 }

@@ -9,7 +9,8 @@ use Laravel\Sanctum\Guard;
 
 class JWT extends Guard
 {
-    static function decode($token) {
+    public static function decode($token)
+    {
         // split the token
         $tokenParts = explode('.', $token);
         $payload = base64_decode($tokenParts[1]);
@@ -17,19 +18,21 @@ class JWT extends Guard
         return json_decode($payload, true);
     }
 
-    static function expiry($token): Carbon
+    public static function expiry($token): Carbon
     {
         $payload = self::decode($token);
 
-        return Carbon::createFromTimestamp($payload["exp"]);
+        return Carbon::createFromTimestamp($payload['exp']);
     }
 
-    static function verify($token)
+    public static function verify($token)
     {
         try {
             $secret = config('services.sidooh.jwt_key');
 
-            if(!isset($secret)) exit('Invalid JWT key!');
+            if (! isset($secret)) {
+                exit('Invalid JWT key!');
+            }
 
             // split the token
             $tokenParts = explode('.', $token);
@@ -44,15 +47,19 @@ class JWT extends Guard
             // build a signature based on the header and payload using the secret
             $base64UrlHeader = base_64_url_encode($header);
             $base64UrlPayload = base_64_url_encode($payload);
-            $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $secret, true);
+            $signature = hash_hmac('sha256', $base64UrlHeader.'.'.$base64UrlPayload, $secret, true);
             $base64UrlSignature = base_64_url_encode($signature);
 
             // verify it matches the signature provided in the token
 
-            if($tokenExpired) Log::debug("Token has expired.");
-            if($base64UrlSignature !== $signatureProvided) Log::debug("Token is invalid.");
+            if ($tokenExpired) {
+                Log::debug('Token has expired.');
+            }
+            if ($base64UrlSignature !== $signatureProvided) {
+                Log::debug('Token is invalid.');
+            }
 
-            return !$tokenExpired && $base64UrlSignature === $signatureProvided;
+            return ! $tokenExpired && $base64UrlSignature === $signatureProvided;
         } catch (Exception $err) {
             Log::error('--- --- --- --- ---   ...[JWT]: Unable to verify auth token...   --- --- --- --- ---', [$err]);
 

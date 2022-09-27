@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('balance', 10)->default(0);
             $table->morphs('floatable');
 
-            $table->unique(["floatable_id", "floatable_type"]);
+            $table->unique(['floatable_id', 'floatable_type']);
 
             $table->timestamps();
         });

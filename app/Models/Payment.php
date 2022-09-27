@@ -22,7 +22,7 @@ class Payment extends Model
         'subtype',
         'provider_id',
         'reference',
-        'description'
+        'description',
     ];
 
     public function provider(): MorphTo
@@ -33,14 +33,13 @@ class Payment extends Model
     /**
      * Scope a query to fetch specific provider.
      *
-     * @param Builder        $query
-     * @param PaymentSubtype $subtype
-     * @param int            $providerId
+     * @param  Builder  $query
+     * @param  PaymentSubtype  $subtype
+     * @param  int  $providerId
      * @return Builder
      */
     public function scopeWhereProvider(Builder $query, PaymentSubtype $subtype, int $providerId): Builder
     {
         return $query->whereSubtype($subtype->name)->whereProviderId($providerId);
     }
-
 }

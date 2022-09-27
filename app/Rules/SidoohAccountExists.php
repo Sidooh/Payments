@@ -21,7 +21,7 @@ class SidoohAccountExists implements InvokableRule
         try {
             $account = SidoohAccounts::find($value);
 
-            if (!isset($account['id'])) {
+            if (! isset($account['id'])) {
                 $fail('The :attribute must be a valid Sidooh account.');
             }
         } catch (Exception) {

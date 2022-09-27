@@ -85,6 +85,6 @@ class Kernel extends HttpKernel
         'signed' => ValidateSignature::class,
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
-        'auth.jwt' => JWTAuth::class
+        'auth.jwt' => JWTAuth::class,
     ];
 }

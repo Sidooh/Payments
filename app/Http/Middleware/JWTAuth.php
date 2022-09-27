@@ -18,16 +18,19 @@ class JWTAuth
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @param \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return JsonResponse|Response
+     *
      * @throws AuthenticationException
      */
     public function handle(Request $request, Closure $next): JsonResponse|Response
     {
         $token = $request->bearerToken();
 
-        if(!JWT::verify($token)) throw new AuthenticationException();
+        if (! JWT::verify($token)) {
+            throw new AuthenticationException();
+        }
 
         Cache::put('auth_token', $token, JWT::expiry($token)->diffInMinutes());
 

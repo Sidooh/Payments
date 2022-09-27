@@ -26,8 +26,9 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
+     *
      * @throws Throwable
      */
     public function __invoke(Request $request): JsonResponse
@@ -35,18 +36,18 @@ class PaymentController extends Controller
         $countryCode = config('services.sidooh.country_code');
 
         $request->validate([
-            "transactions"  => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
-            'payment_mode'  => ['required', new Enum(PaymentMethod::class)],
+            'transactions' => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
+            'payment_mode' => ['required', new Enum(PaymentMethod::class)],
             'debit_account' => [
                 'required',
                 Rule::when(
-                    $request->input("payment_mode") === PaymentMethod::MPESA->name,
+                    $request->input('payment_mode') === PaymentMethod::MPESA->name,
                     "phone:$countryCode",
                     [new SidoohAccountExists]
-                )
+                ),
             ],
-            'transactions.*.product_id'  => ['required', new Enum(ProductType::class)],
-            'transactions.*.amount'      => ['required', 'integer'],
+            'transactions.*.product_id' => ['required', new Enum(ProductType::class)],
+            'transactions.*.amount' => ['required', 'integer'],
             'transactions.*.destination' => ['required', 'numeric'],
             'transactions.*.description' => ['required', 'string'],
         ]);
@@ -60,7 +61,7 @@ class PaymentController extends Controller
         try {
             $data = $repo->process();
 
-            return $this->successResponse($data, "Payment Created.");
+            return $this->successResponse($data, 'Payment Created.');
         } catch (MpesaException $e) {
             Log::critical($e);
         } catch (Exception $err) {
@@ -71,7 +72,7 @@ class PaymentController extends Controller
             Log::error($err);
         }
 
-        return $this->errorResponse("Failed to process payment request.");
+        return $this->errorResponse('Failed to process payment request.');
     }
 
     public function index(Request $request): JsonResponse
@@ -94,14 +95,18 @@ class PaymentController extends Controller
 
     public function show(Payment $payment): JsonResponse
     {
-        if ($payment->subtype === PaymentSubtype::STK->name) $payment->load([
-            "provider:id,status,reference,description,checkout_request_id,amount,phone,created_at",
-            "provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at"
-        ]);
+        if ($payment->subtype === PaymentSubtype::STK->name) {
+            $payment->load([
+                'provider:id,status,reference,description,checkout_request_id,amount,phone,created_at',
+                'provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at',
+            ]);
+        }
 
-        if ($payment->subtype === PaymentSubtype::VOUCHER->name) $payment->load([
-            "provider:id,type,amount,description,created_at",
-        ]);
+        if ($payment->subtype === PaymentSubtype::VOUCHER->name) {
+            $payment->load([
+                'provider:id,type,amount,description,created_at',
+            ]);
+        }
 
         return $this->successResponse($payment);
     }

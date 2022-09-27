@@ -15,5 +15,7 @@ class PaymentSuccessEvent
      *
      * @return void
      */
-    public function __construct(public array $transactions, public array $data) { }
+    public function __construct(public array $transactions, public array $data)
+    {
+    }
 }

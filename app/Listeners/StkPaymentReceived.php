@@ -14,13 +14,16 @@ class StkPaymentReceived
      *
      * @return void
      */
-    public function __construct() { }
+    public function __construct()
+    {
+    }
 
     /**
      * Handle the event.
      *
-     * @param StkPushPaymentSuccessEvent $event
+     * @param  StkPushPaymentSuccessEvent  $event
      * @return void
+     *
      * @throws Throwable
      */
     public function handle(StkPushPaymentSuccessEvent $event): void
