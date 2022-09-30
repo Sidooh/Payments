@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('voucher_transactions', function (Blueprint $table) {
+        Schema::create('voucher_transactions', function(Blueprint $table) {
             $table->id();
 
             $table->string('type', 20); // DEBIT or CREDIT

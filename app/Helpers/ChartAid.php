@@ -39,27 +39,27 @@ class ChartAid
      * @param  null  $frequencyCount
      * @return array
      */
-    #[ArrayShape(['labels' => 'array', 'datasets' => 'array'])]
+    #[ArrayShape(['labels' => "array", 'datasets' => "array"])]
     public function chartDataSet(Collection $models, $frequencyCount = null): array
     {
         $this->models = $models;
 
         if (is_null($frequencyCount)) {
             $frequencyCount = match ($this->period) {
-                Period::TODAY => 24,
-                Period::LAST_SEVEN_DAYS => 7,
+                Period::TODAY            => 24,
+                Period::LAST_SEVEN_DAYS  => 7,
                 Period::LAST_THIRTY_DAYS => match ($this->frequency) {
                     Frequency::WEEKLY => now()->subDays(30)->diffInWeeks(),
-                    default => 30,
+                    default           => 30,
                 },
                 Period::LAST_THREE_MONTHS => match ($this->frequency) {
                     Frequency::MONTHLY => 3,
-                    default => now()->subMonths(3)->diffInWeeks(),
+                    default            => now()->subMonths(3)->diffInWeeks(),
                 },
                 Period::LAST_SIX_MONTHS => 6,
-                Period::YTD => match ($this->frequency) {
+                Period::YTD             => match ($this->frequency) {
                     Frequency::QUARTERLY => 4,
-                    default => 13,
+                    default              => 13,
                 },
             };
         }
@@ -112,7 +112,7 @@ class ChartAid
         }
 
         return [
-            'labels' => $data->keys()->toArray(),
+            'labels'   => $data->keys()->toArray(),
             'datasets' => $data->values()->toArray(),
         ];
     }
@@ -134,9 +134,9 @@ class ChartAid
         return match ($this->frequency) {
             Frequency::YEARLY => Carbon::createFromDate($time, tz: 'Africa/Nairobi'),
             Frequency::WEEKLY => Carbon::now()->setISODate(now()->year, $time),
-            Frequency::DAILY => Carbon::createFromDate(day: $time, tz: 'Africa/Nairobi'),
+            Frequency::DAILY  => Carbon::createFromDate(day: $time, tz: 'Africa/Nairobi'),
             Frequency::HOURLY => Carbon::createFromTime($time, tz: 'Africa/Nairobi'),
-            default => Carbon::parse($time, 'Africa/Nairobi')
+            default           => Carbon::parse($time, 'Africa/Nairobi')
         };
     }
 
@@ -154,7 +154,7 @@ class ChartAid
             }
         } elseif ($freq === 'quarterly') {
             $endDate = $date->isCurrentMonth()
-                ? 'Current Month'
+                ? "Current Month"
                 : $date->shortMonthName;
             $startDate = $date->subMonths(2)->shortMonthName;
 
@@ -175,7 +175,7 @@ class ChartAid
             } else {
                 $name = "{$date->diffInWeeks()} week".($date->diffInWeeks() > 1
                         ? 's'
-                        : '').' ago';
+                        : '')." ago";
             }
         } elseif ($freq === 'daily') {
             if ($date->isCurrentDay()) {
@@ -214,9 +214,9 @@ class ChartAid
             Frequency::YEARLY => $carbonDate->format('Y'),
             Frequency::QUARTERLY, Frequency::MONTHLY => $carbonDate->format('Y-m'),
             Frequency::WEEKLY => $carbonDate->format('W'),
-            Frequency::DAILY => $carbonDate->format('d'),
+            Frequency::DAILY  => $carbonDate->format('d'),
             Frequency::HOURLY => $carbonDate->format('H'),
-            default => $carbonDate->toDateString()
+            default           => $carbonDate->toDateString()
         };
     }
 
@@ -225,12 +225,12 @@ class ChartAid
         $carbonDate = \LocalCarbon::now();
 
         return match ($this->period) {
-            Period::TODAY => $carbonDate->subDay(),
-            Period::LAST_SEVEN_DAYS => $carbonDate->subWeek(),
-            Period::LAST_THIRTY_DAYS => $carbonDate->subDays(30),
+            Period::TODAY             => $carbonDate->subDay(),
+            Period::LAST_SEVEN_DAYS   => $carbonDate->subWeek(),
+            Period::LAST_THIRTY_DAYS  => $carbonDate->subDays(30),
             Period::LAST_THREE_MONTHS => $carbonDate->subMonths(3),
-            Period::LAST_SIX_MONTHS => $carbonDate->subMonths(6),
-            Period::YTD => $carbonDate->subYear(),
+            Period::LAST_SIX_MONTHS   => $carbonDate->subMonths(6),
+            Period::YTD               => $carbonDate->subYear(),
         };
     }
 }

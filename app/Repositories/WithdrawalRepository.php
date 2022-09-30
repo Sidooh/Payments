@@ -94,14 +94,14 @@ class WithdrawalRepository
     public function getPaymentData(int $providerId, string $providerType, PaymentType $type, PaymentSubtype $subtype, Status $status = null): array
     {
         return [
-            'payable_type' => $this->transaction['payable_type'],
-            'payable_id' => $this->transaction['payable_id'],
-            'amount' => $this->transaction['amount'],
-            'details' => $this->transaction['destination'],
-            'type' => $type->name,
-            'subtype' => $subtype->name,
-            'status' => $status->name ?? Status::PENDING->name,
-            'provider_id' => $providerId,
+            'payable_type'  => $this->transaction['payable_type'],
+            'payable_id'    => $this->transaction['payable_id'],
+            'amount'        => $this->transaction['amount'],
+            'details'       => $this->transaction['destination'],
+            'type'          => $type->name,
+            'subtype'       => $subtype->name,
+            'status'        => $status->name ?? Status::PENDING->name,
+            'provider_id'   => $providerId,
             'provider_type' => $providerType,
         ];
     }

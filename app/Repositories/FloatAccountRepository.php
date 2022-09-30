@@ -24,8 +24,8 @@ class FloatAccountRepository
     public function store(Initiator $initiator, int $floatableId): FloatAccount
     {
         return FloatAccount::create([
-            'floatable_id' => $floatableId,
-            'floatable_type' => $initiator,
+            "floatable_id"   => $floatableId,
+            "floatable_type" => $initiator,
         ]);
     }
 
@@ -35,20 +35,20 @@ class FloatAccountRepository
     public function topUp(FloatAccount $floatAccount, Initiator $initiator, $amount): Payment|Model
     {
         $phone = match ($floatAccount->floatable_type) {
-            Initiator::AGENT->value => SidoohAccounts::find($floatAccount->floatable_id)['phone'],
-            Initiator::ENTERPRISE->value => SidoohProducts::findEnterprise($floatAccount->floatable_id)['admin']['account']['phone'],
-            default => throw new Exception('Unexpected initiator value.')
+            Initiator::AGENT->value      => SidoohAccounts::find($floatAccount->floatable_id)["phone"],
+            Initiator::ENTERPRISE->value => SidoohProducts::findEnterprise($floatAccount->floatable_id)["admin"]["account"]["phone"],
+            default                      => throw new Exception('Unexpected initiator value.')
         };
 
         $stkResponse = mpesa_request($phone, 1, MpesaReference::FLOAT);
 
         return Payment::create([
-            'amount' => $amount,
-            'type' => PaymentType::MPESA,
-            'subtype' => PaymentSubtype::STK,
-            'status' => Status::PENDING->name,
-            'provider_id' => $stkResponse->id,
-            'description' => Description::FLOAT_PURCHASE->value.' - '.$floatAccount->floatable_id,
+            "amount"      => $amount,
+            "type"        => PaymentType::MPESA,
+            "subtype"     => PaymentSubtype::STK,
+            "status"      => Status::PENDING->name,
+            "provider_id" => $stkResponse->id,
+            "description" => Description::FLOAT_PURCHASE->value.' - '.$floatAccount->floatable_id,
         ]);
     }
 
@@ -58,11 +58,11 @@ class FloatAccountRepository
         $floatAccount->save();
 
         return [
-            'float_account' => $floatAccount->only(['floatable_id', 'balance', 'floatable_type']),
-            'transaction' => $floatAccount->floatAccountTransactions()->create([
-                'amount' => $amount,
-                'type' => TransactionType::CREDIT,
-                'description' => $description,
+            "float_account" => $floatAccount->only(["floatable_id", "balance", "floatable_type"]),
+            "transaction"   => $floatAccount->floatAccountTransactions()->create([
+                "amount"      => $amount,
+                "type"        => TransactionType::CREDIT,
+                "description" => $description,
             ]),
         ];
     }

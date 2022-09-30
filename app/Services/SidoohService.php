@@ -15,7 +15,7 @@ class SidoohService
 {
     public static function http(): PendingRequest
     {
-        $token = Cache::remember('auth_token', (60 * 14), fn () => self::authenticate());
+        $token = Cache::remember("auth_token", (60 * 14), fn() => self::authenticate());
 
         return Http::withToken($token)->/*retry(1)->*/acceptJson();
     }
@@ -30,12 +30,12 @@ class SidoohService
         $url = config('services.sidooh.services.accounts.url');
 
         $response = Http::post("$url/users/signin", [
-            'email' => 'aa@a.a',
-            'password' => '12345678',
+            'email'    => 'aa@a.a',
+            'password' => "12345678",
         ]);
 
         if ($response->successful()) {
-            return $response->json()['access_token'];
+            return $response->json()["access_token"];
         }
 
         return $response->throw()->json();
@@ -44,15 +44,15 @@ class SidoohService
     /**
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public static function fetch(string $url, string $method = 'GET', array $data = [])
+    public static function fetch(string $url, string $method = "GET", array $data = [])
     {
         Log::info('...[SRV - SIDOOH]: REQ...', [
-            'url' => $url,
-            'method' => $method,
-            'data' => $data,
+            'url'    => $url,
+            "method" => $method,
+            "data"   => $data,
         ]);
 
-        $options = strtoupper($method) === 'POST' ? ['json' => $data] : [];
+        $options = strtoupper($method) === "POST" ? ["json" => $data] : [];
 
         $t = microtime(true);
         try {

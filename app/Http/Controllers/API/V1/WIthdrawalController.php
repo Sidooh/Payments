@@ -27,7 +27,7 @@ class WIthdrawalController extends Controller
         $request->validate([
             //            "transactions" => ['required', 'array'],
             //            "data"         => ["required", "array"],
-            '',
+            "",
         ]);
 
         $data = $request->all();
@@ -39,9 +39,9 @@ class WIthdrawalController extends Controller
         $data = match ($request->input('method')) {
             PaymentMethod::MPESA->name => $repo->mpesa(),
 //            PaymentMethod::VOUCHER->name => $repo->voucher(),
-            default => throw new Exception('Unsupported payment method!')
+            default => throw new Exception("Unsupported payment method!")
         };
 
-        return $this->successResponse($data, 'Payment Created!');
+        return $this->successResponse($data, "Payment Created!");
     }
 }
