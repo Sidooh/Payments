@@ -39,7 +39,7 @@ class SidoohProducts extends SidoohService
             $url .= '?with=enterprise_accounts';
         }
 
-        $response = Cache::remember($id, (60 * 60 * 24), fn () => parent::fetch($url));
+        $response = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));
 
         if (! $response) {
             throw new Exception("Enterprise doesn't exist!");

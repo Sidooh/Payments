@@ -36,18 +36,14 @@ class PaymentController extends Controller
         $countryCode = config('services.sidooh.country_code');
 
         $request->validate([
-            'transactions' => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
-            'payment_mode' => ['required', new Enum(PaymentMethod::class)],
-            'debit_account' => [
+            'payment_mode'               => ['required', new Enum(PaymentMethod::class)],
+            'debit_account'              => [
                 'required',
-                Rule::when(
-                    $request->input('payment_mode') === PaymentMethod::MPESA->name,
-                    "phone:$countryCode",
-                    [new SidoohAccountExists]
-                ),
+                Rule::when($request->input('payment_mode') === PaymentMethod::MPESA->name, "phone:$countryCode", [new SidoohAccountExists]),
             ],
-            'transactions.*.product_id' => ['required', new Enum(ProductType::class)],
-            'transactions.*.amount' => ['required', 'integer'],
+            'transactions.*.product_id'  => ['required', new Enum(ProductType::class)],
+            'transactions.*.reference'   => ['required', 'integer'],
+            'transactions.*.amount'      => ['required', 'integer'],
             'transactions.*.destination' => ['required', 'numeric'],
             'transactions.*.description' => ['required', 'string'],
         ]);

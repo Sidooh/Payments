@@ -16,14 +16,14 @@ class VoucherSeeder extends Seeder
     public function run(): void
     {
         Voucher::create([
-            'type' => VoucherType::SIDOOH,
-            'balance' => 5000,
+            'type'       => VoucherType::SIDOOH,
+            'balance'    => 5000,
             'account_id' => 46,
         ]);
 
         Voucher::create([
-            'type' => VoucherType::SIDOOH,
-            'balance' => 5000,
+            'type'       => VoucherType::SIDOOH,
+            'balance'    => 5000,
             'account_id' => 12,
         ]);
 

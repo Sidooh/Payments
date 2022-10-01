@@ -17,12 +17,12 @@ class PaymentResource extends JsonResource
     public function toArray($request): array|JsonSerializable|Arrayable
     {
         return [
-            'id' => $this->id,
+            'id'         => $this->id,
             'payable_id' => $this->payable_id,
-            'amount' => $this->amount,
-            'status' => $this->status,
-            'type' => $this->type,
-            'subtype' => $this->subtype,
+            'amount'     => $this->amount,
+            'status'     => $this->status,
+            'type'       => $this->type,
+            'subtype'    => $this->subtype,
         ];
     }
 }

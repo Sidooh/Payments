@@ -18,7 +18,7 @@ class FloatAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'initiator' => ['required', 'in:'.Initiator::ENTERPRISE->value.','.Initiator::AGENT->value],
+            'initiator'    => ['required', 'in:'.Initiator::ENTERPRISE->value.','.Initiator::AGENT->value],
             'floatable_id' => [
                 'required',
                 $this->initiator === Initiator::AGENT->value ? new SidoohAccountExists : new SidoohEnterpriseExists,

@@ -24,7 +24,7 @@ class FloatAccountRepository
     public function store(Initiator $initiator, int $floatableId): FloatAccount
     {
         return FloatAccount::create([
-            'floatable_id' => $floatableId,
+            'floatable_id'   => $floatableId,
             'floatable_type' => $initiator,
         ]);
     }
@@ -35,18 +35,18 @@ class FloatAccountRepository
     public function topUp(FloatAccount $floatAccount, Initiator $initiator, $amount): Payment|Model
     {
         $phone = match ($floatAccount->floatable_type) {
-            Initiator::AGENT->value => SidoohAccounts::find($floatAccount->floatable_id)['phone'],
+            Initiator::AGENT->value      => SidoohAccounts::find($floatAccount->floatable_id)['phone'],
             Initiator::ENTERPRISE->value => SidoohProducts::findEnterprise($floatAccount->floatable_id)['admin']['account']['phone'],
-            default => throw new Exception('Unexpected initiator value.')
+            default                      => throw new Exception('Unexpected initiator value.')
         };
 
         $stkResponse = mpesa_request($phone, 1, MpesaReference::FLOAT);
 
         return Payment::create([
-            'amount' => $amount,
-            'type' => PaymentType::MPESA,
-            'subtype' => PaymentSubtype::STK,
-            'status' => Status::PENDING->name,
+            'amount'      => $amount,
+            'type'        => PaymentType::MPESA,
+            'subtype'     => PaymentSubtype::STK,
+            'status'      => Status::PENDING->name,
             'provider_id' => $stkResponse->id,
             'description' => Description::FLOAT_PURCHASE->value.' - '.$floatAccount->floatable_id,
         ]);
@@ -59,9 +59,9 @@ class FloatAccountRepository
 
         return [
             'float_account' => $floatAccount->only(['floatable_id', 'balance', 'floatable_type']),
-            'transaction' => $floatAccount->floatAccountTransactions()->create([
-                'amount' => $amount,
-                'type' => TransactionType::CREDIT,
+            'transaction'   => $floatAccount->floatAccountTransactions()->create([
+                'amount'      => $amount,
+                'type'        => TransactionType::CREDIT,
                 'description' => $description,
             ]),
         ];

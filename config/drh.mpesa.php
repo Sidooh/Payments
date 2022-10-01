@@ -42,7 +42,7 @@ return [
   | Set retries to 0(Zero) to skip retrying
   |
   */
-    'retries' => 2,
+    'retries'         => 2,
     'retry_wait_time' => 1,
 
     /*
@@ -150,16 +150,14 @@ return [
         'result_url' => env('APP_URL').'/payments/callbacks/result/',
     ],
 
-    'test_amount' => env('MPESA_SANDBOX_AMOUNT', 0),
-
     'logging' => [
-        'enabled' => env('MPESA_ENABLE_LOGGING', false),
+        'enabled'  => env('MPESA_ENABLE_LOGGING', false),
         'channels' => [
             'syslog',
             'single' => [
                 'driver' => 'single',
-                'path' => storage_path('logs/mpesa.log'),
-                'level' => env('LOG_LEVEL', 'debug'),
+                'path'   => storage_path('logs/mpesa.log'),
+                'level'  => env('LOG_LEVEL', 'debug'),
             ],
         ],
     ],

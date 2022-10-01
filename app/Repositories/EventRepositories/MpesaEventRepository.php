@@ -71,7 +71,6 @@ class MpesaEventRepository
         ];
 
         if ($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
-            // TODO: If you purchase for self using other MPESA, this fails!!!
             $destination = explode(' - ', $payment->description)[1];
             $accountId = SidoohAccounts::findByPhone($destination)['id'];
 

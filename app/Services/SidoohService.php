@@ -15,7 +15,7 @@ class SidoohService
 {
     public static function http(): PendingRequest
     {
-        $token = Cache::remember('auth_token', (60 * 14), fn () => self::authenticate());
+        $token = Cache::remember('auth_token', (60 * 14), fn() => self::authenticate());
 
         return Http::withToken($token)->/*retry(1)->*/acceptJson();
     }
@@ -30,7 +30,7 @@ class SidoohService
         $url = config('services.sidooh.services.accounts.url');
 
         $response = Http::post("$url/users/signin", [
-            'email' => 'aa@a.a',
+            'email'    => 'aa@a.a',
             'password' => '12345678',
         ]);
 
@@ -47,9 +47,9 @@ class SidoohService
     public static function fetch(string $url, string $method = 'GET', array $data = [])
     {
         Log::info('...[SRV - SIDOOH]: REQ...', [
-            'url' => $url,
+            'url'    => $url,
             'method' => $method,
-            'data' => $data,
+            'data'   => $data,
         ]);
 
         $options = strtoupper($method) === 'POST' ? ['json' => $data] : [];

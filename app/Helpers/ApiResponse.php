@@ -10,7 +10,7 @@ trait ApiResponse
     {
         $res = [
             'result' => 1,
-            'data' => $data,
+            'data'   => $data,
         ];
 
         if ($message) {

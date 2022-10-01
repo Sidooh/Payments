@@ -26,12 +26,12 @@ if (! function_exists('withRelation')) {
     {
         $childRecords = match ($relation) {
             'account' => SidoohAccounts::getAll(),
-            default => throw new BadRequestException('Invalid relation!')
+            default   => throw new BadRequestException('Invalid relation!')
         };
 
         $childRecords = collect($childRecords);
 
-        return $parentRecords->transform(function ($record) use ($parentKey, $relation, $childKey, $childRecords) {
+        return $parentRecords->transform(function($record) use ($parentKey, $relation, $childKey, $childRecords) {
             $record[$relation] = $childRecords->firstWhere($childKey, $record[$parentKey]);
 
             return $record;
