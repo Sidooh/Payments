@@ -27,7 +27,7 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      *
      * @throws Throwable
@@ -131,7 +131,7 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      *
      * @throws Throwable
@@ -147,15 +147,15 @@ class PaymentController extends Controller
             'till_number'                => [
                 Rule::requiredIf(
                     $request->input('merchant_type') === MerchantType::MPESA_BUY_GOODS->name,
-                )],
+                ), ],
             'paybill_number'             => [
                 Rule::requiredIf(
                     $request->input('merchant_type') === MerchantType::MPESA_PAY_BILL->name,
-                )],
+                ), ],
             'account_number'             => [
                 Rule::requiredIf(
                     $request->input('merchant_type') === MerchantType::MPESA_PAY_BILL->name,
-                )],
+                ), ],
             'debit_account'              => [
                 'required',
                 Rule::when(

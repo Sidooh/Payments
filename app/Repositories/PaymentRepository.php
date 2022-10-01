@@ -26,22 +26,24 @@ class PaymentRepository
     private float $totalAmount;
 
     private mixed $firstTransaction;
+
     private MerchantType $merchantType;
+
     private string $accountNumber = '';
+
     private string $tillOrPaybill;
 
     /**
-     * @param Collection $transactions
-     * @param PaymentMethod $method
-     * @param string $debit_account
+     * @param  Collection  $transactions
+     * @param  PaymentMethod  $method
+     * @param  string  $debit_account
      */
     public function __construct(
-        private readonly Collection    $transactions,
+        private readonly Collection $transactions,
         private readonly PaymentMethod $method,
-        private readonly string        $debit_account,
+        private readonly string $debit_account,
 //        private readonly bool $isB2b
-    )
-    {
+    ) {
         $this->totalAmount = $transactions->sum('amount');
         $this->firstTransaction = $this->transactions->first();
     }
@@ -52,12 +54,12 @@ class PaymentRepository
     public function process(): array
     {
         $pass = $this->transactions->every(fn($t) => $t['product_id'] === $this->firstTransaction['product_id']);
-        if (!$pass) {
+        if (! $pass) {
             throw new Exception('Transactions mismatch on product', 422);
         }
 
         return match ($this->method) {
-            PaymentMethod::MPESA => $this->mpesa(),
+            PaymentMethod::MPESA   => $this->mpesa(),
             PaymentMethod::VOUCHER => $this->voucher(),
 //            PaymentMethod::FLOAT->name => $this->float(),
             default => throw new Exception('Unsupported payment method!')
@@ -74,11 +76,11 @@ class PaymentRepository
 
         $productType = ProductType::from($this->firstTransaction['product_id']);
         $reference = match ($productType) {
-            ProductType::AIRTIME => MpesaReference::AIRTIME,
-            ProductType::VOUCHER => MpesaReference::PAY_VOUCHER,
-            ProductType::UTILITY => MpesaReference::PAY_UTILITY,
+            ProductType::AIRTIME      => MpesaReference::AIRTIME,
+            ProductType::VOUCHER      => MpesaReference::PAY_VOUCHER,
+            ProductType::UTILITY      => MpesaReference::PAY_UTILITY,
             ProductType::SUBSCRIPTION => MpesaReference::SUBSCRIPTION,
-            default => throw new Exception('Unexpected match value')
+            default                   => throw new Exception('Unexpected match value')
         };
 
         $stkResponse = mpesa_request($number, $this->totalAmount, $reference);
@@ -107,22 +109,22 @@ class PaymentRepository
 
         $productType = ProductType::from($this->firstTransaction['product_id']);
         $description = match ($productType) {
-            ProductType::AIRTIME => Description::AIRTIME_PURCHASE,
-            ProductType::VOUCHER => Description::VOUCHER_PURCHASE,
-            ProductType::UTILITY => Description::UTILITY_PURCHASE,
+            ProductType::AIRTIME      => Description::AIRTIME_PURCHASE,
+            ProductType::VOUCHER      => Description::VOUCHER_PURCHASE,
+            ProductType::UTILITY      => Description::UTILITY_PURCHASE,
             ProductType::SUBSCRIPTION => Description::SUBSCRIPTION_PURCHASE,
-            ProductType::MERCHANT => Description::MERCHANT_PAYMENT,
-            default => throw new Exception('Unexpected match value')
+            ProductType::MERCHANT     => Description::MERCHANT_PAYMENT,
+            default                   => throw new Exception('Unexpected match value')
         };
 
         if ($productType === ProductType::VOUCHER) {
             $pass = $this->transactions->every(fn($t) => isset($t['destination']) && SidoohAccounts::findByPhone($t['destination']));
-            if (!$pass) {
+            if (! $pass) {
                 throw new Exception('Transactions need destination to be valid', 422);
             }
         }
 
-        return DB::transaction(function () use ($id, $description, $productType) {
+        return DB::transaction(function() use ($id, $description, $productType) {
             [$voucher, $voucherTransaction] = VoucherRepository::debit($id, $this->totalAmount, $description);
 
             $data['debit_voucher'] = $voucher;
@@ -147,9 +149,9 @@ class PaymentRepository
 
             if ($productType === ProductType::MERCHANT) {
                 $b2bRequest = match ($this->merchantType) {
-                    MerchantType::MPESA_PAY_BILL => new PayBillRequest($this->totalAmount, $this->accountNumber, $this->tillOrPaybill),
+                    MerchantType::MPESA_PAY_BILL  => new PayBillRequest($this->totalAmount, $this->accountNumber, $this->tillOrPaybill),
                     MerchantType::MPESA_BUY_GOODS => new BuyGoodsRequest($this->totalAmount, $this->accountNumber, $this->tillOrPaybill),
-                    default => throw new Exception('Unexpected merchant type')
+                    default                       => throw new Exception('Unexpected merchant type')
                 };
 
                 $tendePayRequest = TendePay::b2bRequest($b2bRequest);
@@ -161,7 +163,7 @@ class PaymentRepository
                     'status'      => Status::PENDING->name,
                     'provider_id' => $tendePayRequest->id,
                     'reference'   => $this->firstTransaction['reference'] ?? null,
-                    'description' => $description->name . ' - ' . $this->tillOrPaybill,
+                    'description' => $description->name.' - '.$this->tillOrPaybill,
                 ];
 
                 $data['b2b_payment'] = Payment::create($paymentData)->toArray();
@@ -177,7 +179,7 @@ class PaymentRepository
     public function processB2b(MerchantType $merchantType, string $tillOrPaybill, string $accountNumber = ''): array
     {
         $pass = $this->transactions->every(fn($t) => $t['product_id'] === $this->firstTransaction['product_id']);
-        if (!$pass) {
+        if (! $pass) {
             throw new Exception('Transactions mismatch on product', 422);
         }
 
@@ -186,7 +188,7 @@ class PaymentRepository
         $this->accountNumber = $accountNumber;
 
         return match ($this->method) {
-            PaymentMethod::MPESA => $this->mpesa(),
+            PaymentMethod::MPESA   => $this->mpesa(),
             PaymentMethod::VOUCHER => $this->voucher(),
 //            PaymentMethod::FLOAT->name => $this->float(),
             default => throw new Exception('Unsupported payment method!')
@@ -202,7 +204,7 @@ class PaymentRepository
             'status'      => $status->name ?? Status::PENDING->name,
             'provider_id' => $providerId,
             'reference'   => $transaction['reference'] ?? null,
-            'description' => $transaction['description'] . ' - ' . $transaction['destination'],
+            'description' => $transaction['description'].' - '.$transaction['destination'],
         ]);
     }
 }

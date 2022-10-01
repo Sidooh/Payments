@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('tende_pay_requests', function (Blueprint $table) {
+        Schema::create('tende_pay_requests', function(Blueprint $table) {
             $table->id();
 
             // add fields
