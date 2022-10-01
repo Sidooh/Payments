@@ -32,15 +32,15 @@ class MpesaEventRepository
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING->name) {
-            Log::error("Payment is not pending...", [$payment, $stkCallback->request]);
+            Log::error('Payment is not pending...', [$payment, $stkCallback->request]);
 
             return;
         }
 
-        $payment->update(["status" => Status::FAILED->name]);
+        $payment->update(['status' => Status::FAILED->name]);
 
         SidoohProducts::paymentCallback([
-            "payments" => [
+            'payments' => [
                 [
                     ...Arr::only($payment->toArray(), ['id', 'amount', 'type', 'subtype', 'status', 'reference']),
                     'stk_result_code' => $stkCallback->result_code,
@@ -57,12 +57,12 @@ class MpesaEventRepository
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING->name) {
-            Log::error("Payment is not pending...", [$payment, $stkCallback->request]);
+            Log::error('Payment is not pending...', [$payment, $stkCallback->request]);
 
             return;
         }
 
-        $payment->update(["status" => Status::COMPLETED->name]);
+        $payment->update(['status' => Status::COMPLETED->name]);
 
         Log::info('...[REP - MPESA]: Payment updated...', [$payment->id, $payment->status]);
 
@@ -71,7 +71,6 @@ class MpesaEventRepository
         ];
 
         if ($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
-            // TODO: If you purchase for self using other MPESA, this fails!!!
             $destination = explode(' - ', $payment->description)[1];
             $accountId = SidoohAccounts::findByPhone($destination)['id'];
 
@@ -97,7 +96,7 @@ class MpesaEventRepository
                 throw new Error("Payment is not pending... - $payment->id");
             }
 
-            $payment->update(["status" => Status::COMPLETED->name]);
+            $payment->update(['status' => Status::COMPLETED->name]);
 
             Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
 
@@ -116,7 +115,7 @@ class MpesaEventRepository
                 throw new Error("Payment is not pending... - $payment->id");
             }
 
-            $payment->update(["status" => Status::FAILED->name]);
+            $payment->update(['status' => Status::FAILED->name]);
 
             Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
 

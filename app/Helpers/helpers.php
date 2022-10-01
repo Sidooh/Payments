@@ -8,7 +8,7 @@ if (! function_exists('ddj')) {
     #[NoReturn]
     function ddj(...$vars)
     {
-        echo "<pre>";
+        echo '<pre>';
         print_r($vars);
         exit;
     }
@@ -25,8 +25,8 @@ if (! function_exists('withRelation')) {
     function withRelation($relation, $parentRecords, $parentKey, $childKey)
     {
         $childRecords = match ($relation) {
-            "account" => SidoohAccounts::getAll(),
-            default   => throw new BadRequestException("Invalid relation!")
+            'account' => SidoohAccounts::getAll(),
+            default   => throw new BadRequestException('Invalid relation!')
         };
 
         $childRecords = collect($childRecords);

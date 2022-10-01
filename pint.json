@@ -1,7 +1,6 @@
 {
     "preset": "laravel",
     "rules": {
-        "single_quote": false,
         "binary_operator_spaces": {
             "operators": {
                 "=>": "align"
@@ -9,7 +8,6 @@
         },
         "function_declaration": {
             "closure_function_spacing": "none"
-        },
-        "double_quotes": true
+        }
     }
 }

@@ -26,10 +26,10 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Request $request
-     * @throws Throwable
+     * @param  Request  $request
      * @return JsonResponse
      *
+     * @throws Throwable
      */
     public function __invoke(Request $request): JsonResponse
     {
@@ -39,7 +39,7 @@ class PaymentController extends Controller
             'payment_mode'               => ['required', new Enum(PaymentMethod::class)],
             'debit_account'              => [
                 'required',
-                Rule::when($request->input("payment_mode") === PaymentMethod::MPESA->name, "phone:$countryCode", [new SidoohAccountExists]),
+                Rule::when($request->input('payment_mode') === PaymentMethod::MPESA->name, "phone:$countryCode", [new SidoohAccountExists]),
             ],
             'transactions.*.product_id'  => ['required', new Enum(ProductType::class)],
             'transactions.*.reference'   => ['required', 'integer'],
@@ -57,27 +57,27 @@ class PaymentController extends Controller
         try {
             $data = $repo->process();
 
-            return $this->successResponse($data, "Payment Created.");
+            return $this->successResponse($data, 'Payment Created.');
         } catch (MpesaException $e) {
             Log::critical($e);
         } catch (Exception $err) {
-            if($err->getCode() === 422) {
+            if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
             }
 
             Log::error($err);
         }
 
-        return $this->errorResponse("Failed to process payment request.");
+        return $this->errorResponse('Failed to process payment request.');
     }
 
     public function index(Request $request): JsonResponse
     {
         $payments = Payment::latest()->limit(100);
 
-        if($request->has('status') && $status = Status::tryFrom($request->status)) {
+        if ($request->has('status') && $status = Status::tryFrom($request->status)) {
             $payments->whereStatus($status);
-            if($status !== Status::PENDING) {
+            if ($status !== Status::PENDING) {
                 $payments->limit(100); // Other statuses will have too many records
             }
         } else {
@@ -91,16 +91,16 @@ class PaymentController extends Controller
 
     public function show(Payment $payment): JsonResponse
     {
-        if($payment->subtype === PaymentSubtype::STK->name) {
+        if ($payment->subtype === PaymentSubtype::STK->name) {
             $payment->load([
-                "provider:id,status,reference,description,checkout_request_id,amount,phone,created_at",
-                "provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at",
+                'provider:id,status,reference,description,checkout_request_id,amount,phone,created_at',
+                'provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at',
             ]);
         }
 
-        if($payment->subtype === PaymentSubtype::VOUCHER->name) {
+        if ($payment->subtype === PaymentSubtype::VOUCHER->name) {
             $payment->load([
-                "provider:id,type,amount,description,created_at",
+                'provider:id,type,amount,description,created_at',
             ]);
         }
 

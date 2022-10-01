@@ -36,11 +36,11 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! app()->isProduction());
 
         Relation::enforceMorphMap([
-            "STK"     => MpesaStkRequest::class,
-            "VOUCHER" => VoucherTransaction::class,
-            "B2C"     => MpesaBulkPaymentRequest::class,
+            'STK'     => MpesaStkRequest::class,
+            'VOUCHER' => VoucherTransaction::class,
+            'B2C'     => MpesaBulkPaymentRequest::class,
 
-            "FLOAT" => FloatAccountTransaction::class,
+            'FLOAT' => FloatAccountTransaction::class,
         ]);
     }
 }

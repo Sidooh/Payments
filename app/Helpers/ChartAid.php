@@ -39,7 +39,7 @@ class ChartAid
      * @param  null  $frequencyCount
      * @return array
      */
-    #[ArrayShape(['labels' => "array", 'datasets' => "array"])]
+    #[ArrayShape(['labels' => 'array', 'datasets' => 'array'])]
     public function chartDataSet(Collection $models, $frequencyCount = null): array
     {
         $this->models = $models;
@@ -154,7 +154,7 @@ class ChartAid
             }
         } elseif ($freq === 'quarterly') {
             $endDate = $date->isCurrentMonth()
-                ? "Current Month"
+                ? 'Current Month'
                 : $date->shortMonthName;
             $startDate = $date->subMonths(2)->shortMonthName;
 
@@ -175,7 +175,7 @@ class ChartAid
             } else {
                 $name = "{$date->diffInWeeks()} week".($date->diffInWeeks() > 1
                         ? 's'
-                        : '')." ago";
+                        : '').' ago';
             }
         } elseif ($freq === 'daily') {
             if ($date->isCurrentDay()) {

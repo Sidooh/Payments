@@ -13,7 +13,7 @@ class SidoohProducts extends SidoohService
 {
     public static function baseUrl()
     {
-        return config("services.sidooh.services.products.url");
+        return config('services.sidooh.services.products.url');
     }
 
     /**
@@ -23,7 +23,7 @@ class SidoohProducts extends SidoohService
     {
         Log::info('...[SRV - PRODUCTS]: Payment Callback...', $data);
 
-        return parent::http()->post(self::baseUrl()."/payments/callback", $data)->throw();
+        return parent::http()->post(self::baseUrl().'/payments/callback', $data)->throw();
     }
 
     /**
@@ -35,8 +35,8 @@ class SidoohProducts extends SidoohService
 
         $url = self::baseUrl()."/enterprises/$id";
 
-        if (in_array("enterprise_accounts", $with)) {
-            $url .= "?with=enterprise_accounts";
+        if (in_array('enterprise_accounts', $with)) {
+            $url .= '?with=enterprise_accounts';
         }
 
         $response = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));

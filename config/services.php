@@ -31,7 +31,7 @@ return [
     ],
 
     'sidooh' => [
-        "jwt_key"            => env("JWT_KEY"),
+        'jwt_key'            => env('JWT_KEY'),
         'tagline'            => 'Sidooh, Makes You Money with Every Purchase.',
         'mpesa'              => [
             'env' => 'local',
@@ -45,19 +45,19 @@ return [
         'services'           => [
             'notify'   => [
                 'enabled' => true,
-                'url'     => env("SIDOOH_NOTIFY_API_URL"),
+                'url'     => env('SIDOOH_NOTIFY_API_URL'),
             ],
             'accounts' => [
                 'enabled' => true,
-                'url'     => env("SIDOOH_ACCOUNTS_API_URL"),
+                'url'     => env('SIDOOH_ACCOUNTS_API_URL'),
             ],
             'products' => [
                 'enabled' => true,
-                'url'     => env("SIDOOH_PRODUCTS_API_URL"),
+                'url'     => env('SIDOOH_PRODUCTS_API_URL'),
             ],
             'savings' => [
                 'enabled' => true,
-                'url'     => env("SIDOOH_SAVINGS_API_URL"),
+                'url'     => env('SIDOOH_SAVINGS_API_URL'),
             ],
         ],
     ],

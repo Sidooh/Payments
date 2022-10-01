@@ -19,19 +19,19 @@ class VoucherController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $relations = explode(",", $request->query("with"));
+        $relations = explode(',', $request->query('with'));
 
         $vouchers = Voucher::latest();
 
-        if (in_array("voucher_transactions", $relations)) {
-            $vouchers = $vouchers->with("voucherTransactions:id,voucher_id,type,amount,description,created_at")
+        if (in_array('voucher_transactions', $relations)) {
+            $vouchers = $vouchers->with('voucherTransactions:id,voucher_id,type,amount,description,created_at')
                 ->limit(50);
         }
 
         $vouchers = $vouchers->get();
 
-        if (in_array("account", $relations)) {
-            $vouchers = withRelation("account", $vouchers, "account_id", "id");
+        if (in_array('account', $relations)) {
+            $vouchers = withRelation('account', $vouchers, 'account_id', 'id');
         }
 
         return $this->successResponse($vouchers);
@@ -39,16 +39,16 @@ class VoucherController extends Controller
 
     public function getTransactions(Request $request): JsonResponse
     {
-        $relations = explode(",", $request->query("with"));
+        $relations = explode(',', $request->query('with'));
 
         $transactions = VoucherTransaction::query();
 
-        if (in_array("voucher", $relations)) {
-            $transactions = $transactions->with("voucher:id,account_id,type,balance");
+        if (in_array('voucher', $relations)) {
+            $transactions = $transactions->with('voucher:id,account_id,type,balance');
         }
 
-        if (in_array("payment", $relations)) {
-            $transactions = $transactions->with("payment:id,provider_id,subtype,status");
+        if (in_array('payment', $relations)) {
+            $transactions = $transactions->with('payment:id,provider_id,subtype,status');
         }
 
         $transactions->orderBy('id', 'desc')->limit(100);
@@ -58,14 +58,14 @@ class VoucherController extends Controller
 
     public function show(Request $request, Voucher $voucher): JsonResponse
     {
-        $relations = explode(",", $request->query("with"));
+        $relations = explode(',', $request->query('with'));
 
-        if (in_array("transactions", $relations)) {
-            $voucher->load("voucherTransactions:id,voucher_id,type,amount,description,created_at")->latest()
+        if (in_array('transactions', $relations)) {
+            $voucher->load('voucherTransactions:id,voucher_id,type,amount,description,created_at')->latest()
                 ->limit(100);
         }
 
-        if (in_array("account", $relations)) {
+        if (in_array('account', $relations)) {
             $voucher->account = SidoohAccounts::find($voucher->account_id, true);
         }
 
@@ -74,10 +74,10 @@ class VoucherController extends Controller
 
     public function getAccountVouchers(int $accountId): JsonResponse
     {
-        $vouchers = Voucher::select(["id", "type", "balance"])->whereAccountId($accountId)->get();
+        $vouchers = Voucher::select(['id', 'type', 'balance'])->whereAccountId($accountId)->get();
 
         if ($vouchers->isEmpty()) {
-            $vouchers = [Voucher::create(["account_id" => $accountId, "type" => VoucherType::SIDOOH])];
+            $vouchers = [Voucher::create(['account_id' => $accountId, 'type' => VoucherType::SIDOOH])];
         }
 
         return $this->successResponse($vouchers);
@@ -88,13 +88,13 @@ class VoucherController extends Controller
         $request->validate([
             'account_id'  => ['required'],
             'amount'      => ['required'],
-            "description" => ["required", "string"],
-            "notify"      => ['required', 'boolean'],
+            'description' => ['required', 'string'],
+            'notify'      => ['required', 'boolean'],
         ]);
 
-        $accountId = $request->input("account_id");
-        $amount = $request->input("amount");
-        $description = Description::from($request->input("description"));
+        $accountId = $request->input('account_id');
+        $amount = $request->input('amount');
+        $description = Description::from($request->input('description'));
 
         $response = VoucherRepository::credit($accountId, $amount, $description);
 
@@ -107,23 +107,23 @@ class VoucherController extends Controller
     public function disburse(Request $request): JsonResponse
     {
         $data = $request->validate([
-            "disburse_type" => "in:LUNCH,GENERAL",
-            "enterprise_id" => "required|integer",
-            "amount"        => "numeric",
-            "accounts"      => "array",
+            'disburse_type' => 'in:LUNCH,GENERAL',
+            'enterprise_id' => 'required|integer',
+            'amount'        => 'numeric',
+            'accounts'      => 'array',
         ], [
             'disburse_type.in' => 'invalid :attribute. allowed values are: [LUNCH, GENERAL]',
         ]);
 
         $enterpriseId = $data['enterprise_id'];
-        $voucherType = VoucherType::tryFrom("ENTERPRISE_{$data["disburse_type"]}");
+        $voucherType = VoucherType::tryFrom("ENTERPRISE_{$data['disburse_type']}");
 
-        $enterprise = SidoohProducts::findEnterprise($enterpriseId, ["enterprise_accounts"]);
+        $enterprise = SidoohProducts::findEnterprise($enterpriseId, ['enterprise_accounts']);
 
-        if ($request->isNotFilled("amount")) {
+        if ($request->isNotFilled('amount')) {
             $data['amount'] = match ($data['disburse_type']) {
-                "LUNCH"   => $enterprise["max_lunch"],
-                "GENERAL" => $enterprise["max_general"]
+                'LUNCH'   => $enterprise['max_lunch'],
+                'GENERAL' => $enterprise['max_general']
             };
 
             if (! isset($data['amount'])) {
@@ -131,11 +131,11 @@ class VoucherController extends Controller
             }
         }
 
-        if ($request->isNotFilled("accounts")) {
-            $data['accounts'] = Arr::pluck($enterprise["enterprise_accounts"], "account_id");
+        if ($request->isNotFilled('accounts')) {
+            $data['accounts'] = Arr::pluck($enterprise['enterprise_accounts'], 'account_id');
         }
 
-        $floatAccount = VoucherRepository::disburse($enterprise, $data["accounts"], $data['amount'], $voucherType);
+        $floatAccount = VoucherRepository::disburse($enterprise, $data['accounts'], $data['amount'], $voucherType);
 
         $message = "{$data['disburse_type']} Voucher Disburse Request Successful";
 
