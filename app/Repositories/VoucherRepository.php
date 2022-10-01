@@ -19,15 +19,15 @@ class VoucherRepository
     {
         $voucher = Voucher::firstOrCreate([
             'account_id' => $accountId,
-            'type' => VoucherType::SIDOOH,
+            'type'       => VoucherType::SIDOOH,
         ]);
 
         $voucher->balance += $amount;
         $voucher->save();
 
         $transaction = $voucher->voucherTransactions()->create([
-            'amount' => $amount,
-            'type' => TransactionType::CREDIT,
+            'amount'      => $amount,
+            'type'        => TransactionType::CREDIT,
             'description' => $description,
         ]);
 
@@ -41,7 +41,7 @@ class VoucherRepository
     {
         $voucher = Voucher::firstOrCreate([
             'account_id' => $accountId,
-            'type' => VoucherType::SIDOOH,
+            'type'       => VoucherType::SIDOOH,
         ]);
 
         // TODO: Return proper response/ create specific error type, rather than throwing error
@@ -53,8 +53,8 @@ class VoucherRepository
         $voucher->save();
 
         $transaction = $voucher->voucherTransactions()->create([
-            'amount' => $amount,
-            'type' => TransactionType::DEBIT,
+            'amount'      => $amount,
+            'type'        => TransactionType::DEBIT,
             'description' => $description,
         ]);
 
@@ -69,7 +69,7 @@ class VoucherRepository
         return DB::transaction(function () use ($amount, $accounts, $enterprise, $voucherType) {
             $floatAccount = FloatAccount::firstWhere([
                 'floatable_type' => 'ENTERPRISE',
-                'floatable_id' => $enterprise['id'],
+                'floatable_id'   => $enterprise['id'],
             ]);
 
             $vouchers = Voucher::whereEnterpriseId($enterprise['id'])->whereIn('account_id', $accounts)
@@ -77,11 +77,11 @@ class VoucherRepository
 
             if ($vouchers->isEmpty()) {
                 Voucher::insert(array_map(fn ($accId) => [
-                    'account_id' => $accId,
+                    'account_id'    => $accId,
                     'enterprise_id' => $enterprise['id'],
-                    'type' => $voucherType,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'type'          => $voucherType,
+                    'created_at'    => now(),
+                    'updated_at'    => now(),
                 ], $accounts));
 
                 VoucherRepository::disburse($enterprise, $accounts, $amount, $voucherType);
@@ -89,9 +89,9 @@ class VoucherRepository
 
             $voucherTopUpAmount = function (Voucher $voucher) use ($enterprise) {
                 $disburseType = match (VoucherType::from($voucher->type)) {
-                    VoucherType::ENTERPRISE_LUNCH => 'lunch',
+                    VoucherType::ENTERPRISE_LUNCH   => 'lunch',
                     VoucherType::ENTERPRISE_GENERAL => 'general',
-                    default => throw new Exception('Unexpected match value'),
+                    default                         => throw new Exception('Unexpected match value'),
                 };
 
                 ['max' => $max] = collect($enterprise['settings'])->firstWhere('type', $disburseType);
@@ -110,30 +110,30 @@ class VoucherRepository
 
             $creditVouchers = $vouchers->map(function (Voucher $voucher) use ($voucherTopUpAmount) {
                 return [
-                    'type' => $voucher->type,
+                    'type'          => $voucher->type,
                     'enterprise_id' => $voucher->enterprise_id,
-                    'account_id' => $voucher->account_id,
-                    'balance' => (float) $voucher->balance + (float) $voucherTopUpAmount($voucher),
+                    'account_id'    => $voucher->account_id,
+                    'balance'       => (float) $voucher->balance + (float) $voucherTopUpAmount($voucher),
                 ];
             })->toArray();
 
             $voucherTransactions = $vouchers->map(function (Voucher $voucher) use ($voucherTopUpAmount) {
                 return [
-                    'voucher_id' => $voucher->id,
-                    'type' => TransactionType::CREDIT,
-                    'amount' => $voucherTopUpAmount($voucher),
+                    'voucher_id'  => $voucher->id,
+                    'type'        => TransactionType::CREDIT,
+                    'amount'      => $voucherTopUpAmount($voucher),
                     'description' => Description::VOUCHER_DISBURSEMENT->name,
-                    'created_at' => now(),
+                    'created_at'  => now(),
                 ];
             })->toArray();
 
             $floatTransactions = $vouchers->map(function (Voucher $voucher) use ($voucherTopUpAmount, $floatAccount) {
                 return [
                     'float_account_id' => $floatAccount->id,
-                    'type' => TransactionType::DEBIT,
-                    'amount' => $voucherTopUpAmount($voucher),
-                    'description' => Description::VOUCHER_DISBURSEMENT->name,
-                    'created_at' => now(),
+                    'type'             => TransactionType::DEBIT,
+                    'amount'           => $voucherTopUpAmount($voucher),
+                    'description'      => Description::VOUCHER_DISBURSEMENT->name,
+                    'created_at'       => now(),
                 ];
             })->toArray();
 

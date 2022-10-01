@@ -26,7 +26,7 @@ if (! function_exists('withRelation')) {
     {
         $childRecords = match ($relation) {
             'account' => SidoohAccounts::getAll(),
-            default => throw new BadRequestException('Invalid relation!')
+            default   => throw new BadRequestException('Invalid relation!')
         };
 
         $childRecords = collect($childRecords);

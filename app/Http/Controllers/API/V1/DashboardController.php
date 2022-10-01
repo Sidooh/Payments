@@ -45,10 +45,10 @@ class DashboardController extends Controller
         });
 
         return $this->successResponse([
-            'total_payments' => $totalPayments,
+            'total_payments'       => $totalPayments,
             'total_payments_today' => $totalPaymentsToday,
 
-            'total_revenue' => $totalRevenue,
+            'total_revenue'       => $totalRevenue,
             'total_revenue_today' => $totalRevenueToday,
         ]);
     }

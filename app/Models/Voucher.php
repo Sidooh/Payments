@@ -25,9 +25,9 @@ class Voucher extends Model
     {
         return new Attribute(get: function ($value, $attributes) {
             $disburseType = match (VoucherType::from($this->type)) {
-                VoucherType::ENTERPRISE_LUNCH => 'lunch',
+                VoucherType::ENTERPRISE_LUNCH   => 'lunch',
                 VoucherType::ENTERPRISE_GENERAL => 'general',
-                default => throw new Exception('Unexpected match value'),
+                default                         => throw new Exception('Unexpected match value'),
             };
 
             ['max' => $max] = collect($this->enterprise->settings)->firstWhere('type', $disburseType);

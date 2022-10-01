@@ -12,20 +12,20 @@ class SidoohNotify extends SidoohService
     public static function notify(array $to, string $message, EventType $eventType)
     {
         Log::info('...[SRV - NOTIFY]: Send Notification...', [
-            'channel' => 'SMS',
-            'event_type' => $eventType->value,
+            'channel'     => 'SMS',
+            'event_type'  => $eventType->value,
             'destination' => implode(', ', $to),
-            'content' => $message,
+            'content'     => $message,
         ]);
 
         $url = config('services.sidooh.services.notify.url').'/notifications';
 
         try {
             $response = parent::fetch($url, 'POST', [
-                'channel' => 'sms',
-                'event_type' => $eventType->value,
+                'channel'     => 'sms',
+                'event_type'  => $eventType->value,
                 'destination' => $to,
-                'content' => $message,
+                'content'     => $message,
             ]);
 
             // TODO: To implement if necessary

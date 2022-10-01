@@ -15,9 +15,9 @@ class MpesaController extends Controller
     public function getBySubType(Request $request): JsonResponse
     {
         $subType = match ($request->query('sub-type')) {
-            'stk' => PaymentSubtype::STK,
-            'c2b' => PaymentSubtype::C2B,
-            'b2c' => PaymentSubtype::B2C,
+            'stk'   => PaymentSubtype::STK,
+            'c2b'   => PaymentSubtype::C2B,
+            'b2c'   => PaymentSubtype::B2C,
             default => null
         };
 

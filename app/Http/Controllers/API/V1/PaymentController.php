@@ -27,7 +27,7 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      *
      * @throws Throwable
@@ -37,9 +37,9 @@ class PaymentController extends Controller
         $countryCode = config('services.sidooh.country_code');
 
         $request->validate([
-            'transactions'               => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
-            'payment_mode'               => ['required', new Enum(PaymentMethod::class)],
-            'debit_account'              => [
+            'transactions'  => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
+            'payment_mode'  => ['required', new Enum(PaymentMethod::class)],
+            'debit_account' => [
                 'required',
                 Rule::when(
                     $request->input('payment_mode') === PaymentMethod::MPESA->name,
@@ -131,7 +131,7 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return JsonResponse
      *
      * @throws Throwable
@@ -141,22 +141,22 @@ class PaymentController extends Controller
         $countryCode = config('services.sidooh.country_code');
 
         $request->validate([
-            'transactions'               => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
-            'payment_mode'               => ['required', new Enum(PaymentMethod::class)],
-            'merchant_type'              => ['required', new Enum(MerchantType::class)],
-            'till_number'                => [
+            'transactions'  => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
+            'payment_mode'  => ['required', new Enum(PaymentMethod::class)],
+            'merchant_type' => ['required', new Enum(MerchantType::class)],
+            'till_number'   => [
                 Rule::requiredIf(
                     $request->input('merchant_type') === MerchantType::MPESA_BUY_GOODS->name,
-                )],
-            'paybill_number'             => [
+                ), ],
+            'paybill_number' => [
                 Rule::requiredIf(
                     $request->input('merchant_type') === MerchantType::MPESA_PAY_BILL->name,
-                )],
-            'account_number'             => [
+                ), ],
+            'account_number' => [
                 Rule::requiredIf(
                     $request->input('merchant_type') === MerchantType::MPESA_PAY_BILL->name,
-                )],
-            'debit_account'              => [
+                ), ],
+            'debit_account' => [
                 'required',
                 Rule::when(
                     $request->input('payment_mode') === PaymentMethod::MPESA->name,

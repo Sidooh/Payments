@@ -29,7 +29,6 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function () {
 
         Route::post('/withdraw', [PaymentController::class, 'withdraw']);
         Route::post('/b2b', [PaymentController::class, 'b2bPayment']);
-
     });
 
     Route::get('/accounts/{accountId}/vouchers', [VoucherController::class, 'getAccountVouchers']);

@@ -86,10 +86,10 @@ class VoucherController extends Controller
     public function credit(Request $request): JsonResponse
     {
         $request->validate([
-            'account_id' => ['required'],
-            'amount' => ['required'],
+            'account_id'  => ['required'],
+            'amount'      => ['required'],
             'description' => ['required', 'string'],
-            'notify' => ['required', 'boolean'],
+            'notify'      => ['required', 'boolean'],
         ]);
 
         $accountId = $request->input('account_id');
@@ -109,8 +109,8 @@ class VoucherController extends Controller
         $data = $request->validate([
             'disburse_type' => 'in:LUNCH,GENERAL',
             'enterprise_id' => 'required|integer',
-            'amount' => 'numeric',
-            'accounts' => 'array',
+            'amount'        => 'numeric',
+            'accounts'      => 'array',
         ], [
             'disburse_type.in' => 'invalid :attribute. allowed values are: [LUNCH, GENERAL]',
         ]);
@@ -122,7 +122,7 @@ class VoucherController extends Controller
 
         if ($request->isNotFilled('amount')) {
             $data['amount'] = match ($data['disburse_type']) {
-                'LUNCH' => $enterprise['max_lunch'],
+                'LUNCH'   => $enterprise['max_lunch'],
                 'GENERAL' => $enterprise['max_general']
             };
 
