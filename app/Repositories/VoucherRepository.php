@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\Enums\Description;
 use App\Enums\TransactionType;
 use App\Enums\VoucherType;
-use App\Helpers\ApiResponse;
 use App\Models\FloatAccount;
 use App\Models\FloatAccountTransaction;
 use App\Models\Voucher;
@@ -16,8 +15,6 @@ use Throwable;
 
 class VoucherRepository
 {
-    use ApiResponse;
-
     public static function credit(int $accountId, float $amount, Description $description): array
     {
         $voucher = Voucher::firstOrCreate([
@@ -57,7 +54,7 @@ class VoucherRepository
 
         $transaction = $voucher->voucherTransactions()->create([
             'amount'      => $amount,
-            'type'        => TransactionType::CREDIT,
+            'type'        => TransactionType::DEBIT,
             'description' => $description,
         ]);
 

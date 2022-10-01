@@ -2,9 +2,11 @@
 
 namespace App\Repositories\EventRepositories;
 
+use App\Enums\Description;
 use App\Enums\PaymentSubtype;
 use App\Enums\Status;
 use App\Models\Payment;
+use App\Repositories\VoucherRepository;
 use App\Services\SidoohProducts;
 use DrH\TendePay\Models\TendePayCallback;
 use Illuminate\Support\Arr;
@@ -22,6 +24,16 @@ class TendePayEventRepository
             return;
         }
 
+        // TODO: refund voucher payment
+        $voucherPayment = Payment::whereReference($payment->reference)
+            ->whereAmount($payment->amount)
+            ->whereDescription($payment->description)
+            ->whereSubType(PaymentSubtype::VOUCHER)
+            ->with('provider')
+            ->first();
+
+        [$voucher] = VoucherRepository::credit($voucherPayment->provider->account_id, $payment->amount, Description::VOUCHER_PURCHASE);
+
         $payment->update(['status' => Status::FAILED->name]);
 
         SidoohProducts::paymentCallback([
@@ -30,6 +42,7 @@ class TendePayEventRepository
                     ...Arr::only($payment->toArray(), ['id', 'amount', 'type', 'subtype', 'status', 'reference']),
                 ],
             ],
+            'credit_vouchers' => [$voucher]
         ]);
     }
 
