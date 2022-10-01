@@ -150,8 +150,6 @@ return [
         'result_url' => env('APP_URL').'/payments/callbacks/result/',
     ],
 
-    'test_amount' => env('MPESA_SANDBOX_AMOUNT', 0),
-
     'logging' => [
         'enabled'  => env('MPESA_ENABLE_LOGGING', false),
         'channels' => [

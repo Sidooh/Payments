@@ -3,8 +3,11 @@
     "rules": {
         "binary_operator_spaces": {
             "operators": {
-                "=>": "align_single_space_minimal"
+                "=>": "align"
             }
+        },
+        "function_declaration": {
+            "closure_function_spacing": "none"
         }
     }
 }

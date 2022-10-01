@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API\V1;
 
-use App\Enums\MerchantType;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\ProductType;
@@ -37,17 +36,13 @@ class PaymentController extends Controller
         $countryCode = config('services.sidooh.country_code');
 
         $request->validate([
-            'transactions'  => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
-            'payment_mode'  => ['required', new Enum(PaymentMethod::class)],
-            'debit_account' => [
+            'payment_mode'               => ['required', new Enum(PaymentMethod::class)],
+            'debit_account'              => [
                 'required',
-                Rule::when(
-                    $request->input('payment_mode') === PaymentMethod::MPESA->name,
-                    "phone:$countryCode",
-                    [new SidoohAccountExists]
-                ),
+                Rule::when($request->input('payment_mode') === PaymentMethod::MPESA->name, "phone:$countryCode", [new SidoohAccountExists]),
             ],
             'transactions.*.product_id'  => ['required', new Enum(ProductType::class)],
+            'transactions.*.reference'   => ['required', 'integer'],
             'transactions.*.amount'      => ['required', 'integer'],
             'transactions.*.destination' => ['required', 'numeric'],
             'transactions.*.description' => ['required', 'string'],
@@ -126,73 +121,5 @@ class PaymentController extends Controller
         $response = $repo->mpesa();
 
         return $this->successResponse($response);
-    }
-
-    /**
-     * Handle the incoming request.
-     *
-     * @param  Request  $request
-     * @return JsonResponse
-     *
-     * @throws Throwable
-     */
-    public function b2bPayment(Request $request): JsonResponse
-    {
-        $countryCode = config('services.sidooh.country_code');
-
-        $request->validate([
-            'transactions'  => ['required', 'array'], //TODO: Define what should be passed in transactions data: product_id, amount, reference, destination
-            'payment_mode'  => ['required', new Enum(PaymentMethod::class)],
-            'merchant_type' => ['required', new Enum(MerchantType::class)],
-            'till_number'   => [
-                Rule::requiredIf(
-                    $request->input('merchant_type') === MerchantType::MPESA_BUY_GOODS->name,
-                ), ],
-            'paybill_number' => [
-                Rule::requiredIf(
-                    $request->input('merchant_type') === MerchantType::MPESA_PAY_BILL->name,
-                ), ],
-            'account_number' => [
-                Rule::requiredIf(
-                    $request->input('merchant_type') === MerchantType::MPESA_PAY_BILL->name,
-                ), ],
-            'debit_account' => [
-                'required',
-                Rule::when(
-                    $request->input('payment_mode') === PaymentMethod::MPESA->name,
-                    "phone:$countryCode",
-                    [new SidoohAccountExists]
-                ),
-            ],
-            'transactions.*.product_id'  => ['required', new Enum(ProductType::class)],
-            'transactions.*.amount'      => ['required', 'integer'],
-            'transactions.*.destination' => ['required', 'numeric'],
-            'transactions.*.description' => ['required', 'string'],
-        ]);
-
-        Log::info('...[CTRL - PAYMENT]: Invoke...', $request->all());
-
-        $transactions = collect($request->transactions);
-
-        $repo = new PaymentRepository($transactions, PaymentMethod::from($request->payment_mode), $request->debit_account);
-
-        try {
-            $data = $repo->processB2b(MerchantType::from($request->merchant_type),
-                $request->paybill_number ?? $request->till_number,
-                $request->account_number ?? ''
-            );
-
-            return $this->successResponse($data, 'Payment Created.');
-        } catch (MpesaException $e) {
-            Log::critical($e);
-        } catch (Exception $err) {
-            if ($err->getCode() === 422) {
-                return $this->errorResponse($err->getMessage(), $err->getCode());
-            }
-
-            Log::error($err);
-        }
-
-        return $this->errorResponse('Failed to process payment request.');
     }
 }

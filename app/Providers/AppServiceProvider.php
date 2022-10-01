@@ -6,7 +6,6 @@ use App\Models\FloatAccountTransaction;
 use App\Models\VoucherTransaction;
 use DrH\Mpesa\Entities\MpesaBulkPaymentRequest;
 use DrH\Mpesa\Entities\MpesaStkRequest;
-use DrH\TendePay\Models\TendePayRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -40,7 +39,6 @@ class AppServiceProvider extends ServiceProvider
             'STK'     => MpesaStkRequest::class,
             'VOUCHER' => VoucherTransaction::class,
             'B2C'     => MpesaBulkPaymentRequest::class,
-            'B2B'     => TendePayRequest::class,
 
             'FLOAT' => FloatAccountTransaction::class,
         ]);

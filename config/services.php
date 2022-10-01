@@ -31,9 +31,9 @@ return [
     ],
 
     'sidooh' => [
-        'jwt_key' => env('JWT_KEY'),
-        'tagline' => 'Sidooh, Makes You Money with Every Purchase.',
-        'mpesa'   => [
+        'jwt_key'            => env('JWT_KEY'),
+        'tagline'            => 'Sidooh, Makes You Money with Every Purchase.',
+        'mpesa'              => [
             'env' => 'local',
             'b2c' => [
                 'phone'      => '254708374149',
@@ -41,9 +41,9 @@ return [
                 'max_amount' => '70000',
             ],
         ],
-        'country_code' => env('COUNTRY_CODE', 'KE'),
-        'services'     => [
-            'notify' => [
+        'country_code'       => env('COUNTRY_CODE', 'KE'),
+        'services'           => [
+            'notify'   => [
                 'enabled' => true,
                 'url'     => env('SIDOOH_NOTIFY_API_URL'),
             ],

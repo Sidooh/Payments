@@ -25,19 +25,19 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request): JsonResponse
     {
-        $totalPayments = Cache::remember('total_payments', 60 * 60 * 24, function () {
+        $totalPayments = Cache::remember('total_payments', 60 * 60 * 24, function() {
             return Payment::count();
         });
-        $totalPaymentsToday = Cache::remember('total_payments_today', 60 * 60, function () {
+        $totalPaymentsToday = Cache::remember('total_payments_today', 60 * 60, function() {
             return Payment::whereDate('created_at', Carbon::today())->count();
         });
 
-        $totalRevenue = Cache::remember('total_revenue', 60 * 60 * 24, function () {
+        $totalRevenue = Cache::remember('total_revenue', 60 * 60 * 24, function() {
             return round(Payment::whereStatus(Status::COMPLETED->name)
                 ->whereNotIn('subtype', [PaymentSubtype::B2C->name, PaymentSubtype::VOUCHER->name])
                 ->sum('amount'));
         });
-        $totalRevenueToday = Cache::remember('total_revenue_today', 60 * 60, function () {
+        $totalRevenueToday = Cache::remember('total_revenue_today', 60 * 60, function() {
             return round(Payment::whereStatus(Status::COMPLETED->name)
                 ->whereNotIn('subtype', [PaymentSubtype::B2C->name, PaymentSubtype::VOUCHER->name])
                 ->whereDate('created_at', Carbon::today())
@@ -60,15 +60,15 @@ class DashboardController extends Controller
         $chartAid = new ChartAid(Period::TODAY, $frequency, 'sum', 'amount');
         $chartAid->setShowFuture(true);
 
-        $fetch = function (array $whereBetween, int $freqCount = null) use ($chartAid) {
+        $fetch = function(array $whereBetween, int $freqCount = null) use ($chartAid) {
             $cacheKey = 'payments_'.implode('_', $whereBetween);
-            $transactions = Cache::remember($cacheKey, 60 * 60, function () use ($whereBetween) {
+            $transactions = Cache::remember($cacheKey, 60 * 60, function() use ($whereBetween) {
                 return Payment::select(['status', 'created_at', 'amount'])
                     ->whereBetween('created_at', $whereBetween)->get();
             });
 
-            $transform = function ($transactions, $key) use ($freqCount, $chartAid) {
-                $models = $transactions->groupBy(fn ($item) => $chartAid->chartDateFormat($item->created_at));
+            $transform = function($transactions, $key) use ($freqCount, $chartAid) {
+                $models = $transactions->groupBy(fn($item) => $chartAid->chartDateFormat($item->created_at));
 
                 return [$key => $chartAid->chartDataSet($models, $freqCount)];
             };
