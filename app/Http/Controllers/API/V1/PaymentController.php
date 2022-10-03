@@ -109,6 +109,13 @@ class PaymentController extends Controller
             ]);
         }
 
+        if ($payment->subtype === PaymentSubtype::B2B->name) {
+            $payment->load([
+                'provider:id,status,transaction_reference,service,text,response_code,response_message,created_at',
+                'provider.callback:id,initiator_reference,response_code,status,status_description,amount,account_reference,confirmation_code,reciever_party_name,created_at',
+            ]);
+        }
+
         return $this->successResponse($payment);
     }
 
