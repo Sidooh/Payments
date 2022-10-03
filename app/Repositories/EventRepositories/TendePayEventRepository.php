@@ -28,11 +28,11 @@ class TendePayEventRepository
         $voucherPayment = Payment::whereReference($payment->reference)
             ->whereAmount($payment->amount)
             ->whereDescription($payment->description)
-            ->whereSubType(PaymentSubtype::VOUCHER)
+            ->whereSubtype(PaymentSubtype::VOUCHER)
             ->with('provider')
             ->first();
 
-        [$voucher] = VoucherRepository::credit($voucherPayment->provider->account_id, $payment->amount, Description::VOUCHER_PURCHASE);
+        [$voucher] = VoucherRepository::credit($voucherPayment->provider->voucher->account_id, $payment->amount, Description::VOUCHER_REFUND);
 
         $payment->update(['status' => Status::FAILED->name]);
 
