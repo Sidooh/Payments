@@ -42,7 +42,7 @@ class TendePayEventRepository
                     ...Arr::only($payment->toArray(), ['id', 'amount', 'type', 'subtype', 'status', 'reference']),
                 ],
             ],
-            'credit_vouchers' => [$voucher]
+            'credit_vouchers' => [$voucher],
         ]);
     }
 
