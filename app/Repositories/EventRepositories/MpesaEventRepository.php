@@ -78,7 +78,7 @@ class MpesaEventRepository
 
             $data['credit_vouchers'] = [$voucher];
         } elseif ($stkCallback->request->reference === MpesaReference::FLOAT) {
-            $floatAccount = FloatAccount::findOrFail(explode(' - ', $payment->description)[1]);
+            $floatAccount = FloatAccount::find(explode(' - ', $payment->description)[1]);
 
             FloatAccountRepository::credit($floatAccount, $payment->amount, Description::FLOAT_PURCHASE);
 

@@ -25,7 +25,7 @@ class FloatAccountController extends Controller
 
         $floatAccounts = FloatAccount::latest();
 
-        if (in_array('voucher_transactions', $relations)) {
+        if (in_array('float_account_transactions', $relations)) {
             $floatAccounts = $floatAccounts->with('floatAccountTransactions:id,float_account_id,type,amount,description,created_at')
                 ->limit(50);
         }

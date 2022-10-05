@@ -20,8 +20,8 @@ namespace App\Models{
  * @property int $floatable_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FloatAccountTransaction[] $floatAccountTransaction
- * @property-read int|null $float_account_transaction_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FloatAccountTransaction[] $floatAccountTransactions
+ * @property-read int|null $float_account_transactions_count
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $floatable
  * @method static \Database\Factories\FloatAccountFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount newModelQuery()
@@ -42,13 +42,14 @@ namespace App\Models{
  * App\Models\FloatAccountTransaction
  *
  * @property int $id
- * @property string $type
+ * @property \App\Enums\TransactionType $type
  * @property string $amount
  * @property string $description
  * @property int $float_account_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\FloatAccount $floatAccount
+ * @property-read \App\Models\Payment|null $payment
  * @method static \Database\Factories\FloatAccountTransactionFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction newQuery()
