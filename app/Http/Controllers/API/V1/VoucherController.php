@@ -118,7 +118,7 @@ class VoucherController extends Controller
         $enterpriseId = $data['enterprise_id'];
         $voucherType = VoucherType::tryFrom("ENTERPRISE_{$data['disburse_type']}");
 
-        $enterprise = SidoohProducts::findEnterprise($enterpriseId, ['enterprise_accounts']);
+        $enterprise = SidoohProducts::findEnterprise($enterpriseId);
 
         if ($request->isNotFilled('amount')) {
             $data['amount'] = match ($data['disburse_type']) {

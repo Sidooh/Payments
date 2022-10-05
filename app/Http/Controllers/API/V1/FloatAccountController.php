@@ -21,7 +21,16 @@ class FloatAccountController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $floatAccounts = FloatAccount::latest()->get();
+        $relations = explode(',', $request->query('with'));
+
+        $floatAccounts = FloatAccount::latest();
+
+        if (in_array('voucher_transactions', $relations)) {
+            $floatAccounts = $floatAccounts->with('floatAccountTransactions:id,float_account_id,type,amount,description,created_at')
+                ->limit(50);
+        }
+
+        $floatAccounts = $floatAccounts->get();
 
         return $this->successResponse($floatAccounts);
     }
@@ -78,7 +87,7 @@ class FloatAccountController extends Controller
             'description',
             'float_account_id',
             'created_at',
-        ]);
+        ])->orderBy('id', 'desc')->limit(100);
 
         if (in_array('float-account', $relations)) {
             $transactions = $transactions->with('floatAccount:id,floatable_id,floatable_type,balance');
@@ -87,8 +96,6 @@ class FloatAccountController extends Controller
         if (in_array('payment', $relations)) {
             $transactions = $transactions->with('payment:id,provider_id,subtype,status');
         }
-
-        $transactions->orderBy('id', 'desc')->limit(100);
 
         return $this->successResponse($transactions->get());
     }
