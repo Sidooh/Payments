@@ -93,10 +93,6 @@ class FloatAccountController extends Controller
             $transactions = $transactions->with('floatAccount:id,floatable_id,floatable_type,balance');
         }
 
-        if (in_array('payment', $relations)) {
-            $transactions = $transactions->with('payment:id,provider_id,subtype,status');
-        }
-
         return $this->successResponse($transactions->get());
     }
 }

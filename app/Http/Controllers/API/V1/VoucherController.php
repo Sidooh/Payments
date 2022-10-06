@@ -23,14 +23,14 @@ class VoucherController extends Controller
 
         $vouchers = Voucher::latest();
 
-        if (in_array('voucher_transactions', $relations)) {
+        if(in_array('voucher_transactions', $relations)) {
             $vouchers = $vouchers->with('voucherTransactions:id,voucher_id,type,amount,description,created_at')
                 ->limit(50);
         }
 
         $vouchers = $vouchers->get();
 
-        if (in_array('account', $relations)) {
+        if(in_array('account', $relations)) {
             $vouchers = withRelation('account', $vouchers, 'account_id', 'id');
         }
 
@@ -41,17 +41,12 @@ class VoucherController extends Controller
     {
         $relations = explode(',', $request->query('with'));
 
-        $transactions = VoucherTransaction::query();
+        $transactions = VoucherTransaction::select(["id", "type", "amount", "description", "voucher_id", "created_at"])
+            ->orderBy('id', 'desc')->limit(100);
 
-        if (in_array('voucher', $relations)) {
+        if(in_array('voucher', $relations)) {
             $transactions = $transactions->with('voucher:id,account_id,type,balance');
         }
-
-        if (in_array('payment', $relations)) {
-            $transactions = $transactions->with('payment:id,provider_id,subtype,status');
-        }
-
-        $transactions->orderBy('id', 'desc')->limit(100);
 
         return $this->successResponse($transactions->get());
     }
@@ -60,12 +55,12 @@ class VoucherController extends Controller
     {
         $relations = explode(',', $request->query('with'));
 
-        if (in_array('transactions', $relations)) {
+        if(in_array('transactions', $relations)) {
             $voucher->load('voucherTransactions:id,voucher_id,type,amount,description,created_at')->latest()
                 ->limit(100);
         }
 
-        if (in_array('account', $relations)) {
+        if(in_array('account', $relations)) {
             $voucher->account = SidoohAccounts::find($voucher->account_id, true);
         }
 
@@ -76,7 +71,7 @@ class VoucherController extends Controller
     {
         $vouchers = Voucher::select(['id', 'type', 'balance'])->whereAccountId($accountId)->get();
 
-        if ($vouchers->isEmpty()) {
+        if($vouchers->isEmpty()) {
             $vouchers = [Voucher::create(['account_id' => $accountId, 'type' => VoucherType::SIDOOH])];
         }
 
@@ -120,18 +115,18 @@ class VoucherController extends Controller
 
         $enterprise = SidoohProducts::findEnterprise($enterpriseId);
 
-        if ($request->isNotFilled('amount')) {
+        if($request->isNotFilled('amount')) {
             $data['amount'] = match ($data['disburse_type']) {
-                'LUNCH'   => $enterprise['max_lunch'],
+                'LUNCH' => $enterprise['max_lunch'],
                 'GENERAL' => $enterprise['max_general']
             };
 
-            if (! isset($data['amount'])) {
+            if(!isset($data['amount'])) {
                 return $this->errorResponse("Amount is required! default amount for {$data['disburse_type']} voucher not set");
             }
         }
 
-        if ($request->isNotFilled('accounts')) {
+        if($request->isNotFilled('accounts')) {
             $data['accounts'] = Arr::pluck($enterprise['enterprise_accounts'], 'account_id');
         }
 
