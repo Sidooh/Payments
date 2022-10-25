@@ -177,7 +177,7 @@ class PaymentController extends Controller
             'transactions.*.description' => ['required', 'string'],
         ]);
 
-        Log::info('...[CTRL - PAYMENT]: Invoke...', $request->all());
+        Log::info('...[CTRL - PAYMENT]: Invoke b2b...', $request->all());
 
         $transactions = collect($request->transactions);
 

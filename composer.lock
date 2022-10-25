@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9614f393878ee08c5c443e9f922e1898",
+    "content-hash": "db14ee99fdaf4fd2cb12e0f68c4467c4",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -827,16 +827,16 @@
         },
         {
             "name": "drh/laravel-tendepay",
-            "version": "v1.1.1",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/laravel-tendepay.git",
-                "reference": "1fce27270c88364fbdb59fb74706a476a4d161b7"
+                "reference": "c9acf95659795917989b77b0736f9dd678d0f592"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/laravel-tendepay/zipball/1fce27270c88364fbdb59fb74706a476a4d161b7",
-                "reference": "1fce27270c88364fbdb59fb74706a476a4d161b7",
+                "url": "https://api.github.com/repos/DrH97/laravel-tendepay/zipball/c9acf95659795917989b77b0736f9dd678d0f592",
+                "reference": "c9acf95659795917989b77b0736f9dd678d0f592",
                 "shasum": ""
             },
             "require": {
@@ -896,9 +896,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/laravel-tendepay/issues",
-                "source": "https://github.com/DrH97/laravel-tendepay/tree/v1.1.1"
+                "source": "https://github.com/DrH97/laravel-tendepay/tree/v1.2.0"
             },
-            "time": "2022-10-25T17:24:05+00:00"
+            "time": "2022-10-25T18:47:22+00:00"
         },
         {
             "name": "drh/mpesa",

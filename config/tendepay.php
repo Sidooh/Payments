@@ -10,7 +10,7 @@ return [
     | Sandbox base url: 'http://144.76.108.226:8180/GatewayAPIChannel/RequestProcessor/request'
     | Production base url: TODO()
     */
-    'sandbox' => env('TENDEPAY_SANDBOX', false),
+    'sandbox'           => env('TENDEPAY_SANDBOX', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,7 +32,7 @@ return [
     | Url of the api
     |
     */
-    'url' => env('TENDEPAY_URL', 'http://144.76.108.226:8180/GatewayAPIChannel/RequestProcessor/request'),
+    'url'               => env('TENDEPAY_URL', 'http://144.76.108.226:8180/GatewayAPIChannel/RequestProcessor/request'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ return [
     | Location of the public key provided by TendePay
     |
     */
-    'encryption_key' => env('TENDEPAY_ENCRYPTION_KEY'),
+    'encryption_key'    => env('TENDEPAY_ENCRYPTION_KEY'),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ return [
     | Username provided by TendePay
     |
     */
-    'username' => env('TENDEPAY_USERNAME'),
+    'username'          => env('TENDEPAY_USERNAME'),
 
     /*
     |--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ return [
     | Password provided by TendePay
     |
     */
-    'password' => env('TENDEPAY_PASSWORD'),
+    'password'          => env('TENDEPAY_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------
@@ -72,7 +72,7 @@ return [
     | Paybill to use for funds
     |
     */
-    'source_paybill' => env('TENDEPAY_SOURCE_PAYBILL'),
+    'source_paybill'    => env('TENDEPAY_SOURCE_PAYBILL'),
 
     /*
     |--------------------------------------------------------------------------
@@ -82,6 +82,20 @@ return [
     | MSISDN(Phone number) to use for requests
     |
     */
-    'msisdn' => env('TENDEPAY_MSISDN'),
+    'msisdn'            => env('TENDEPAY_MSISDN'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Logging
+    |--------------------------------------------------------------------------
+    |
+    | Whether to log in the library
+    |
+    */
+    'logging'           => [
+        'enabled'  => env('TENDEPAY_ENABLE_LOGGING', false),
+        'channels' => [
+            'single', 'stderr',
+        ]
+    ]
 ];
