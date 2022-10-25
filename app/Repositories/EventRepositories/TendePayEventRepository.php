@@ -27,9 +27,9 @@ class TendePayEventRepository
         // TODO: refund voucher payment
         $voucherPayment = Payment::whereReference($payment->reference)
             ->whereAmount($payment->amount)
-            ->whereDescription($payment->description)
+//            ->whereDescription($payment->description)
             ->whereSubtype(PaymentSubtype::VOUCHER)
-            ->with('provider')
+            ->with('provider.voucher')
             ->first();
 
         [$voucher] = VoucherRepository::credit($voucherPayment->provider->voucher->account_id, $payment->amount, Description::VOUCHER_REFUND);
@@ -48,7 +48,7 @@ class TendePayEventRepository
 
     public static function b2bPaymentSent(TendePayCallback $callback): void
     {
-        $payment = Payment::whereProvider(PaymentSubtype::STK, $callback->request->id)->firstOrFail();
+        $payment = Payment::whereProvider(PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING->name) {
             Log::error('Payment is not pending...', [$payment, $callback->request]);
