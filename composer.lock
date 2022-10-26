@@ -827,16 +827,16 @@
         },
         {
             "name": "drh/laravel-tendepay",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/laravel-tendepay.git",
-                "reference": "c9acf95659795917989b77b0736f9dd678d0f592"
+                "reference": "c0918654008473353e50b18d435f7e34ec30480f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/laravel-tendepay/zipball/c9acf95659795917989b77b0736f9dd678d0f592",
-                "reference": "c9acf95659795917989b77b0736f9dd678d0f592",
+                "url": "https://api.github.com/repos/DrH97/laravel-tendepay/zipball/c0918654008473353e50b18d435f7e34ec30480f",
+                "reference": "c0918654008473353e50b18d435f7e34ec30480f",
                 "shasum": ""
             },
             "require": {
@@ -896,9 +896,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/laravel-tendepay/issues",
-                "source": "https://github.com/DrH97/laravel-tendepay/tree/v1.2.0"
+                "source": "https://github.com/DrH97/laravel-tendepay/tree/v1.2.1"
             },
-            "time": "2022-10-25T18:47:22+00:00"
+            "time": "2022-10-26T04:45:45+00:00"
         },
         {
             "name": "drh/mpesa",
