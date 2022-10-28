@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\API\V2;
 
+use App\DTOs\PaymentDTO;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MerchantPaymentRequest;
 use App\Http\Requests\PaymentRequest;
+use App\Repositories\PaymentRepositories\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -17,10 +19,21 @@ class PaymentController extends Controller
      * @param PaymentRequest $request
      * @return JsonResponse
      *
+     * @throws \Exception
      */
     public function __invoke(PaymentRequest $request): JsonResponse
     {
         Log::info('...[CTRL - PAYMENTv2]: Invoke...', $request->all());
+
+        [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
+        $repo = new Repository(new PaymentDTO(
+            $request->accountId,
+            $request->amount,
+            $type,
+            $subtype,
+            $request->description,
+            $request->reference,
+        ));
 
         $transactions = collect($request->transactions);
 

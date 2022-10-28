@@ -37,16 +37,6 @@ class PaymentRequest extends FormRequest
             'source'              => ['required', new Enum(PaymentMethod::class)],
             'source_account'      => ['required', $this->sourceAccountRule()],
 
-//            'destination'         => ['nullable', new Enum(PaymentMethod::class)],
-//            'destination_account' => [
-//                'nullable',
-//                Rule::when(
-//                    $this->input('payment_mode') === PaymentMethod::MPESA->name,
-//                    "phone:$countryCode",
-//                    [new SidoohAccountExists]
-//                ),
-//            ],
-
             'ipn' => ['nullable', 'url'],
         ];
     }
