@@ -26,11 +26,11 @@ trait ApiResponse
             'result' => 0,
         ];
 
-        if ($errors) {
-            $response['errors'] = $errors;
-        }
         if ($message) {
             $response['message'] = $message;
+        }
+        if ($errors) {
+            $response['errors'] = $errors;
         }
 
         return response()->json($response, $code);
