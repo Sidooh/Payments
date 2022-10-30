@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers\API\V2;
 
+use App\DTOs\PaymentDTO;
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FloatAccountTopupRequest;
+use App\Http\Resources\PaymentResource;
+use App\Repositories\PaymentRepositories\PaymentRepository;
+use DrH\Mpesa\Exceptions\MpesaException;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -20,14 +27,30 @@ class FloatAccountController extends Controller
     {
         Log::info('...[CTRL - FLOAT_ACCOUNTv2]: Invoke...', $request->all());
 
-        $transactions = collect($request->transactions);
-
-        $repo = new PaymentRepository($transactions, PaymentMethod::from($request->payment_mode), $request->debit_account);
-
         try {
-            $data = $repo->process();
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
 
-            return $this->successResponse($data, 'Payment Created.');
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    $request->reference,
+                    $request->source_account,
+                    false,
+                    PaymentType::SIDOOH,
+                    PaymentSubtype::FLOAT,
+                    ['float_account_id' => $request->float_account]
+                ),
+                $request->ipn
+            );
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment->refresh()), 'Payment Requested.');
+            // TODO: Change to PaymentException - create one and use internally
         } catch (MpesaException $e) {
             Log::critical($e);
         } catch (Exception $err) {
@@ -38,6 +61,6 @@ class FloatAccountController extends Controller
             Log::error($err);
         }
 
-        return $this->errorResponse('Failed to process payment request.');
+        return $this->errorResponse('Failed to process credit request.');
     }
 }

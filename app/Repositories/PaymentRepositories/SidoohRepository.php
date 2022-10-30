@@ -2,10 +2,14 @@
 
 namespace App\Repositories\PaymentRepositories;
 
-class SidoohRepository implements PaymentRepository
+use App\Repositories\PaymentRepositories\Providers\PaymentContract;
+use App\Repositories\PaymentRepositories\Providers\SidoohProvider;
+
+class SidoohRepository extends Repository
 {
-    function requestPayment(): int
+    public function getPaymentProvider(): PaymentContract
     {
-        // TODO: Implement requestPayment() method.
+        // TODO: Handle reference as needed
+        return new SidoohProvider($this->paymentData);
     }
 }

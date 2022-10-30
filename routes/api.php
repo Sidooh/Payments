@@ -5,6 +5,7 @@ use App\Http\Controllers\API\V1\FloatAccountController;
 use App\Http\Controllers\API\V1\MpesaController;
 use App\Http\Controllers\API\V1\PaymentController;
 use App\Http\Controllers\API\V1\VoucherController;
+use App\Http\Controllers\API\V2\AdminController;
 use App\Http\Controllers\API\V2\FloatAccountController as FloatAccountControllerV2;
 use App\Http\Controllers\API\V2\PaymentController as PaymentControllerV2;
 use App\Http\Controllers\API\V2\VoucherController as VoucherControllerV2;
@@ -69,6 +70,9 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
         Route::post('/', PaymentControllerV2::class);
         Route::post('/merchant', [PaymentControllerV2::class, 'merchant']);
 
+        Route::middleware('throttle:api')
+            ->get('/{payment}', [PaymentControllerV2::class, 'show']);
+
 //        Route::post('/withdraw', [PaymentControllerV2::class, 'withdraw']);
     });
 
@@ -84,5 +88,9 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
         Route::post('/credit', [FloatAccountControllerV2::class, 'credit']);
 
 //        Route::post('/disburse', [VoucherController::class, 'disburse']);
+    });
+
+    Route::prefix('/admin')->group(function () {
+        Route::post('/app', AdminController::class);
     });
 });

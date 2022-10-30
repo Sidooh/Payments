@@ -16,6 +16,7 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
+        'account_id',
         'amount',
         'status',
         'type',
@@ -23,6 +24,15 @@ class Payment extends Model
         'provider_id',
         'reference',
         'description',
+        'ipn',
+        'destination_type',
+        'destination_subtype',
+        'destination_provider_id',
+        'destination_data'
+    ];
+
+    protected $casts = [
+        'destination_data' => 'array'
     ];
 
     public function provider(): MorphTo

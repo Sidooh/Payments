@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\SidoohVoucherExists;
+use App\Enums\PaymentMethod;
+use App\Rules\SidoohVoucherIsForAccount;
+use Illuminate\Contracts\Validation\InvokableRule;
 
 class VoucherCreditRequest extends PaymentRequest
 {
@@ -24,7 +26,15 @@ class VoucherCreditRequest extends PaymentRequest
     public function rules(): array
     {
         return parent::rules() + [
-                'voucher'         => ['required', new SidoohVoucherExists],
+                'voucher' => ['required', 'different:source_account'],
             ];
+    }
+
+    function sourceAccountRule(): InvokableRule|string
+    {
+        return match (PaymentMethod::tryFrom($this->input('source'))) {
+            PaymentMethod::VOUCHER => new SidoohVoucherIsForAccount,
+            default => parent::sourceAccountRule()
+        };
     }
 }

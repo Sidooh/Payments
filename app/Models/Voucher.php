@@ -21,6 +21,18 @@ class Voucher extends Model
         'type',
     ];
 
+    /**
+     * Get the voucher's limit.
+     *
+     * @return Attribute
+     */
+    protected function limit(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 70000,
+        );
+    }
+
     public function voucherTopUpAmount(): Attribute
     {
         return new Attribute(get: function($value, $attributes) {
@@ -39,7 +51,7 @@ class Voucher extends Model
     /**
      * ---------------------------------------- Relationships ----------------------------------------
      */
-    public function voucherTransactions(): HasMany
+    public function transactions(): HasMany
     {
         return $this->hasMany(VoucherTransaction::class);
     }

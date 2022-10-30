@@ -3,49 +3,21 @@
 namespace App\Repositories\PaymentRepositories;
 
 use App\DTOs\PaymentDTO;
-use App\Enums\PaymentType;
-use Exception;
+use App\Repositories\PaymentRepositories\Providers\PaymentContract;
 
-class Repository
+abstract class Repository
 {
-    private PaymentRepository $sourceRepository;
-    private PaymentRepository $destinationRepository;
+    abstract protected function getPaymentProvider(): PaymentContract;
 
-    /**
-     * @throws Exception
-     */
-    public function __construct(private readonly PaymentDTO $paymentData)
+    public function __construct(protected readonly PaymentDTO $paymentData)
     {
-        $this->setPaymentRepositories();
     }
 
-    function setPaymentRepositories(): Repository
+    function process(): int
     {
-        $this->sourceRepository = match ($this->paymentData->type) {
-            PaymentType::MPESA => new MpesaRepository(),
-            default => throw new Exception('Unsupported source')
-        };
+        $provider = $this->getPaymentProvider();
 
-        $this->destinationRepository = match ($this->paymentData->destinationType) {
-            PaymentType::SIDOOH => new SidoohRepository(),
-            default => throw new Exception('Unsupported destination')
-        };
-
-        return $this;
+        return $provider->requestPayment();
     }
 
-    function getSourcePaymentRepository(): PaymentRepository
-    {
-        return $this->sourceRepository;
-    }
-
-    function getDestinationPaymentRepository(): PaymentRepository
-    {
-        return $this->destinationRepository;
-    }
-
-    function process(): void
-    {
-
-    }
 }

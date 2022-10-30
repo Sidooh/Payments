@@ -2,10 +2,14 @@
 
 namespace App\Repositories\PaymentRepositories;
 
-class MpesaRepository implements PaymentRepository
+use App\Repositories\PaymentRepositories\Providers\MpesaProvider;
+use App\Repositories\PaymentRepositories\Providers\PaymentContract;
+
+class MpesaRepository extends Repository
 {
-    function requestPayment(): int
+    public function getPaymentProvider(): PaymentContract
     {
-        // TODO: Implement requestPayment() method.
+        // TODO: Handle reference as needed
+        return new MpesaProvider($this->paymentData->source, $this->paymentData->amount, $this->paymentData->reference);
     }
 }

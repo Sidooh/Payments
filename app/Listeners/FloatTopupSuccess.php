@@ -2,13 +2,13 @@
 
 namespace App\Listeners;
 
-use App\Repositories\EventRepositories\MpesaEventRepository;
-use DrH\Mpesa\Events\StkPushPaymentSuccessEvent;
+use App\Events\FloatTopupEvent;
+use App\Repositories\EventRepositories\SidoohEventRepository;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class StkPaymentReceived
+class FloatTopupSuccess
 {
     /**
      * Create the event listener.
@@ -22,17 +22,17 @@ class StkPaymentReceived
     /**
      * Handle the event.
      *
-     * @param  StkPushPaymentSuccessEvent  $event
+     * @param  FloatTopupEvent  $event
      * @return void
      *
      * @throws Throwable
      */
-    public function handle(StkPushPaymentSuccessEvent $event): void
+    public function handle(FloatTopupEvent $event): void
     {
-        Log::info('...[EVENT]: STK Payment Received...');
+        Log::info('...[EVENT]: Float topped up...');
 
         try {
-            MpesaEventRepository::stkPaymentReceived($event->stkCallback);
+            SidoohEventRepository::floatTopup($event->transaction);
         } catch (Exception $e) {
             Log::critical($e);
         }

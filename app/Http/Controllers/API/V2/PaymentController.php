@@ -3,11 +3,16 @@
 namespace App\Http\Controllers\API\V2;
 
 use App\DTOs\PaymentDTO;
+use App\Enums\MerchantType;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MerchantPaymentRequest;
 use App\Http\Requests\PaymentRequest;
-use App\Repositories\PaymentRepositories\Repository;
+use App\Http\Resources\PaymentResource;
+use App\Models\Payment;
+use App\Repositories\PaymentRepositories\PaymentRepository;
+use DrH\Mpesa\Exceptions\MpesaException;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -25,24 +30,25 @@ class PaymentController extends Controller
     {
         Log::info('...[CTRL - PAYMENTv2]: Invoke...', $request->all());
 
-        [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
-        $repo = new Repository(new PaymentDTO(
-            $request->accountId,
-            $request->amount,
-            $type,
-            $subtype,
-            $request->description,
-            $request->reference,
-        ));
-
-        $transactions = collect($request->transactions);
-
-        $repo = new PaymentRepository($transactions, PaymentMethod::from($request->payment_mode), $request->debit_account);
-
         try {
-            $data = $repo->process();
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    $request->reference,
+                    $request->source_account
+                ),
+                $request->ipn
+            );
 
-            return $this->successResponse($data, 'Payment Created.');
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
+            // TODO: Change to PaymentException - create one and use internally
         } catch (MpesaException $e) {
             Log::critical($e);
         } catch (Exception $err) {
@@ -62,19 +68,42 @@ class PaymentController extends Controller
      *
      * @param MerchantPaymentRequest $request
      * @return JsonResponse
+     * @throws Exception
      */
     public function merchant(MerchantPaymentRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - PAYMENTv2]: Invoke...', $request->all());
-
-        $transactions = collect($request->transactions);
-
-        $repo = new PaymentRepository($transactions, PaymentMethod::from($request->payment_mode), $request->debit_account);
+        Log::info('...[CTRL - PAYMENTv2]: Merchant...', $request->all());
 
         try {
-            $data = $repo->process();
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
+            $merchantType = MerchantType::from($request->merchant_type);
+            [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
 
-            return $this->successResponse($data, 'Payment Created.');
+            $destination = $merchantType === MerchantType::MPESA_PAY_BILL ?
+                $request->only('merchant_type', 'paybill_number', 'account_number') :
+                $request->only('merchant_type', 'till_number', 'account_number');
+
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    $request->reference,
+                    $request->source_account,
+                    false,
+                    $type2,
+                    $subtype2,
+                    $destination
+                ),
+                $request->ipn
+            );
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
+            // TODO: Change to PaymentException - create one and use internally
         } catch (MpesaException $e) {
             Log::critical($e);
         } catch (Exception $err) {
@@ -86,5 +115,18 @@ class PaymentController extends Controller
         }
 
         return $this->errorResponse('Failed to process payment request.');
+    }
+
+    /**
+     * Handle the incoming request.
+     *
+     * @param Payment $payment
+     * @return JsonResponse
+     */
+    public function show(Payment $payment): JsonResponse
+    {
+        // TODO: Add auth check functionality for this
+
+        return $this->successResponse(PaymentResource::make($payment), 'Payment query.');
     }
 }
