@@ -31,6 +31,7 @@ class TendePayEventRepository
             return;
         }
 
+        // TODO: What if float was used? can it be used?
         DB::transaction(function() use ($payment) {
             $voucher = Voucher::firstOrCreate([
                 'account_id' => $payment->account_id,
