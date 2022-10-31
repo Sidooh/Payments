@@ -9,7 +9,6 @@ class SidoohRepository extends Repository
 {
     public function getPaymentProvider(): PaymentContract
     {
-        // TODO: Handle reference as needed
         return new SidoohProvider($this->paymentData);
     }
 }

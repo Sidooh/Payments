@@ -50,7 +50,7 @@ class PaymentRequest extends FormRequest
             PaymentMethod::MPESA => "phone:$countryCode",
             PaymentMethod::VOUCHER => new SidoohVoucherExists,
             PaymentMethod::FLOAT => new SidoohFloatAccountExists,
-            default => new SidoohAccountExists
+            default => abort(422, 'Unsupported source')
         };
     }
 }

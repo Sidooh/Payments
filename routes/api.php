@@ -69,11 +69,11 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
 
         Route::post('/', PaymentControllerV2::class);
         Route::post('/merchant', [PaymentControllerV2::class, 'merchant']);
+        Route::post('/withdraw', [PaymentControllerV2::class, 'withdraw']);
 
         Route::middleware('throttle:api')
             ->get('/{payment}', [PaymentControllerV2::class, 'show']);
 
-//        Route::post('/withdraw', [PaymentControllerV2::class, 'withdraw']);
     });
 
     Route::prefix('/vouchers')->group(function () {

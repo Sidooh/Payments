@@ -9,7 +9,6 @@ class MpesaRepository extends Repository
 {
     public function getPaymentProvider(): PaymentContract
     {
-        // TODO: Handle reference as needed
-        return new MpesaProvider($this->paymentData->source, $this->paymentData->amount, $this->paymentData->reference);
+        return new MpesaProvider($this->paymentData);
     }
 }

@@ -45,7 +45,9 @@ class SidoohProvider implements PaymentContract
 
         // TODO: Add float option as well
         return match ($this->paymentDTO->subtype) {
-            PaymentSubtype::VOUCHER => VoucherRepository::debit($this->paymentDTO->source, $this->paymentDTO->amount, $this->paymentDTO->description)->id
+            PaymentSubtype::VOUCHER => VoucherRepository::debit($this->paymentDTO->source, $this->paymentDTO->amount, $this->paymentDTO->description)->id,
+            PaymentSubtype::FLOAT => FloatAccountRepository::debit($this->paymentDTO->source, $this->paymentDTO->amount, $this->paymentDTO->description)->id,
+            default => throw new Exception('Unsupported payment subtype')
         };
 
     }
@@ -70,6 +72,7 @@ class SidoohProvider implements PaymentContract
 
     /**
      * @throws TendePayException
+     * @throws Exception
      */
     private function tendePay(): int
     {
