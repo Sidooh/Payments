@@ -31,6 +31,7 @@ class VoucherCreditSuccess
     {
         Log::info('...[EVENT]: Voucher credited...');
 
+        // TODO: Handle async?
         try {
             SidoohEventRepository::voucherCredited($event->transaction);
         } catch (Exception $e) {

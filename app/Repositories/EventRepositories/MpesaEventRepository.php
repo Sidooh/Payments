@@ -32,11 +32,12 @@ class MpesaEventRepository
 
         $payment->update(['status' => Status::FAILED->name]);
 
-        SidoohService::sendCallback($payment->ipn, 'POST', [
-            PaymentResource::make($payment),
-            "code"    => $stkCallback->result_code,
-            "message" => $stkCallback->result_desc,
-        ]);
+        SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+//        SidoohService::sendCallback($payment->ipn, 'POST', [
+//            PaymentResource::make($payment),
+//            "code"    => $stkCallback->result_code,
+//            "message" => $stkCallback->result_desc,
+//        ]);
     }
 
     /**
@@ -57,7 +58,7 @@ class MpesaEventRepository
         if (!$payment->destination_type) {
             $payment->update(['status' => Status::COMPLETED->name]);
 
-            SidoohService::sendCallback($payment->ipn, 'POST', [PaymentResource::make($payment)]);
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
 
             return;
         }
@@ -82,7 +83,7 @@ class MpesaEventRepository
 
             $payment->update(['status' => Status::COMPLETED->name]);
 
-            SidoohService::sendCallback($payment->ipn, 'POST', [PaymentResource::make($payment)]);
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
         } catch (Exception $e) {
             Log::error($e);
         }
@@ -103,10 +104,11 @@ class MpesaEventRepository
 
             $payment->update(['status' => Status::FAILED->name]);
 
-            SidoohService::sendCallback($payment->ipn, 'POST', [
-                PaymentResource::make($payment),
-                "message" => "Withdrawal to Mpesa failed",
-            ]);
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+//            SidoohService::sendCallback($payment->ipn, 'POST', [
+//                PaymentResource::make($payment),
+//                "message" => "Withdrawal to Mpesa failed",
+//            ]);
 
         } catch (Exception $e) {
             Log::error($e);
