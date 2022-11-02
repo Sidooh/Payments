@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -80,9 +81,9 @@ class SidoohService
     }
 
 
-    public static function sendCallback(string $url, string $method = 'GET', array $data = []): void
+    public static function sendCallback(string $url, string $method = 'GET', JsonResource $data = null): void
     {
-        Log::info('...[SRV - SIDOOH]: CBK...', [
+        Log::info('...[SRV - SIDOOH]: CB...', [
             'url'    => $url,
             'method' => $method,
             'data'   => $data,

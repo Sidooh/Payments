@@ -79,6 +79,7 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
     Route::prefix('/vouchers')->group(function () {
 
         Route::post('/credit', [VoucherControllerV2::class, 'credit']);
+        Route::get('/{voucher}', [VoucherController::class, 'show']);
 
 //        Route::post('/disburse', [VoucherController::class, 'disburse']);
     });
@@ -93,4 +94,7 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
     Route::prefix('/admin')->group(function () {
         Route::post('/app', AdminController::class);
     });
+
+    Route::get('/accounts/{accountId}/vouchers', [VoucherController::class, 'getAccountVouchers']);
+
 });

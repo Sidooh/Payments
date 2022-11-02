@@ -22,7 +22,7 @@ class VoucherCreditSuccess
     /**
      * Handle the event.
      *
-     * @param  VoucherCreditEvent  $event
+     * @param VoucherCreditEvent $event
      * @return void
      *
      * @throws Throwable
@@ -31,6 +31,7 @@ class VoucherCreditSuccess
     {
         Log::info('...[EVENT]: Voucher credited...');
 
+        // TODO: Handle async?
         try {
             SidoohEventRepository::voucherCredited($event->transaction);
         } catch (Exception $e) {

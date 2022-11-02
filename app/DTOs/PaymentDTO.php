@@ -42,7 +42,7 @@ class PaymentDTO
         $validPaymentCombinations = match ($this->subtype) {
             PaymentSubtype::STK => [null, PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT, PaymentSubtype::B2B],
             PaymentSubtype::VOUCHER => [null, PaymentSubtype::VOUCHER, PaymentSubtype::B2B],
-            PaymentSubtype::FLOAT => [PaymentSubtype::VOUCHER, PaymentSubtype::B2C],
+            PaymentSubtype::FLOAT => [PaymentSubtype::VOUCHER],
             default => throw new Exception('Unsupported payment combination')
         };
 
