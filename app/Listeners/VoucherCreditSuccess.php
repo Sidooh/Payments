@@ -22,7 +22,7 @@ class VoucherCreditSuccess
     /**
      * Handle the event.
      *
-     * @param  VoucherCreditEvent  $event
+     * @param VoucherCreditEvent $event
      * @return void
      *
      * @throws Throwable

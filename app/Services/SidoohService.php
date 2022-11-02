@@ -83,7 +83,7 @@ class SidoohService
 
     public static function sendCallback(string $url, string $method = 'GET', JsonResource $data = null): void
     {
-        Log::info('...[SRV - SIDOOH]: CBK...', [
+        Log::info('...[SRV - SIDOOH]: CB...', [
             'url'    => $url,
             'method' => $method,
             'data'   => $data,

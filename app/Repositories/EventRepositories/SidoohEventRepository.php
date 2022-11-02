@@ -29,7 +29,7 @@ class SidoohEventRepository
 
         $payment->update(['status' => Status::COMPLETED->name]);
 
-        if ($payment->subtype === PaymentSubtype::STK)
+        if ($payment->subtype === PaymentSubtype::STK->name)
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
     }
 
