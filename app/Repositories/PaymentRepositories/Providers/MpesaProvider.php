@@ -54,7 +54,7 @@ class MpesaProvider implements PaymentContract
         $phone = $this->paymentDTO->destinationData['phone'];
 
         return match ($this->paymentDTO->destinationSubtype) {
-            PaymentSubtype::B2C => mpesa_send($phone, $this->paymentDTO->amount, $this->paymentDTO->reference)->id,
+            PaymentSubtype::B2C => mpesa_send($phone, $this->paymentDTO->amount, 'payment')->id,
             default => throw new Exception("Unsupported payment subtype")
         };
     }
