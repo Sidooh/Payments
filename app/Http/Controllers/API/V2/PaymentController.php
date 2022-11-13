@@ -134,7 +134,7 @@ class PaymentController extends Controller
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
-            [$type2, $subtype2] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
+            [$type2, $subtype2] = PaymentMethod::from($request->destination)->getWithdrawalTypeAndSubtype();
             $subtype2 = $type2 === PaymentType::MPESA ?  PaymentSubtype::B2C: $subtype2;
 
             $destination = match ($subtype2) {

@@ -64,6 +64,10 @@ Route::middleware('throttle:3,60')->prefix('/v1')->group(function () {
         ->name('payments.mpesa.status.query');
 });
 
+#=========================================================================================================
+# V2 API
+#=========================================================================================================
+
 Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
     Route::prefix('/payments')->group(function () {
 
