@@ -25,7 +25,7 @@ return [
    |--------------------------------------------------------------------------
    |
    | If you decide to cache credentials, they will be kept in your app cache
-   | configuration for sometime. Reducing the need for many requests for
+   | configuration for some time. Reducing the need for many requests for
    | generating credentials
    |
    */
@@ -147,7 +147,15 @@ return [
         'result_url' => env('APP_URL').'/payments/callbacks/result/',
     ],
 
-    'test_amount' => env('MPESA_SANDBOX_AMOUNT', 0),
+    /*
+     |------------------------------------------------------
+     | Set sandbox amount
+     | ------------------------------------------------------
+     | Specify whether to use actual amount on sandbox
+     | 0 - actual amount, any other value will use that value
+     |
+     */
+    'sandbox_test_amount' => env('MPESA_SANDBOX_AMOUNT', 1),
 
     'logging' => [
         'enabled'  => env('MPESA_ENABLE_LOGGING', false),
