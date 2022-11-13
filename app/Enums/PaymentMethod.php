@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Exception;
+
 enum PaymentMethod: string
 {
     case MPESA = 'MPESA';
@@ -17,11 +19,15 @@ enum PaymentMethod: string
         };
     }
 
+    /**
+     * @throws Exception
+     */
     function getWithdrawalTypeAndSubtype(): array
     {
         return match ($this) {
-            self::MPESA => [PaymentType::SIDOOH, PaymentSubtype::B2C],
-            self::VOUCHER => [PaymentType::SIDOOH, PaymentSubtype::VOUCHER]
+            self::MPESA => [PaymentType::MPESA, PaymentSubtype::B2C],
+            self::VOUCHER => [PaymentType::SIDOOH, PaymentSubtype::VOUCHER],
+            self::FLOAT => throw new Exception('Unsupported payment method')
         };
     }
 }
