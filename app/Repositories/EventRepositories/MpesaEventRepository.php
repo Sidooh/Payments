@@ -2,51 +2,42 @@
 
 namespace App\Repositories\EventRepositories;
 
+use App\DTOs\PaymentDTO;
 use App\Enums\Description;
-use App\Enums\MpesaReference;
 use App\Enums\PaymentSubtype;
 use App\Enums\Status;
-use App\Models\FloatAccount;
+use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
-use App\Repositories\FloatAccountRepository;
-use App\Repositories\VoucherRepository;
-use App\Services\SidoohAccounts;
-use App\Services\SidoohProducts;
-use App\Services\SidoohSavings;
+use App\Repositories\PaymentRepositories\PaymentRepository;
+use App\Repositories\SidoohRepositories\FloatAccountRepository;
+use App\Services\SidoohService;
 use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkCallback;
 use Error;
 use Exception;
-use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class MpesaEventRepository
 {
-    /**
-     * @throws RequestException
-     */
     public static function stkPaymentFailed(MpesaStkCallback $stkCallback): void
     {
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING->name) {
-            Log::error('Payment is not pending...', [$payment, $stkCallback->request]);
+            Log::critical('Payment is not pending...', [$payment, $stkCallback->request]);
 
             return;
         }
 
         $payment->update(['status' => Status::FAILED->name]);
 
-        SidoohProducts::paymentCallback([
-            'payments' => [
-                [
-                    ...Arr::only($payment->toArray(), ['id', 'amount', 'type', 'subtype', 'status', 'reference']),
-                    'stk_result_code' => $stkCallback->result_code,
-                ],
-            ],
-        ]);
+        SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+//        SidoohService::sendCallback($payment->ipn, 'POST', [
+//            PaymentResource::make($payment),
+//            "code"    => $stkCallback->result_code,
+//            "message" => $stkCallback->result_desc,
+//        ]);
     }
 
     /**
@@ -57,50 +48,42 @@ class MpesaEventRepository
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING->name) {
-            Log::error('Payment is not pending...', [$payment, $stkCallback->request]);
+            Log::critical('Payment is not pending...', [$payment, $stkCallback->request]);
 
             return;
         }
 
-        $payment->update(['status' => Status::COMPLETED->name]);
 
-        Log::info('...[REP - MPESA]: Payment updated...', [$payment->id, $payment->status]);
+        //Complete payment
+        if (!$payment->destination_type) {
+            $payment->update(['status' => Status::COMPLETED->name]);
 
-        $data['payments'] = [
-            Arr::only($payment->toArray(), ['id', 'amount', 'type', 'subtype', 'status', 'reference']),
-        ];
-
-        if ($stkCallback->request->reference === MpesaReference::PAY_VOUCHER) {
-            $destination = explode(' - ', $payment->description)[1];
-            $accountId = SidoohAccounts::findByPhone($destination)['id'];
-
-            [$voucher] = VoucherRepository::credit($accountId, $payment->amount, Description::VOUCHER_PURCHASE);
-
-            $data['credit_vouchers'] = [$voucher];
-        } elseif ($stkCallback->request->reference === MpesaReference::FLOAT) {
-            $floatAccount = FloatAccount::find(explode(' - ', $payment->description)[1]);
-
-            FloatAccountRepository::credit($floatAccount, $payment->amount, Description::FLOAT_PURCHASE);
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
 
             return;
         }
 
-        SidoohProducts::paymentCallback($data);
+        // Handle destination payment
+        $repo = new PaymentRepository(
+            PaymentDTO::fromPayment($payment),
+            $payment->ipn
+        );
+
+        $repo->processPayment();
+
     }
 
     public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
-            $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
+            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)->firstOrFail();
             if ($payment->status !== Status::PENDING->name) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
 
             $payment->update(['status' => Status::COMPLETED->name]);
 
-            Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
-
-            SidoohSavings::paymentCallback($payment);
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
         } catch (Exception $e) {
             Log::error($e);
         }
@@ -109,17 +92,24 @@ class MpesaEventRepository
     public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
-            $payment = Payment::whereProvider(PaymentSubtype::STK, $paymentResponse->request->id)->firstOrFail();
+            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)->firstOrFail();
 
             if ($payment->status !== Status::PENDING->name) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
 
+            $account = $payment->provider->floatAccount;
+
+            FloatAccountRepository::credit($account->id, $payment->amount, Description::VOUCHER_REFUND->value);
+
             $payment->update(['status' => Status::FAILED->name]);
 
-            Log::info('...[REPO]: B2C Payment updated...', $payment->toArray());
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+//            SidoohService::sendCallback($payment->ipn, 'POST', [
+//                PaymentResource::make($payment),
+//                "message" => "Withdrawal to Mpesa failed",
+//            ]);
 
-            SidoohSavings::paymentCallback($payment);
         } catch (Exception $e) {
             Log::error($e);
         }

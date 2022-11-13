@@ -14,7 +14,7 @@ class B2CPaymentSuccess
      * @param  B2CPaymentSuccessEvent  $event
      * @return void
      */
-    public function handle(B2CPaymentSuccessEvent $event)
+    public function handle(B2CPaymentSuccessEvent $event): void
     {
         Log::info('...[EVENT]: B2C Payment Sent...');
 
