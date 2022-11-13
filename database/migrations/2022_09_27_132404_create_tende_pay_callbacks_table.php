@@ -19,7 +19,7 @@ return new class extends Migration
 
             $table->double('amount');
             $table->string('account_reference');
-            $table->string('confirmation_code');
+            $table->string('confirmation_code')->nullable();
             $table->string('msisdn');
             $table->string('receiver_party_name')->nullable();
             $table->string('date');

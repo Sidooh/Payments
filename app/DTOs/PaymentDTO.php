@@ -42,7 +42,7 @@ class PaymentDTO
         $validPaymentCombinations = match ($this->subtype) {
             PaymentSubtype::STK => [null, PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT, PaymentSubtype::B2B],
             PaymentSubtype::VOUCHER => [null, PaymentSubtype::VOUCHER, PaymentSubtype::B2B],
-            PaymentSubtype::FLOAT => [PaymentSubtype::VOUCHER],
+            PaymentSubtype::FLOAT => [PaymentSubtype::VOUCHER, PaymentSubtype::B2C],
             default => throw new Exception('Unsupported payment combination')
         };
 
@@ -51,6 +51,9 @@ class PaymentDTO
         }
     }
 
+    /**
+     * @throws Exception
+     */
     static function fromPayment(Payment $payment): PaymentDTO
     {
         $dto = new PaymentDTO(
@@ -69,10 +72,5 @@ class PaymentDTO
         $dto->payment = $payment;
 
         return $dto;
-    }
-
-    function setWithdrawal(bool $isWithdrawal = false): void
-    {
-        $this->isWithdrawal = $isWithdrawal;
     }
 }
