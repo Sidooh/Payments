@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d0b67e1dde2f5700353101f887992d93",
+    "content-hash": "0157e4746d4c92d3d1da726f49fd4030",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -902,16 +902,16 @@
         },
         {
             "name": "drh/mpesa",
-            "version": "v2.1.1",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/mpesa.git",
-                "reference": "b7a5e10d088b225ec6aecf35b5f7b49603c9d92b"
+                "reference": "6fa4fb05746cdceec57b74c983dbb901f92890a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/b7a5e10d088b225ec6aecf35b5f7b49603c9d92b",
-                "reference": "b7a5e10d088b225ec6aecf35b5f7b49603c9d92b",
+                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/6fa4fb05746cdceec57b74c983dbb901f92890a7",
+                "reference": "6fa4fb05746cdceec57b74c983dbb901f92890a7",
                 "shasum": ""
             },
             "require": {
@@ -939,7 +939,7 @@
                         "DrH\\Mpesa\\MpesaServiceProvider"
                     ],
                     "aliases": {
-                        "B2C": "DrH\\Mpesa\\Facades\\B2C",
+                        "Bulk": "DrH\\Mpesa\\Facades\\Bulk",
                         "Identity": "DrH\\Mpesa\\Facades\\Identity",
                         "Registrar": "DrH\\Mpesa\\Facades\\Registrar",
                         "STK": "DrH\\Mpesa\\Facades\\STK"
@@ -969,9 +969,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/mpesa/issues",
-                "source": "https://github.com/DrH97/mpesa/tree/v2.1.1"
+                "source": "https://github.com/DrH97/mpesa/tree/v2.2.0"
             },
-            "time": "2022-09-17T14:58:27+00:00"
+            "time": "2022-11-13T18:47:46+00:00"
         },
         {
             "name": "egulias/email-validator",
