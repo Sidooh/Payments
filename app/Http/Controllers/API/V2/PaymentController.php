@@ -130,7 +130,7 @@ class PaymentController extends Controller
      */
     public function withdraw(WithdrawalRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - PAYMENTv2]: Withdraw...', $request->all());
+        Log::info('...[CTRL - PAYMENT ~v2]: Withdraw...', $request->all());
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();

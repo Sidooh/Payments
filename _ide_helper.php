@@ -4,7 +4,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 9.33.0.
+ * Generated for Laravel 9.39.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -1685,6 +1685,17 @@
         {            //Method inherited from \Illuminate\Foundation\Console\Kernel
                         /** @var \App\Console\Kernel $instance */
                         $instance->bootstrap();
+        }
+                    /**
+         * Bootstrap the application without booting service providers.
+         *
+         * @return void
+         * @static
+         */
+        public static function bootstrapWithoutBootingProviders()
+        {            //Method inherited from \Illuminate\Foundation\Console\Kernel
+                        /** @var \App\Console\Kernel $instance */
+                        $instance->bootstrapWithoutBootingProviders();
         }
                     /**
          * Set the Artisan application instance.
@@ -4989,7 +5000,7 @@
                     /**
          * Return all of the created connections.
          *
-         * @return \Illuminate\Database\array<string, \Illuminate\Database\Connection>
+         * @return array<string, \Illuminate\Database\Connection>
          * @static
          */
         public static function getConnections()
@@ -12767,6 +12778,7 @@
      * @method static \Illuminate\Routing\RouteRegistrar scopeBindings()
      * @method static \Illuminate\Routing\RouteRegistrar where(array $where)
      * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
+     * @method static \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
      * @see \Illuminate\Routing\Router
      */
         class Route {
@@ -12989,13 +13001,13 @@
          *
          * @param array $attributes
          * @param \Closure|array|string $routes
-         * @return void
+         * @return \Illuminate\Routing\Router
          * @static
          */
         public static function group($attributes, $routes)
         {
                         /** @var \Illuminate\Routing\Router $instance */
-                        $instance->group($attributes, $routes);
+                        return $instance->group($attributes, $routes);
         }
                     /**
          * Merge the given array with the last group stack.
@@ -13264,6 +13276,19 @@
         {
                         /** @var \Illuminate\Routing\Router $instance */
                         return $instance->pushMiddlewareToGroup($group, $middleware);
+        }
+                    /**
+         * Remove the given middleware from the specified group.
+         *
+         * @param string $group
+         * @param string $middleware
+         * @return \Illuminate\Routing\Router
+         * @static
+         */
+        public static function removeMiddlewareFromGroup($group, $middleware)
+        {
+                        /** @var \Illuminate\Routing\Router $instance */
+                        return $instance->removeMiddlewareFromGroup($group, $middleware);
         }
                     /**
          * Flush the router's middleware groups.
@@ -14646,6 +14671,18 @@
                         return $instance->getHandler();
         }
                     /**
+         * Set the underlying session handler implementation.
+         *
+         * @param \SessionHandlerInterface $handler
+         * @return void
+         * @static
+         */
+        public static function setHandler($handler)
+        {
+                        /** @var \Illuminate\Session\Store $instance */
+                        $instance->setHandler($handler);
+        }
+                    /**
          * Determine if the session handler needs a request.
          *
          * @return bool
@@ -15175,6 +15212,18 @@
         {
                         /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->size($path);
+        }
+                    /**
+         * Get the checksum for a file.
+         *
+         * @return string|false
+         * @throws UnableToProvideChecksum
+         * @static
+         */
+        public static function checksum($path, $options = [])
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
+                        return $instance->checksum($path, $options);
         }
                     /**
          * Get the mime-type of a given file.
@@ -16783,6 +16832,65 @@
                         $instance->callCreator($view);
         }
                     /**
+         * Start injecting content into a fragment.
+         *
+         * @param string $fragment
+         * @return void
+         * @static
+         */
+        public static function startFragment($fragment)
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        $instance->startFragment($fragment);
+        }
+                    /**
+         * Stop injecting content into a fragment.
+         *
+         * @return string
+         * @throws \InvalidArgumentException
+         * @static
+         */
+        public static function stopFragment()
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        return $instance->stopFragment();
+        }
+                    /**
+         * Get the contents of a fragment.
+         *
+         * @param string $name
+         * @param string|null $default
+         * @return mixed
+         * @static
+         */
+        public static function getFragment($name, $default = null)
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        return $instance->getFragment($name, $default);
+        }
+                    /**
+         * Get the entire array of rendered fragments.
+         *
+         * @return array
+         * @static
+         */
+        public static function getFragments()
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        return $instance->getFragments();
+        }
+                    /**
+         * Flush all of the fragments.
+         *
+         * @return void
+         * @static
+         */
+        public static function flushFragments()
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        $instance->flushFragments();
+        }
+                    /**
          * Start injecting content into a section.
          *
          * @param string $section
@@ -17089,6 +17197,17 @@
      */
         class Vite {
                     /**
+         * Get the preloaded assets.
+         *
+         * @var array
+         * @static
+         */
+        public static function preloadedAssets()
+        {
+                        /** @var \Illuminate\Foundation\Vite $instance */
+                        return $instance->preloadedAssets();
+        }
+                    /**
          * Get the Content Security Policy nonce applied to all generated tags.
          *
          * @return string|null
@@ -17193,6 +17312,18 @@
         {
                         /** @var \Illuminate\Foundation\Vite $instance */
                         return $instance->useStyleTagAttributes($attributes);
+        }
+                    /**
+         * Use the given callback to resolve attributes for preload tags.
+         *
+         * @param \Illuminate\Foundation\(callable(string,  string, ?array, ?array): array)|array  $attributes
+         * @return \Illuminate\Foundation\Vite
+         * @static
+         */
+        public static function usePreloadTagAttributes($attributes)
+        {
+                        /** @var \Illuminate\Foundation\Vite $instance */
+                        return $instance->usePreloadTagAttributes($attributes);
         }
                     /**
          * Generate React refresh runtime script.
@@ -17367,13 +17498,36 @@
 
 }
 
+    namespace DrH\TendePay\Facades {
+            /**
+     *
+     *
+     * @see \DrH\TendePay\TendePay
+     */
+        class TendePay {
+                    /**
+         *
+         *
+         * @throws TendePayException
+         * @static
+         */
+        public static function b2bRequest($request, $reference = null, $msisdn = null, $relationId = null)
+        {
+                        /** @var \DrH\TendePay\TendePay $instance */
+                        return $instance->b2bRequest($request, $reference, $msisdn, $relationId);
+        }
+
+    }
+
+}
+
     namespace DrH\Mpesa\Facades {
             /**
      *
      *
      * @see \DrH\Mpesa\Library\BulkSender
      */
-        class B2C {
+        class Bulk {
                     /**
          * Set number to receive the funds
          *
@@ -17439,6 +17593,21 @@
                         return $instance->balance();
         }
                     /**
+         * Query a transaction.
+         *
+         * @param string $transactionId
+         * @return array
+         * @throws ClientException
+         * @throws ExternalServiceException
+         * @throws GuzzleException
+         * @static
+         */
+        public static function status($transactionId)
+        {
+                        /** @var \DrH\Mpesa\Library\BulkSender $instance */
+                        return $instance->status($transactionId);
+        }
+                    /**
          *
          *
          * @param string $number
@@ -17459,7 +17628,7 @@
          * @param \DrH\Mpesa\Library\MpesaAccount|null $account
          * @return array
          * @throws GuzzleException
-         * @throws ExternalServiceException|\DrH\Mpesa\Exceptions\ClientException
+         * @throws ExternalServiceException|ClientException
          * @static
          */
         public static function sendRequest($body, $endpoint, $account = null)
@@ -17511,7 +17680,7 @@
          * @param \DrH\Mpesa\Library\MpesaAccount|null $account
          * @return array
          * @throws GuzzleException
-         * @throws ExternalServiceException|\DrH\Mpesa\Exceptions\ClientException
+         * @throws ExternalServiceException|ClientException
          * @static
          */
         public static function sendRequest($body, $endpoint, $account = null)
@@ -17609,7 +17778,7 @@
          * @param \DrH\Mpesa\Library\MpesaAccount|null $account
          * @return array
          * @throws GuzzleException
-         * @throws ExternalServiceException|\DrH\Mpesa\Exceptions\ClientException
+         * @throws ExternalServiceException|ClientException
          * @static
          */
         public static function sendRequest($body, $endpoint, $account = null)
@@ -17717,7 +17886,7 @@
          * @param \DrH\Mpesa\Library\MpesaAccount|null $account
          * @return array
          * @throws GuzzleException
-         * @throws ExternalServiceException|\DrH\Mpesa\Exceptions\ClientException
+         * @throws ExternalServiceException|ClientException
          * @static
          */
         public static function sendRequest($body, $endpoint, $account = null)
@@ -18329,7 +18498,7 @@
                     /**
          *
          *
-         * @return \Spatie\FlareClient\array<int, FlareMiddleware|class-string<FlareMiddleware>>
+         * @return array<int, FlareMiddleware|class-string<FlareMiddleware>>
          * @static
          */
         public static function getMiddleware()
@@ -18390,7 +18559,7 @@
                     /**
          *
          *
-         * @param \Spatie\FlareClient\FlareMiddleware\FlareMiddleware|\Spatie\FlareClient\array<FlareMiddleware>|\Spatie\FlareClient\class-string<FlareMiddleware> $middleware
+         * @param \Spatie\FlareClient\FlareMiddleware\FlareMiddleware|array<FlareMiddleware>|\Spatie\FlareClient\class-string<FlareMiddleware> $middleware
          * @return \Spatie\FlareClient\Flare
          * @static
          */
@@ -18402,7 +18571,7 @@
                     /**
          *
          *
-         * @return \Spatie\FlareClient\array<int,FlareMiddleware|\Spatie\FlareClient\class-string<FlareMiddleware>>
+         * @return array<int,FlareMiddleware|class-string<FlareMiddleware>>
          * @static
          */
         public static function getMiddlewares()
@@ -18562,7 +18731,7 @@
          *
          * @param string $groupName
          * @param mixed $default
-         * @return \Spatie\FlareClient\array<int, mixed>
+         * @return array<int, mixed>
          * @static
          */
         public static function getGroup($groupName = 'context', $default = [])
@@ -20369,7 +20538,7 @@ namespace  {
                 /**
              * Set the table which the query is targeting.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|string $table
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $table
              * @param string|null $as
              * @return \Illuminate\Database\Query\Builder
              * @static
@@ -21883,6 +22052,20 @@ namespace  {
             }
 
                 /**
+             * Get a single expression value from the first result of a query.
+             *
+             * @param string $expression
+             * @param array $bindings
+             * @return mixed
+             * @static
+             */
+            public static function rawValue($expression, $bindings = [])
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->rawValue($expression, $bindings);
+            }
+
+                /**
              * Get the count of the total records for the paginator.
              *
              * @param array $columns
@@ -22441,7 +22624,8 @@ namespace  {
             class View extends \Illuminate\Support\Facades\View {}
             class Vite extends \Illuminate\Support\Facades\Vite {}
             class LocalCarbon extends \App\Facades\LocalCarbon {}
-            class B2C extends \DrH\Mpesa\Facades\B2C {}
+            class TendePay extends \DrH\TendePay\Facades\TendePay {}
+            class Bulk extends \DrH\Mpesa\Facades\Bulk {}
             class Identity extends \DrH\Mpesa\Facades\Identity {}
             class Registrar extends \DrH\Mpesa\Facades\Registrar {}
             class STK extends \DrH\Mpesa\Facades\STK {}
@@ -22551,7 +22735,7 @@ if (! function_exists('e')) {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|string|null  $value
+     * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|null  $value
      * @param  bool  $doubleEncode
      * @return string
      */
@@ -22563,6 +22747,10 @@ if (! function_exists('e')) {
 
         if ($value instanceof Htmlable) {
             return $value->toHtml();
+        }
+
+        if ($value instanceof BackedEnum) {
+            $value = $value->value;
         }
 
         return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8', $doubleEncode);
