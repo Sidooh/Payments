@@ -16,8 +16,11 @@ class MpesaController extends Controller
     public function __invoke(string $type, string $subType): JsonResponse
     {
         return match (PaymentType::tryFrom(strtoupper($type))) {
-            PaymentType::SIDOOH => throw new \Exception('To be implemented'),
-            PaymentType::MPESA  => match (PaymentSubtype::tryFrom(strtoupper($subType))) {
+            PaymentType::SIDOOH => match (PaymentSubtype::tryFrom(strtoupper($subType))) {
+                PaymentSubtype::B2B => $this->getB2BPayments(),
+                default             => throw new \Exception("Unexpected sub-type $subType for type $type")
+            },
+            PaymentType::MPESA => match (PaymentSubtype::tryFrom(strtoupper($subType))) {
                 PaymentSubtype::B2C => $this->getB2CPayments(),
                 PaymentSubtype::STK => $this->getSTKPayments(),
                 PaymentSubtype::C2B => $this->getC2BPayments(),
