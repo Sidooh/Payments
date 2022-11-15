@@ -29,7 +29,7 @@ class MpesaController extends Controller
 
     public function getSTKPayments(): JsonResponse
     {
-        $payments = Payment::whereType(PaymentType::MPESA->name)->whereSubtype(PaymentSubtype::STK->name)->with([
+        $payments = Payment::whereSubtype(PaymentSubtype::STK->name)->with([
             'provider:id,status,reference,checkout_request_id,amount,phone,created_at',
             'provider.response:id,checkout_request_id,result_desc,created_at',
         ])->latest()->get();
@@ -39,7 +39,7 @@ class MpesaController extends Controller
 
     public function getC2BPayments(): JsonResponse
     {
-        $payments = Payment::whereType(PaymentType::MPESA->name)->whereSubtype(PaymentSubtype::C2B->name)->with([
+        $payments = Payment::whereSubtype(PaymentSubtype::C2B)->with([
             'provider:id,status,reference,checkout_request_id,amount,phone,created_at',
             'provider.response:id,checkout_request_id,result_desc,created_at',
         ])->latest()->get();
@@ -49,7 +49,15 @@ class MpesaController extends Controller
 
     public function getB2CPayments(): JsonResponse
     {
-        $payments = Payment::whereType(PaymentType::SIDOOH->name)->whereSubtype(PaymentSubtype::FLOAT)->latest()->get();
+        $payments = Payment::whereDestinationSubtype(PaymentSubtype::B2C)->latest()->get();
+
+        return $this->successResponse($payments);
+    }
+
+    public function getB2BPayments(): JsonResponse
+    {
+        $payments = Payment::whereDestinationType(PaymentType::TENDE)->whereDestinationSubtype(PaymentSubtype::B2B)
+            ->latest()->get();
 
         return $this->successResponse($payments);
     }
