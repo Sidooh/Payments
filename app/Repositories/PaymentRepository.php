@@ -163,7 +163,7 @@ class PaymentRepository
                     'status'      => Status::PENDING->name,
                     'provider_id' => $tendePayRequest->id,
                     'reference'   => $this->firstTransaction['reference'] ?? null,
-                    'description' => $description->value.' - '.$this->tillOrPaybill . ($this->accountNumber ? ' - '.$this->accountNumber : ''),
+                    'description' => $description->value.' - '.$this->tillOrPaybill.($this->accountNumber ? ' - '.$this->accountNumber : ''),
                 ];
 
                 $data['b2b_payment'] = Payment::create($paymentData)->toArray();
