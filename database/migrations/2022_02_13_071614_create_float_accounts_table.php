@@ -19,9 +19,9 @@ return new class extends Migration
             $table->decimal('balance', 10)->default(0);
             $table->morphs('floatable');
 
-            $table->unsignedBigInteger('account_id')->nullable();
+            $table->unsignedBigInteger('account_id')->index()->nullable();
 
-            $table->unique(['floatable_id', 'floatable_type', 'account_id']);
+            $table->unique(['floatable_type', 'account_id']);
 
             $table->timestamps();
         });

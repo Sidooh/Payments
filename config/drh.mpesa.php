@@ -136,7 +136,7 @@ return [
          * Go to https://developer.safaricom.co.ke/test_credentials and paste your initiator password to generate
          * security credential
          */
-        'security_credential' => 'ZW20xkR58Tm4E1CZxliomiGC9wKPnM+RE/+bbxPgFSbhU10PKRYFjjO2W0HVRjdpZQcw9VInadmPVrsN+SramgZBg6Jix6NslJa+npItFRZyiI5eodSOKR2h7Fm/HpjOJAYvPBBBbBwvom+fJv06l4wIpDOkiiTY5+qx8J+FSZ/c4iVRSaDN5VHVXvUXJqsIRvoc0sLSU+EwJYgE4lx/J8gyhokWVBUCvxjOW/mOymi0rbESByKU2IXA3D2+ds5n+XwcrxB+n0Ub7WDw+ia0N1ixn2HqHpfaizp20FywVlw3AxHpueyRWrbzeo8jzCmG3ZBU0xdIMCiTeVBPGNUz1A==',
+        'security_credential' => env('MPESA_B2C_SECURITY_CREDENTIAL', 'ZW20xkR58Tm4E1CZxliomiGC9wKPnM+RE/+bbxPgFSbhU10PKRYFjjO2W0HVRjdpZQcw9VInadmPVrsN+SramgZBg6Jix6NslJa+npItFRZyiI5eodSOKR2h7Fm/HpjOJAYvPBBBbBwvom+fJv06l4wIpDOkiiTY5+qx8J+FSZ/c4iVRSaDN5VHVXvUXJqsIRvoc0sLSU+EwJYgE4lx/J8gyhokWVBUCvxjOW/mOymi0rbESByKU2IXA3D2+ds5n+XwcrxB+n0Ub7WDw+ia0N1ixn2HqHpfaizp20FywVlw3AxHpueyRWrbzeo8jzCmG3ZBU0xdIMCiTeVBPGNUz1A=='),
         /*
          * Notification URL for timeout
          */
