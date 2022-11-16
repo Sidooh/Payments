@@ -42,7 +42,7 @@ class FloatAccountController extends Controller
     {
         $initiator = $request->enum('initiator', Initiator::class);
 
-        $account = $this->repo->store($initiator, $request->validated('floatable_id'));
+        $account = $this->repo->store($initiator, $request->validated('reference'), $request->validated('account_id'));
 
         return $this->successResponse($account);
     }

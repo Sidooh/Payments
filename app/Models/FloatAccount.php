@@ -17,6 +17,7 @@ class FloatAccount extends Model
     protected $fillable = [
         'floatable_id',
         'floatable_type',
+        'account_id',
     ];
 
     /**
