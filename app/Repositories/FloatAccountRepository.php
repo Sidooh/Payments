@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 class FloatAccountRepository
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function store(Initiator $initiator, int $floatableId, int $accountId): FloatAccount
     {
@@ -31,7 +31,7 @@ class FloatAccountRepository
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function topUp(FloatAccount $floatAccount, Initiator $initiator, $amount): Payment|Model
     {
