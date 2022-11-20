@@ -40,9 +40,7 @@ class FloatAccountController extends Controller
      */
     public function store(FloatAccountRequest $request): JsonResponse
     {
-        $initiator = $request->enum('initiator', Initiator::class);
-
-        $account = $this->repo->store($initiator, $request->validated('account_id'));
+        $account = $this->repo->store($request->validated('account_id'));
 
         return $this->successResponse($account);
     }
