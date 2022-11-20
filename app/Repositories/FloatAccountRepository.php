@@ -21,12 +21,9 @@ class FloatAccountRepository
     /**
      * @throws \Exception
      */
-    public function store(Initiator $initiator, int $floatableId): FloatAccount
+    public function store(Initiator $initiator, int $accountId): FloatAccount
     {
-        return FloatAccount::create([
-            'floatable_id'   => $floatableId,
-            'floatable_type' => $initiator,
-        ]);
+        return FloatAccount::create(['account_id' => $accountId]);
     }
 
     /**

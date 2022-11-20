@@ -15,8 +15,7 @@ class FloatAccount extends Model
     use HasFactory;
 
     protected $fillable = [
-        'floatable_id',
-        'floatable_type',
+        'account_id',
     ];
 
     /**
