@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Helpers\ApiResponse;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -55,6 +56,7 @@ class Handler extends ExceptionHandler
             $e instanceof ModelNotFoundException        => $this->errorResponse('The specified resource cannot be found', 404),
             $e instanceof HttpException                 => $this->errorResponse($e->getMessage(), $e->getStatusCode()),
             $e instanceof AuthenticationException       => $this->errorResponse($e->getMessage(), 401),
+            $e instanceof AuthorizationException       => $this->errorResponse($e->getMessage(), 403),
             default                                     => $this->errorResponse('Something went wrong, please contact support')
         };
     }

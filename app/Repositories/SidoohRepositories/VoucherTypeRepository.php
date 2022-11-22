@@ -9,17 +9,17 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class VoucherRepository
+class VoucherTypeRepository
 {
     /**
      * @throws Exception|Throwable
      */
-    public static function credit(int $id, float $amount, string $description): VoucherTransaction
+    public static function disburse(int $id, float $amount, string $description): VoucherTransaction
     {
         $voucher = Voucher::findOrFail($id);
 
         // TODO: Check if voucher settings and voucher has limit, check this even before if possible
-        if ($voucher->balance + $amount > $voucher->voucherType->limit_amount) {
+        if ($voucher->balance + $amount > $voucher->limit) {
             throw new Exception('Amount will exceed voucher limit.', 422);
         }
 
@@ -27,11 +27,13 @@ class VoucherRepository
             $voucher->balance += $amount;
             $voucher->save();
 
-            return $voucher->transactions()->create([
+            $transaction = $voucher->transactions()->create([
                 'amount'      => $amount,
                 'type'        => TransactionType::CREDIT,
                 'description' => $description,
             ]);
+
+            return $transaction;
         }, 2);
     }
 

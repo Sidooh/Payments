@@ -18,10 +18,9 @@ return new class extends Migration
 
             $table->string('type', 20);
             $table->integer('balance')->unsigned()->default(0);
-            $table->foreignId('account_id')->unsigned();
-            $table->foreignId('enterprise_id')->nullable();
+            $table->foreignId('account_id');
 
-            $table->unique(['type', 'account_id', 'enterprise_id']);
+            $table->unique(['type', 'account_id']);
 
             $table->timestamps();
         });
