@@ -7,8 +7,10 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreVoucherRequest;
 use App\Http\Requests\VoucherCreditRequest;
 use App\Http\Resources\PaymentResource;
+use App\Models\Voucher;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Exception;
@@ -17,6 +19,16 @@ use Illuminate\Support\Facades\Log;
 
 class VoucherController extends Controller
 {
+    public function store(StoreVoucherRequest $request): JsonResponse
+    {
+        $voucher = Voucher::firstOrCreate([
+            'account_id'      => $request->account_id,
+            'voucher_type_id' => $request->voucher_type_id,
+        ]);
+
+        return $this->successResponse($voucher);
+    }
+
     /**
      * Handle the incoming request.
      *
