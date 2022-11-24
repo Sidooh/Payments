@@ -24,7 +24,7 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param PaymentRequest $request
+     * @param  PaymentRequest  $request
      * @return JsonResponse
      *
      * @throws \Exception
@@ -65,17 +65,17 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
-
     /**
      * Handle the incoming request.
      *
-     * @param MerchantPaymentRequest $request
+     * @param  MerchantPaymentRequest  $request
      * @return JsonResponse
+     *
      * @throws Exception
      */
     public function merchant(MerchantPaymentRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - PAYMENTv2]: Merchant...', $request->all());
+        Log::info('...[CTRL - PAYMENT ~v2]: Merchant...', $request->all());
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
@@ -123,23 +123,23 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param WithdrawalRequest $request
+     * @param  WithdrawalRequest  $request
      * @return JsonResponse
      *
      * @throws \Exception
      */
     public function withdraw(WithdrawalRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - PAYMENTv2]: Withdraw...', $request->all());
+        Log::info('...[CTRL - PAYMENT ~v2]: Withdraw...', $request->all());
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
             [$type2, $subtype2] = PaymentMethod::from($request->destination)->getWithdrawalTypeAndSubtype();
-            $subtype2 = $type2 === PaymentType::MPESA ?  PaymentSubtype::B2C: $subtype2;
+            $subtype2 = $type2 === PaymentType::MPESA ? PaymentSubtype::B2C : $subtype2;
 
             $destination = match ($subtype2) {
                 PaymentSubtype::VOUCHER => 'voucher_id',
-                PaymentSubtype::B2C => 'phone',
+                PaymentSubtype::B2C     => 'phone',
             };
 
             $repo = new PaymentRepository(
@@ -179,7 +179,7 @@ class PaymentController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Payment $payment
+     * @param  Payment  $payment
      * @return JsonResponse
      */
     public function show(Payment $payment): JsonResponse

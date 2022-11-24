@@ -28,11 +28,11 @@ class Payment extends Model
         'destination_type',
         'destination_subtype',
         'destination_provider_id',
-        'destination_data'
+        'destination_data',
     ];
 
     protected $casts = [
-        'destination_data' => 'array'
+        'destination_data' => 'array',
     ];
 
     public function provider(): MorphTo

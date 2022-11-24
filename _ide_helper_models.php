@@ -20,9 +20,9 @@ namespace App\Models{
  * @property int $floatable_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FloatAccountTransaction[] $floatAccountTransaction
- * @property-read int|null $float_account_transaction_count
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $floatable
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FloatAccountTransaction[] $transactions
+ * @property-read int|null $transactions_count
  * @method static \Database\Factories\FloatAccountFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount newQuery()
@@ -42,13 +42,14 @@ namespace App\Models{
  * App\Models\FloatAccountTransaction
  *
  * @property int $id
- * @property string $type
+ * @property \App\Enums\TransactionType $type
  * @property string $amount
  * @property string $description
  * @property int $float_account_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\FloatAccount $floatAccount
+ * @property-read \App\Models\Payment|null $payment
  * @method static \Database\Factories\FloatAccountTransactionFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction newQuery()
@@ -78,15 +79,29 @@ namespace App\Models{
  * @property string|null $reference
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $account_id
+ * @property string|null $destination_type
+ * @property string|null $destination_subtype
+ * @property int|null $destination_provider_id
+ * @property array|null $destination_data
+ * @property string|null $ipn
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $destinationProvider
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $provider
  * @method static \Database\Factories\PaymentFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationProvider(\App\Enums\PaymentSubtype $subtype, int $providerId)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationProviderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationSubtype($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereIpn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvider(\App\Enums\PaymentSubtype $subtype, int $providerId)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereReference($value)
@@ -109,8 +124,8 @@ namespace App\Models{
  * @property int|null $enterprise_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VoucherTransaction[] $voucherTransactions
- * @property-read int|null $voucher_transactions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VoucherTransaction[] $transactions
+ * @property-read int|null $transactions_count
  * @method static \Database\Factories\VoucherFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher newQuery()

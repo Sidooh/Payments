@@ -23,8 +23,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth.jwt')->prefix('/v1')->group(function () {
-    Route::prefix('/payments')->group(function () {
+Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
+    Route::prefix('/payments')->group(function() {
         Route::get('/', [PaymentController::class, 'index']);
         Route::get('/{payment}', [PaymentController::class, 'show']);
 
@@ -42,15 +42,13 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function () {
     Route::get('/dashboard', DashboardController::class);
     Route::get('/dashboard/revenue-chart', [DashboardController::class, 'revenueChart']);
 
-    Route::prefix('/vouchers')->group(function () {
+    Route::prefix('/vouchers')->group(function() {
         Route::get('/', [VoucherController::class, 'index']);
         Route::get('/transactions', [VoucherController::class, 'getTransactions']);
         Route::get('/{voucher}', [VoucherController::class, 'show']);
     });
 
-    Route::get('/mpesa/payments', [MpesaController::class, 'getBySubType']);
-
-    Route::prefix('/float-accounts')->group(function () {
+    Route::prefix('/float-accounts')->group(function() {
         Route::get('/', [FloatAccountController::class, 'index']);
         Route::post('/', [FloatAccountController::class, 'store']);
         Route::get('/transactions', [FloatAccountController::class, 'getTransactions']);
@@ -58,27 +56,27 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function () {
 
         Route::post('/{floatAccount}/top-up', [FloatAccountController::class, 'topUp']);
     });
+
+    Route::get('/payments/{type}/{subtype}', MpesaController::class);
 });
 
-Route::middleware('throttle:3,60')->prefix('/v1')->group(function () {
+Route::middleware('throttle:3,60')->prefix('/v1')->group(function() {
     Route::get('payments/mpesa/status/query', [PaymentController::class, 'queryMpesaStatus'])
         ->name('payments.mpesa.status.query');
 });
 
-#=========================================================================================================
-# V2 API
-#=========================================================================================================
+//=========================================================================================================
+// V2 API
+//=========================================================================================================
 
-Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
-    Route::prefix('/payments')->group(function () {
-
+Route::middleware('auth.jwt')->prefix('/v2')->group(function() {
+    Route::prefix('/payments')->group(function() {
         Route::post('/', PaymentControllerV2::class);
         Route::post('/merchant', [PaymentControllerV2::class, 'merchant']);
         Route::post('/withdraw', [PaymentControllerV2::class, 'withdraw']);
 
         Route::middleware('throttle:api')
             ->get('/{payment}', [PaymentControllerV2::class, 'show']);
-
     });
 
     Route::apiResource('voucher-types', VoucherTypeController::class)
@@ -93,7 +91,7 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
         Route::get('/{voucher}', [VoucherController::class, 'show']);
     });
 
-    Route::prefix('/float-accounts')->group(function () {
+    Route::prefix('/float-accounts')->group(function() {
         Route::post('/credit', [FloatAccountControllerV2::class, 'credit']);
 
         // TODO: Refactor when moving back to v1
@@ -104,10 +102,9 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
         Route::get('/{floatAccount}/transactions', [FloatAccountController::class, 'showTransactions']);
     });
 
-    Route::prefix('/admin')->group(function () {
+    Route::prefix('/admin')->group(function() {
         Route::post('/app', AdminController::class);
     });
 
     Route::get('/accounts/{accountId}/vouchers', [VoucherController::class, 'getAccountVouchers']);
-
 });

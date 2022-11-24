@@ -38,17 +38,12 @@ class VoucherController extends Controller
     {
         $relations = explode(',', $request->query('with'));
 
-        $transactions = VoucherTransaction::query();
+        $transactions = VoucherTransaction::select(['id', 'type', 'amount', 'description', 'voucher_id', 'created_at'])
+            ->orderBy('id', 'desc')->limit(100);
 
         if (in_array('voucher', $relations)) {
             $transactions = $transactions->with('voucher:id,account_id,type,balance');
         }
-
-        if (in_array('payment', $relations)) {
-            $transactions = $transactions->with('payment:id,provider_id,subtype,status');
-        }
-
-        $transactions->orderBy('id', 'desc')->limit(100);
 
         return $this->successResponse($transactions->get());
     }
