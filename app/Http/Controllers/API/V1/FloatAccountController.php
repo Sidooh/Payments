@@ -92,4 +92,20 @@ class FloatAccountController extends Controller
 
         return $this->successResponse($transactions->get());
     }
+
+    public function showTransactions(FloatAccount $floatAccount): JsonResponse
+    {
+        $transactions = $floatAccount->transactions()->select([
+            'id',
+            'type',
+            'amount',
+            'description',
+            'float_account_id',
+            'created_at',
+        ]);
+
+        $transactions->orderBy('id', 'desc')->limit(100);
+
+        return $this->successResponse($transactions->get());
+    }
 }

@@ -95,6 +95,13 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function () {
 
     Route::prefix('/float-accounts')->group(function () {
         Route::post('/credit', [FloatAccountControllerV2::class, 'credit']);
+
+        // TODO: Refactor when moving back to v1
+        Route::get('/', [FloatAccountController::class, 'index']);
+        Route::post('/', [FloatAccountController::class, 'store']);
+        Route::get('/transactions', [FloatAccountController::class, 'getTransactions']);
+        Route::get('/{floatAccount}', [FloatAccountController::class, 'show']);
+        Route::get('/{floatAccount}/transactions', [FloatAccountController::class, 'showTransactions']);
     });
 
     Route::prefix('/admin')->group(function () {

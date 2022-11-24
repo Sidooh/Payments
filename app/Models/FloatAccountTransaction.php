@@ -20,6 +20,10 @@ class FloatAccountTransaction extends Model
         'description',
     ];
 
+    protected $casts = [
+        'amount' => 'int'
+    ];
+
     /**
      * ---------------------------------------- Relationships ----------------------------------------
      */
