@@ -9,6 +9,7 @@ use App\Http\Controllers\API\V2\AdminController;
 use App\Http\Controllers\API\V2\FloatAccountController as FloatAccountControllerV2;
 use App\Http\Controllers\API\V2\PaymentController as PaymentControllerV2;
 use App\Http\Controllers\API\V2\VoucherController as VoucherControllerV2;
+use App\Http\Controllers\API\V2\VoucherTypeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,7 +30,7 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
 
         Route::post('/', PaymentController::class);
         Route::post('/voucher/credit', [VoucherController::class, 'credit']);
-        Route::post('/voucher/disburse', [VoucherController::class, 'disburse']);
+//        Route::post('/voucher/disburse', [VoucherController::class, 'disburse']);
 
         Route::post('/withdraw', [PaymentController::class, 'withdraw']);
         Route::post('/b2b', [PaymentController::class, 'b2bPayment']);
@@ -78,17 +79,26 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function() {
             ->get('/{payment}', [PaymentControllerV2::class, 'show']);
     });
 
-    Route::prefix('/vouchers')->group(function() {
+    Route::apiResource('voucher-types', VoucherTypeController::class)
+        ->only(['index', 'show', 'store']);
+    Route::prefix('/voucher-types')->group(function () {
+        Route::post('/{voucher_type}/disburse', [VoucherTypeController::class, 'disburse']);
+    });
+
+    Route::prefix('/vouchers')->group(function () {
         Route::post('/credit', [VoucherControllerV2::class, 'credit']);
         Route::get('/{voucher}', [VoucherController::class, 'show']);
-
-//        Route::post('/disburse', [VoucherController::class, 'disburse']);
     });
 
     Route::prefix('/float-accounts')->group(function() {
         Route::post('/credit', [FloatAccountControllerV2::class, 'credit']);
 
-//        Route::post('/disburse', [VoucherController::class, 'disburse']);
+        // TODO: Refactor when moving back to v1
+        Route::get('/', [FloatAccountController::class, 'index']);
+        Route::post('/', [FloatAccountController::class, 'store']);
+        Route::get('/transactions', [FloatAccountController::class, 'getTransactions']);
+        Route::get('/{floatAccount}', [FloatAccountController::class, 'show']);
+        Route::get('/{floatAccount}/transactions', [FloatAccountController::class, 'showTransactions']);
     });
 
     Route::prefix('/admin')->group(function() {
