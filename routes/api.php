@@ -81,11 +81,11 @@ Route::middleware('auth.jwt')->prefix('/v2')->group(function() {
 
     Route::apiResource('voucher-types', VoucherTypeController::class)
         ->only(['index', 'show', 'store']);
-    Route::prefix('/voucher-types')->group(function () {
+    Route::prefix('/voucher-types')->group(function() {
         Route::post('/{voucher_type}/disburse', [VoucherTypeController::class, 'disburse']);
     });
 
-    Route::prefix('/vouchers')->group(function () {
+    Route::prefix('/vouchers')->group(function() {
         Route::post('/', [VoucherControllerV2::class, 'store']);
         Route::post('/credit', [VoucherControllerV2::class, 'credit']);
         Route::get('/{voucher}', [VoucherController::class, 'show']);

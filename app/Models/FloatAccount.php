@@ -20,7 +20,7 @@ class FloatAccount extends Model
     ];
 
     protected $casts = [
-        'balance' => 'int'
+        'balance' => 'int',
     ];
 
     /**
