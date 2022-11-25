@@ -17,11 +17,13 @@ class FloatAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'initiator'  => ['required', 'in:'.Initiator::ENTERPRISE->value.','.Initiator::AGENT->value],
-            'account_id' => [
+            'initiator'  => ['required', 'in:' . Initiator::ENTERPRISE->value . ',' . Initiator::AGENT->value],
+            'account_id' => ['required', 'integer', new SidoohAccountExists],
+            'reference'  => [
                 'required',
-                new SidoohAccountExists,
-                Rule::unique('float_accounts'),
+                Rule::unique('float_accounts', 'floatable_id')
+                    ->where('floatable_type', $this->initiator)
+                    ->where('account_id', $this->account_id),
             ],
         ];
     }
@@ -29,7 +31,7 @@ class FloatAccountRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'floatable_id.unique' => 'Float account already exists.',
+            'reference.unique' => 'Float account already exists.',
         ];
     }
 }

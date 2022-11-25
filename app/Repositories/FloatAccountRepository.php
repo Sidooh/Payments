@@ -19,15 +19,19 @@ use Illuminate\Database\Eloquent\Model;
 class FloatAccountRepository
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function store(int $accountId): FloatAccount
+    public function store(Initiator $initiator, int $floatableId, int $accountId): FloatAccount
     {
-        return FloatAccount::create(['account_id' => $accountId]);
+        return FloatAccount::create([
+            'floatable_id'   => $floatableId,
+            'floatable_type' => $initiator,
+            'account_id' => $accountId,
+        ]);
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function topUp(FloatAccount $floatAccount, Initiator $initiator, $amount): Payment|Model
     {

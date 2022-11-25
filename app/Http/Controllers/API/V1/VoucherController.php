@@ -9,11 +9,8 @@ use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use App\Repositories\VoucherRepository;
 use App\Services\SidoohAccounts;
-use App\Services\SidoohProducts;
-use Arr;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Throwable;
 
 class VoucherController extends Controller
 {
@@ -96,44 +93,44 @@ class VoucherController extends Controller
         return $this->successResponse($response);
     }
 
-    /**
-     * @throws Throwable
-     */
-    public function disburse(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'disburse_type' => 'in:LUNCH,GENERAL',
-            'enterprise_id' => 'required|integer',
-            'amount'        => 'numeric',
-            'accounts'      => 'array',
-        ], [
-            'disburse_type.in' => 'invalid :attribute. allowed values are: [LUNCH, GENERAL]',
-        ]);
-
-        $enterpriseId = $data['enterprise_id'];
-        $voucherType = VoucherType::tryFrom("ENTERPRISE_{$data['disburse_type']}");
-
-        $enterprise = SidoohProducts::findEnterprise($enterpriseId);
-
-        if ($request->isNotFilled('amount')) {
-            $data['amount'] = match ($data['disburse_type']) {
-                'LUNCH'   => $enterprise['max_lunch'],
-                'GENERAL' => $enterprise['max_general']
-            };
-
-            if (! isset($data['amount'])) {
-                return $this->errorResponse("Amount is required! default amount for {$data['disburse_type']} voucher not set");
-            }
-        }
-
-        if ($request->isNotFilled('accounts')) {
-            $data['accounts'] = Arr::pluck($enterprise['enterprise_accounts'], 'account_id');
-        }
-
-        $floatAccount = VoucherRepository::disburse($enterprise, $data['accounts'], $data['amount'], $voucherType);
-
-        $message = "{$data['disburse_type']} Voucher Disburse Request Successful";
-
-        return $this->successResponse($floatAccount, $message);
-    }
+//    /**
+//     * @throws Throwable
+//     */
+//    public function disburse(Request $request): JsonResponse
+//    {
+//        $data = $request->validate([
+//            'disburse_type' => 'in:LUNCH,GENERAL',
+//            'enterprise_id' => 'required|integer',
+//            'amount'        => 'numeric',
+//            'accounts'      => 'array',
+//        ], [
+//            'disburse_type.in' => 'invalid :attribute. allowed values are: [LUNCH, GENERAL]',
+//        ]);
+//
+//        $enterpriseId = $data['enterprise_id'];
+//        $voucherType = VoucherType::tryFrom("ENTERPRISE_{$data['disburse_type']}");
+//
+//        $enterprise = SidoohProducts::findEnterprise($enterpriseId, ['enterprise_accounts']);
+//
+//        if ($request->isNotFilled('amount')) {
+//            $data['amount'] = match ($data['disburse_type']) {
+//                'LUNCH'   => $enterprise['max_lunch'],
+//                'GENERAL' => $enterprise['max_general']
+//            };
+//
+//            if (! isset($data['amount'])) {
+//                return $this->errorResponse("Amount is required! default amount for {$data['disburse_type']} voucher not set");
+//            }
+//        }
+//
+//        if ($request->isNotFilled('accounts')) {
+//            $data['accounts'] = Arr::pluck($enterprise['enterprise_accounts'], 'account_id');
+//        }
+//
+//        $floatAccount = VoucherRepository::disburse($enterprise, $data['accounts'], $data['amount'], $voucherType);
+//
+//        $message = "{$data['disburse_type']} Voucher Disburse Request Successful";
+//
+//        return $this->successResponse($floatAccount, $message);
+//    }
 }

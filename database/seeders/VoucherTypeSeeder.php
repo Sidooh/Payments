@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\FloatAccount;
+use App\Models\VoucherType;
 use Illuminate\Database\Seeder;
 
-class FloatAccountSeeder extends Seeder
+class VoucherTypeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,10 +15,10 @@ class FloatAccountSeeder extends Seeder
     public function run()
     {
         //
-        FloatAccount::create([
+        VoucherType::create([
+            'name' => 'SIDOOH',
+            'limit_amount' => 70000,
             'account_id' => 1,
-            'floatable_id' => 1,
-            'floatable_type' => 'ENTERPRISE',
         ]);
     }
 }

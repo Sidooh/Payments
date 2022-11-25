@@ -40,7 +40,9 @@ class FloatAccountController extends Controller
      */
     public function store(FloatAccountRequest $request): JsonResponse
     {
-        $account = $this->repo->store($request->validated('account_id'));
+        $initiator = $request->enum('initiator', Initiator::class);
+
+        $account = $this->repo->store($initiator, $request->validated('reference'), $request->validated('account_id'));
 
         return $this->successResponse($account);
     }
@@ -90,6 +92,22 @@ class FloatAccountController extends Controller
         if (in_array('float-account', $relations)) {
             $transactions = $transactions->with('floatAccount:id,floatable_id,floatable_type,balance');
         }
+
+        return $this->successResponse($transactions->get());
+    }
+
+    public function showTransactions(FloatAccount $floatAccount): JsonResponse
+    {
+        $transactions = $floatAccount->transactions()->select([
+            'id',
+            'type',
+            'amount',
+            'description',
+            'float_account_id',
+            'created_at',
+        ]);
+
+        $transactions->orderBy('id', 'desc')->limit(100);
 
         return $this->successResponse($transactions->get());
     }

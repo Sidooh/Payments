@@ -26,7 +26,7 @@ class VoucherCreditRequest extends PaymentRequest
     public function rules(): array
     {
         return parent::rules() + [
-                'voucher' => ['required', 'different:source_account'],
+                'voucher' => ['required', 'exists:vouchers,id'],
             ];
     }
 
