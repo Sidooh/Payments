@@ -15,18 +15,19 @@ namespace App\Models{
  * App\Models\FloatAccount
  *
  * @property int $id
- * @property string $balance
+ * @property int $balance
  * @property string $floatable_type
  * @property int $floatable_id
+ * @property int|null $account_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $floatable
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FloatAccountTransaction[] $transactions
  * @property-read int|null $transactions_count
  * @method static \Database\Factories\FloatAccountFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount query()
+ * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereFloatableId($value)
@@ -43,7 +44,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property \App\Enums\TransactionType $type
- * @property string $amount
+ * @property int $amount
  * @property string $description
  * @property int $float_account_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -118,14 +119,15 @@ namespace App\Models{
  * App\Models\Voucher
  *
  * @property int $id
- * @property string $type
+ * @property string|null $type
  * @property int $balance
  * @property int $account_id
- * @property int|null $enterprise_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $voucher_type_id
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VoucherTransaction[] $transactions
  * @property-read int|null $transactions_count
+ * @property-read \App\Models\VoucherType|null $voucherType
  * @method static \Database\Factories\VoucherFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher newQuery()
@@ -133,10 +135,10 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereEnterpriseId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereVoucherTypeId($value)
  */
 	class IdeHelperVoucher {}
 }
@@ -167,5 +169,38 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|VoucherTransaction whereVoucherId($value)
  */
 	class IdeHelperVoucherTransaction {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\VoucherType
+ *
+ * @property int $id
+ * @property string $name
+ * @property int $is_locked
+ * @property int $limit_amount
+ * @property string|null $expires_at
+ * @property array|null $settings
+ * @property int $account_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Voucher[] $vouchers
+ * @property-read int|null $vouchers_count
+ * @method static \Database\Factories\VoucherTypeFactory factory(...$parameters)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType query()
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereIsLocked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereLimitAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	class IdeHelperVoucherType {}
 }
 
