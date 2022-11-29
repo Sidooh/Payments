@@ -60,7 +60,6 @@ class PaymentRepository
                 }
             }
         } else {
-            // TODO: Update payment
             $payment = $this->updatePayment($providerId);
         }
 
