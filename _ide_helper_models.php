@@ -199,7 +199,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereSettings($value)
  * @method static \Illuminate\Database\Eloquent\Builder|VoucherType whereUpdatedAt($value)
- * @mixin \Eloquent
  */
 	class IdeHelperVoucherType {}
 }
