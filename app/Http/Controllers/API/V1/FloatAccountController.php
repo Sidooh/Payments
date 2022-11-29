@@ -2,47 +2,56 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\DTOs\PaymentDTO;
 use App\Enums\Initiator;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FloatAccountRequest;
-use App\Http\Requests\FloatRequest;
+use App\Http\Requests\FloatAccountTopupRequest;
+use App\Http\Resources\PaymentResource;
 use App\Models\FloatAccount;
-use App\Models\FloatAccountTransaction;
-use App\Repositories\FloatAccountRepository;
+use App\Repositories\PaymentRepositories\PaymentRepository;
+use App\Services\SidoohAccounts;
+use DrH\Mpesa\Exceptions\MpesaException;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class FloatAccountController extends Controller
 {
-    public function __construct(private readonly FloatAccountRepository $repo)
-    {
-    }
-
     public function index(Request $request): JsonResponse
     {
         $relations = explode(',', $request->query('with'));
 
         $floatAccounts = FloatAccount::latest();
 
-        if (in_array('float_account_transactions', $relations)) {
-            $floatAccounts = $floatAccounts->with('floatAccountTransactions:id,float_account_id,type,amount,description,created_at')
-                ->limit(50);
+        if (in_array('transactions', $relations)) {
+            $floatAccounts = $floatAccounts->with('transactions:id,float_account_id,type,amount,description,created_at')
+                ->limit(10);
         }
 
-        $floatAccounts = $floatAccounts->get();
+        $floatAccounts = $floatAccounts->limit(1000)->get();
+
+        if (in_array('account', $relations)) {
+            $floatAccounts = withRelation('account', $floatAccounts, 'account_id', 'id');
+        }
 
         return $this->successResponse($floatAccounts);
     }
 
-    /**
-     * @throws \Exception
-     */
     public function store(FloatAccountRequest $request): JsonResponse
     {
         $initiator = $request->enum('initiator', Initiator::class);
 
-        $account = $this->repo->store($initiator, $request->validated('reference'), $request->validated('account_id'));
+        $account = FloatAccount::firstOrCreate([
+            'floatable_type' => $initiator,
+            'account_id'     => $request->account_id,
+        ], [
+            'floatable_id' => $request->reference,
+        ]);
 
         return $this->successResponse($account);
     }
@@ -52,63 +61,61 @@ class FloatAccountController extends Controller
         $relations = explode(',', $request->query('with'));
 
         if (in_array('transactions', $relations)) {
-            $floatAccount->load('floatAccountTransactions:id,float_account_id,type,amount,description,created_at')
-                ->latest()->limit(100);
+            $floatAccount->load('transactions:id,float_account_id,type,amount,description,created_at')
+                ->limit(100);
+        }
+
+        if (in_array('account', $relations)) {
+            $floatAccount->account = SidoohAccounts::find($floatAccount->account_id, true);
         }
 
         return $this->successResponse($floatAccount);
     }
 
     /**
-     * @throws \Exception
+     * Handle the incoming request.
+     *
+     * @param FloatAccountTopupRequest $request
+     * @return JsonResponse
      */
-    public function topUp(FloatRequest $request, FloatAccount $floatAccount): JsonResponse
+    public function credit(FloatAccountTopupRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        Log::info('...[CTRL - FLOAT_ACCOUNTv2]: Invoke...', $request->all());
 
-        Log::info('...[CTRL - FLOAT ACCOUNT]: Process Float Request...', $data);
+        try {
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
 
-        $initiator = $request->enum('initiator', Initiator::class);
-        $amount = $request->validated('amount');
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    $request->reference,
+                    $request->source_account,
+                    false,
+                    PaymentType::SIDOOH,
+                    PaymentSubtype::FLOAT,
+                    ['float_account_id' => $request->float_account]
+                ),
+                $request->ipn
+            );
 
-        $floatAccount = $this->repo->topUp($floatAccount, $initiator, $amount);
+            $payment = $repo->processPayment();
 
-        return $this->successResponse($floatAccount);
-    }
+            return $this->successResponse(PaymentResource::make($payment->refresh()), 'Payment Requested.');
+            // TODO: Change to PaymentException - create one and use internally
+        } catch (MpesaException $e) {
+            Log::critical($e);
+        } catch (Exception $err) {
+            if ($err->getCode() === 422) {
+                return $this->errorResponse($err->getMessage(), $err->getCode());
+            }
 
-    public function getTransactions(Request $request): JsonResponse
-    {
-        $relations = explode(',', $request->query('with'));
-
-        $transactions = FloatAccountTransaction::query()->select([
-            'id',
-            'type',
-            'amount',
-            'description',
-            'float_account_id',
-            'created_at',
-        ])->orderBy('id', 'desc')->limit(100);
-
-        if (in_array('float-account', $relations)) {
-            $transactions = $transactions->with('floatAccount:id,floatable_id,floatable_type,balance');
+            Log::error($err);
         }
 
-        return $this->successResponse($transactions->get());
-    }
-
-    public function showTransactions(FloatAccount $floatAccount): JsonResponse
-    {
-        $transactions = $floatAccount->transactions()->select([
-            'id',
-            'type',
-            'amount',
-            'description',
-            'float_account_id',
-            'created_at',
-        ]);
-
-        $transactions->orderBy('id', 'desc')->limit(100);
-
-        return $this->successResponse($transactions->get());
+        return $this->errorResponse('Failed to process credit request.');
     }
 }

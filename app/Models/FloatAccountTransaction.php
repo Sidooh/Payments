@@ -22,7 +22,7 @@ class FloatAccountTransaction extends Model
     ];
 
     protected $casts = [
-        'amount' => 'int'
+        'amount' => 'int',
         'type'   => TransactionType::class,
     ];
 
