@@ -4,9 +4,11 @@ namespace App\DTOs;
 
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
+use App\Models\FloatAccount;
 use App\Models\Payment;
 use App\Services\SidoohAccounts;
 use Exception;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PaymentDTO
 {
@@ -43,11 +45,18 @@ class PaymentDTO
             PaymentSubtype::STK => [null, PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT, PaymentSubtype::B2B],
             PaymentSubtype::VOUCHER => [null, PaymentSubtype::VOUCHER, PaymentSubtype::B2B],
             PaymentSubtype::FLOAT => [PaymentSubtype::VOUCHER, PaymentSubtype::B2C],
-            default => throw new Exception('Unsupported payment combination')
+            default => throw new HttpException(422, 'Unsupported payment source')
         };
 
         if (!in_array($this->destinationSubtype, $validPaymentCombinations)) {
-            throw new Exception('Unsupported payment combination');
+            throw new HttpException(422, 'Unsupported payment destination');
+        }
+
+        if ($this->destinationSubtype === PaymentSubtype::FLOAT) {
+            $exists = FloatAccount::whereId($this->destinationData['float_account_id'])->exists();
+            if (!$exists) {
+                throw new HttpException(422, 'Invalid float account');
+            }
         }
     }
 

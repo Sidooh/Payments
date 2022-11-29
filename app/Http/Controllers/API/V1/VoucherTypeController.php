@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\V2;
+namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DisburseVoucherTypeRequest;
@@ -9,18 +9,39 @@ use App\Models\Voucher;
 use App\Models\VoucherType;
 use App\Repositories\SidoohRepositories\FloatAccountRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
+use App\Services\SidoohAccounts;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class VoucherTypeController extends Controller
 {
-
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return $this->successResponse(VoucherType::latest()->get());
+        $relations = explode(',', $request->query('with'));
+
+        $types = VoucherType::latest();
+
+        if ($id = $request->integer('account_id')) {
+            $types->whereAccountId($id);
+        }
+
+        if (in_array('vouchers', $relations)) {
+            $types->with('vouchers:id,account_id,voucher_type_id,balance')
+                ->latest()
+                ->limit(10);
+        }
+
+        $types = $types->limit(1000)->get();
+
+        if (in_array('account', $relations)) {
+            $types = withRelation('account', $types, 'account_id', 'id');
+        }
+
+        return $this->successResponse($types);
     }
 
     public function store(StoreVoucherTypeRequest $request): JsonResponse
@@ -45,10 +66,16 @@ class VoucherTypeController extends Controller
 
     public function show(VoucherType $voucherType, Request $request): JsonResponse
     {
-        if ($request->boolean('with_vouchers')) {
+        $relations = explode(',', $request->query('with'));
+
+        if (in_array('vouchers', $relations)) {
             $voucherType->load(['vouchers' => function ($query) {
                 $query->without('voucherType');
             }]);
+        }
+
+        if (in_array('account', $relations)) {
+            $voucherType->account = SidoohAccounts::find($voucherType->account_id, true);
         }
 
         return $this->successResponse($voucherType);
@@ -62,9 +89,6 @@ class VoucherTypeController extends Controller
         // TODO: Check float account is for account/ is authorized
 
         try {
-
-//            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
-
 
             $result = DB::transaction(function () use ($request, $voucherType) {
                 $voucher = Voucher::whereVoucherTypeId($voucherType->id)
@@ -80,30 +104,11 @@ class VoucherTypeController extends Controller
                 $vT = VoucherRepository::credit($voucher->id, $request->amount, $request->description);
 
                 return [$fT, $vT];
-            });
-
-//            $repo = new PaymentRepository(
-//                new PaymentDTO(
-//                    $request->account_id,
-//                    $request->amount,
-//                    $type,
-//                    $subtype,
-//                    $request->description,
-//                    $request->reference,
-//                    $request->source_account,
-//                    false,
-//                    PaymentType::SIDOOH,
-//                    PaymentSubtype::VOUCHER,
-//                    ['voucher_id' => $request->voucher]
-//                ),
-//                $request->ipn
-//            );
-
-//            $payment = $repo->processPayment();
+            }, 2);
 
             return $this->successResponse($result, 'Disbursed.');
             // TODO: Change to PaymentException - create one and use internally
-        } catch (Exception $err) {
+        } catch (Exception|Throwable $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
             }
