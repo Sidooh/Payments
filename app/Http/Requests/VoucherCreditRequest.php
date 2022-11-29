@@ -26,15 +26,15 @@ class VoucherCreditRequest extends PaymentRequest
     public function rules(): array
     {
         return parent::rules() + [
-                'voucher' => ['required', 'exists:vouchers,id'],
-            ];
+            'voucher' => ['required', 'exists:vouchers,id'],
+        ];
     }
 
-    function sourceAccountRule(): InvokableRule|string
+    public function sourceAccountRule(): InvokableRule|string
     {
         return match (PaymentMethod::tryFrom($this->input('source'))) {
             PaymentMethod::VOUCHER => new SidoohVoucherIsForAccount,
-            default => parent::sourceAccountRule()
+            default                => parent::sourceAccountRule()
         };
     }
 }

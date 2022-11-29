@@ -25,12 +25,12 @@ class MerchantPaymentRequest extends PaymentRequest
     public function rules(): array
     {
         return parent::rules() + [
-                'merchant_type'         => ['required', new Enum(MerchantType::class)],
-                ...$this->destinationAccountRule()
-            ];
+            'merchant_type'         => ['required', new Enum(MerchantType::class)],
+            ...$this->destinationAccountRule(),
+        ];
     }
 
-    function destinationAccountRule(): array
+    public function destinationAccountRule(): array
     {
         return match (MerchantType::tryFrom($this->input('merchant_type'))) {
             MerchantType::MPESA_PAY_BILL => [

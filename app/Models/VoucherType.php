@@ -14,11 +14,11 @@ class VoucherType extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'account_id'
+        'name', 'account_id',
     ];
 
     protected $casts = [
-        'settings' => 'array'
+        'settings' => 'array',
     ];
 
     public function vouchers(): HasMany

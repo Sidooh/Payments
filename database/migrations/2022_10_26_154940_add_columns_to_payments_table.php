@@ -4,8 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new
-class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -13,7 +13,7 @@ class extends Migration {
      */
     public function up()
     {
-        Schema::table('payments', function (Blueprint $table) {
+        Schema::table('payments', function(Blueprint $table) {
             //
             $table->unsignedBigInteger('account_id')->nullable();
 
@@ -32,10 +32,10 @@ class extends Migration {
      */
     public function down()
     {
-        Schema::table('payments', function (Blueprint $table) {
+        Schema::table('payments', function(Blueprint $table) {
             //
             $table->dropColumn([
-                'ipn', 'destination_data', 'destination_provider_id', 'destination_subtype', 'destination_type', 'account_id'
+                'ipn', 'destination_data', 'destination_provider_id', 'destination_subtype', 'destination_type', 'account_id',
             ]);
         });
     }

@@ -53,9 +53,8 @@ class MpesaEventRepository
             return;
         }
 
-
         //Complete payment
-        if (!$payment->destination_type) {
+        if (! $payment->destination_type) {
             $payment->update(['status' => Status::COMPLETED->name]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
@@ -70,7 +69,6 @@ class MpesaEventRepository
         );
 
         $repo->processPayment();
-
     }
 
     public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse): void
@@ -109,7 +107,6 @@ class MpesaEventRepository
 //                PaymentResource::make($payment),
 //                "message" => "Withdrawal to Mpesa failed",
 //            ]);
-
         } catch (Exception $e) {
             Log::error($e);
         }

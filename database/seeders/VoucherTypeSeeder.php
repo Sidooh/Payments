@@ -16,9 +16,9 @@ class VoucherTypeSeeder extends Seeder
     {
         //
         VoucherType::create([
-            'name' => 'SIDOOH',
+            'name'         => 'SIDOOH',
             'limit_amount' => 70000,
-            'account_id' => 1,
+            'account_id'   => 1,
         ]);
     }
 }

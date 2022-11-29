@@ -80,7 +80,6 @@ class SidoohService
         }
     }
 
-
     public static function sendCallback(string $url, string $method = 'GET', JsonResource $data = null): void
     {
         Log::info('...[SRV - SIDOOH]: CB...', [

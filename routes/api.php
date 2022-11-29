@@ -49,14 +49,14 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::post('/{voucher_type}/disburse', [VoucherTypeController::class, 'disburse']);
     });
 
-    Route::prefix('/vouchers')->group(function () {
+    Route::prefix('/vouchers')->group(function() {
         Route::get('/', [VoucherController::class, 'index']);
         Route::post('/', [VoucherController::class, 'store']);
         Route::get('/{voucher}', [VoucherController::class, 'show']);
         Route::post('/credit', [VoucherController::class, 'credit']);
     });
 
-    Route::prefix('/voucher-transactions')->group(function () {
+    Route::prefix('/voucher-transactions')->group(function() {
         Route::get('/', [VoucherTransactionController::class, 'index']);
         Route::get('/{transaction}', [VoucherTransactionController::class, 'show']);
     });
@@ -68,7 +68,7 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::post('/credit', [FloatAccountController::class, 'credit']);
     });
 
-    Route::prefix('/float-account-transactions')->group(function () {
+    Route::prefix('/float-account-transactions')->group(function() {
         Route::get('/', [FloatAccountTransactionController::class, 'index']);
         Route::get('/{transaction}', [FloatAccountTransactionController::class, 'show']);
     });
@@ -82,5 +82,4 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/', DashboardController::class);
         Route::get('/revenue-chart', [DashboardController::class, 'revenueChart']);
     });
-
 });

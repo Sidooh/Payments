@@ -23,7 +23,7 @@ class VoucherRepository
             throw new Exception('Amount will exceed voucher limit.', 422);
         }
 
-        return DB::transaction(function () use ($description, $amount, $voucher) {
+        return DB::transaction(function() use ($description, $amount, $voucher) {
             $voucher->balance += $amount;
             $voucher->save();
 
@@ -47,7 +47,7 @@ class VoucherRepository
             throw new Exception('Insufficient voucher balance.', 422);
         }
 
-        return DB::transaction(function () use ($description, $amount, $voucher) {
+        return DB::transaction(function() use ($description, $amount, $voucher) {
             $voucher->balance -= $amount;
             $voucher->save();
 

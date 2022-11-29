@@ -18,5 +18,4 @@ class FloatAccountTopupRequest extends FormRequest
             'float_account' => ['required', new SidoohFloatAccountExists],
         ];
     }
-
 }

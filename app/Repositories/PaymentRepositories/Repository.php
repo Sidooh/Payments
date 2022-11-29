@@ -13,11 +13,10 @@ abstract class Repository
     {
     }
 
-    function process(): int
+    public function process(): int
     {
         $provider = $this->getPaymentProvider();
 
         return $provider->requestPayment();
     }
-
 }
