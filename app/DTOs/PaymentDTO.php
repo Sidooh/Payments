@@ -42,8 +42,7 @@ class PaymentDTO
         SidoohAccounts::find($this->accountId);
 
         $validPaymentCombinations = match ($this->subtype) {
-            PaymentSubtype::STK => [null, PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT, PaymentSubtype::B2B],
-            PaymentSubtype::VOUCHER => [null, PaymentSubtype::VOUCHER, PaymentSubtype::B2B],
+            PaymentSubtype::STK, PaymentSubtype::VOUCHER => [null, PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT, PaymentSubtype::B2B],
             PaymentSubtype::FLOAT => [PaymentSubtype::VOUCHER, PaymentSubtype::B2C],
             default => throw new HttpException(422, 'Unsupported payment source')
         };

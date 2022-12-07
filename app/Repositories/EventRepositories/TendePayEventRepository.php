@@ -43,10 +43,6 @@ class TendePayEventRepository
             $payment->update(['status' => Status::FAILED->name]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
-//            SidoohService::sendCallback($payment->ipn, 'POST', [
-//                PaymentResource::make($payment),
-//                "message" => "Merchant payment failed",
-//            ]);
         });
     }
 
