@@ -63,10 +63,7 @@ class MpesaEventRepository
         }
 
         // Handle destination payment
-        $repo = new PaymentRepository(
-            PaymentDTO::fromPayment($payment),
-            $payment->ipn
-        );
+        $repo = new PaymentRepository(PaymentDTO::fromPayment($payment), $payment->ipn);
 
         $repo->processPayment();
     }
@@ -74,7 +71,8 @@ class MpesaEventRepository
     public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
-            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)->firstOrFail();
+            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
+                ->firstOrFail();
             if ($payment->status !== Status::PENDING->name) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
@@ -90,7 +88,8 @@ class MpesaEventRepository
     public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
-            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)->firstOrFail();
+            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
+                ->firstOrFail();
 
             if ($payment->status !== Status::PENDING->name) {
                 throw new Error("Payment is not pending... - $payment->id");
