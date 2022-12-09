@@ -20,7 +20,7 @@ class FloatAccountTransactionController extends Controller
             'description',
             'float_account_id',
             'created_at',
-        ])->limit(1000)->latest();
+        ])->limit($request->integer('limit', 1000))->latest();
 
         if ($id = $request->integer('float_account_id')) {
             $transactions->whereFloatAccountId($id);
