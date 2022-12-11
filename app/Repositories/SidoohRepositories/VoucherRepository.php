@@ -51,13 +51,11 @@ class VoucherRepository
             $voucher->balance -= $amount;
             $voucher->save();
 
-            $transaction = $voucher->transactions()->create([
+            return $voucher->transactions()->create([
                 'amount'      => $amount,
                 'type'        => TransactionType::DEBIT,
                 'description' => $description,
             ]);
-
-            return $transaction;
         }, 2);
     }
 }

@@ -23,7 +23,6 @@ class StoreVoucherRequest extends FormRequest
     {
         return [
             'account_id'         => ['required', 'integer', new SidoohAccountExists],
-            'voucher_account_id' => ['required', 'integer', new SidoohAccountExists],
             'voucher_type_id'    => ['required', 'integer', 'exists:voucher_types,id'],
         ];
     }

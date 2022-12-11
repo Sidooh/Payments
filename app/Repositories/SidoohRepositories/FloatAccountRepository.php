@@ -22,13 +22,11 @@ class FloatAccountRepository
             $account->balance += $amount;
             $account->save();
 
-            $transaction = $account->transactions()->create([
+            return $account->transactions()->create([
                 'amount'      => $amount,
                 'type'        => TransactionType::CREDIT,
                 'description' => $description,
             ]);
-
-            return $transaction;
         }, 2);
     }
 
@@ -48,13 +46,11 @@ class FloatAccountRepository
             $account->balance -= $amount;
             $account->save();
 
-            $transaction = $account->transactions()->create([
+            return $account->transactions()->create([
                 'amount'      => $amount,
                 'type'        => TransactionType::DEBIT,
                 'description' => $description,
             ]);
-
-            return $transaction;
         }, 2);
     }
 }
