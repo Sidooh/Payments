@@ -4,5 +4,5 @@ namespace App\Repositories\PaymentRepositories\Providers;
 
 interface PaymentContract
 {
-    function requestPayment(): int;
+    public function requestPayment(): int;
 }

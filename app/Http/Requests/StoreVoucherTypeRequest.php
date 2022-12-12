@@ -23,7 +23,7 @@ class StoreVoucherTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'initiator'  => ['required', 'in:' . Initiator::ENTERPRISE->value],
+            'initiator'  => ['required', 'in:'.Initiator::ENTERPRISE->value],
             'account_id' => ['required', 'integer', new SidoohAccountExists],
             'name'       => ['required', 'string'],
         ];

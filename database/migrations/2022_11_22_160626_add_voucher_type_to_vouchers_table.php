@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('vouchers', function (Blueprint $table) {
+        Schema::table('vouchers', function(Blueprint $table) {
             //
             $table->string('type')->change()->nullable();
 
@@ -31,7 +31,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('vouchers', function (Blueprint $table) {
+        Schema::table('vouchers', function(Blueprint $table) {
             //
             $table->dropUnique(['voucher_type_id', 'account_id']);
             $table->dropForeignIdFor(VoucherType::class);

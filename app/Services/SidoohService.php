@@ -80,9 +80,12 @@ class SidoohService
         }
     }
 
-
-    public static function sendCallback(string $url, string $method = 'GET', JsonResource $data = null): void
+    public static function sendCallback(?string $url, string $method = 'GET', JsonResource $data = null): void
     {
+        if (! $url) {
+            return;
+        }
+
         Log::info('...[SRV - SIDOOH]: CB...', [
             'url'    => $url,
             'method' => $method,
@@ -91,7 +94,7 @@ class SidoohService
 
         $options = strtoupper($method) === 'POST' ? ['json' => $data] : [];
 
-        dispatch(function () use ($options, $url, $method) {
+        dispatch(function() use ($options, $url, $method) {
             $t = microtime(true);
             try {
                 $response = Http::timeout(2)->send($method, $url, $options);
@@ -103,6 +106,5 @@ class SidoohService
                 Log::info('...[SRV - SIDOOH]: ERR... '.$latency.'ms', [$err]);
             }
         })->afterResponse();
-
     }
 }

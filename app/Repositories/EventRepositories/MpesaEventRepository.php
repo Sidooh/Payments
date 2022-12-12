@@ -53,9 +53,8 @@ class MpesaEventRepository
             return;
         }
 
-
         //Complete payment
-        if (!$payment->destination_type) {
+        if (! $payment->destination_type) {
             $payment->update(['status' => Status::COMPLETED->name]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
@@ -64,19 +63,16 @@ class MpesaEventRepository
         }
 
         // Handle destination payment
-        $repo = new PaymentRepository(
-            PaymentDTO::fromPayment($payment),
-            $payment->ipn
-        );
+        $repo = new PaymentRepository(PaymentDTO::fromPayment($payment), $payment->ipn);
 
         $repo->processPayment();
-
     }
 
     public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
-            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)->firstOrFail();
+            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
+                ->firstOrFail();
             if ($payment->status !== Status::PENDING->name) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
@@ -92,7 +88,8 @@ class MpesaEventRepository
     public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
-            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)->firstOrFail();
+            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
+                ->firstOrFail();
 
             if ($payment->status !== Status::PENDING->name) {
                 throw new Error("Payment is not pending... - $payment->id");
@@ -109,7 +106,6 @@ class MpesaEventRepository
 //                PaymentResource::make($payment),
 //                "message" => "Withdrawal to Mpesa failed",
 //            ]);
-
         } catch (Exception $e) {
             Log::error($e);
         }

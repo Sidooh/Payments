@@ -48,16 +48,16 @@ class VoucherTypeController extends Controller
     {
         $exists = VoucherType::whereName($request->name)->whereAccountId($request->account_id)->exists();
         if ($exists) {
-            return $this->errorResponse("a similar voucher exists", 422);
+            return $this->errorResponse('a similar voucher exists', 422);
         }
 
         $count = VoucherType::whereAccountId($request->account_id)->count();
         if ($count > 2) {
-            return $this->errorResponse("limit of vouchers reached", 422);
+            return $this->errorResponse('limit of vouchers reached', 422);
         }
 
         $voucher = VoucherType::create([
-            'name' => $request->name,
+            'name'       => $request->name,
             'account_id' => $request->account_id,
         ]);
 
@@ -69,7 +69,7 @@ class VoucherTypeController extends Controller
         $relations = explode(',', $request->query('with'));
 
         if (in_array('vouchers', $relations)) {
-            $voucherType->load(['vouchers' => function ($query) {
+            $voucherType->load(['vouchers' => function($query) {
                 $query->without('voucherType');
             }]);
         }
@@ -83,19 +83,18 @@ class VoucherTypeController extends Controller
 
     public function disburse(VoucherType $voucherType, DisburseVoucherTypeRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - VOUCHERTYPEv2]: Disburse...', $request->all());
+        Log::info('...[CTRL - VOUCHERTYPE]: Disburse...', $request->all());
 
         // TODO: Check voucher type is for account/ is authorized
         // TODO: Check float account is for account/ is authorized
 
         try {
-
-            $result = DB::transaction(function () use ($request, $voucherType) {
+            $result = DB::transaction(function() use ($request, $voucherType) {
                 $voucher = Voucher::whereVoucherTypeId($voucherType->id)
                     ->whereAccountId($request->account_id)
                     ->first();
 
-                if (!$voucher) {
+                if (! $voucher) {
                     throw new Exception('invalid voucher selected', 422);
                 }
 

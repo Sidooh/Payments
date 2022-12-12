@@ -10,7 +10,7 @@
         "drh/mpesa": "^2.2",
         "fruitcake/laravel-cors": "^2.0.5",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^9.39",
+        "laravel/framework": "^9.43",
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.7",
         "propaganistas/laravel-phone": "^4.4",

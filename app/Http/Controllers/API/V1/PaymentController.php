@@ -144,7 +144,7 @@ class PaymentController extends Controller
 
     public function merchant(MerchantPaymentRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - PAYMENT ~v2]: Merchant...', $request->all());
+        Log::info('...[CTRL - PAYMENT]: Merchant...', $request->all());
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
@@ -192,7 +192,7 @@ class PaymentController extends Controller
 
     public function withdraw(WithdrawalRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - PAYMENT ~v2]: Withdraw...', $request->all());
+        Log::info('...[CTRL - PAYMENT]: Withdraw...', $request->all());
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();

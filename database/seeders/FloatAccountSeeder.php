@@ -16,8 +16,8 @@ class FloatAccountSeeder extends Seeder
     {
         //
         FloatAccount::create([
-            'account_id' => 1,
-            'floatable_id' => 1,
+            'account_id'     => 1,
+            'floatable_id'   => 1,
             'floatable_type' => 'ENTERPRISE',
         ]);
     }

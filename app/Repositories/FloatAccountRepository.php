@@ -26,7 +26,7 @@ class FloatAccountRepository
         return FloatAccount::create([
             'floatable_id'   => $floatableId,
             'floatable_type' => $initiator,
-            'account_id' => $accountId,
+            'account_id'     => $accountId,
         ]);
     }
 

@@ -18,17 +18,15 @@ class FloatAccountRepository
     {
         $account = FloatAccount::findOrFail($id);
 
-        return DB::transaction(function () use ($description, $amount, $account) {
+        return DB::transaction(function() use ($description, $amount, $account) {
             $account->balance += $amount;
             $account->save();
 
-            $transaction = $account->transactions()->create([
+            return $account->transactions()->create([
                 'amount'      => $amount,
                 'type'        => TransactionType::CREDIT,
                 'description' => $description,
             ]);
-
-            return $transaction;
         }, 2);
     }
 
@@ -44,17 +42,15 @@ class FloatAccountRepository
             throw new Exception('Insufficient float balance.', 422);
         }
 
-        return DB::transaction(function () use ($description, $amount, $account) {
+        return DB::transaction(function() use ($description, $amount, $account) {
             $account->balance -= $amount;
             $account->save();
 
-            $transaction = $account->transactions()->create([
+            return $account->transactions()->create([
                 'amount'      => $amount,
                 'type'        => TransactionType::DEBIT,
                 'description' => $description,
             ]);
-
-            return $transaction;
         }, 2);
     }
 }

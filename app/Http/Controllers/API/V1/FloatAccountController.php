@@ -75,12 +75,12 @@ class FloatAccountController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param FloatAccountTopupRequest $request
+     * @param  FloatAccountTopupRequest  $request
      * @return JsonResponse
      */
     public function credit(FloatAccountTopupRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - FLOAT_ACCOUNTv2]: Invoke...', $request->all());
+        Log::info('...[CTRL - FLOAT_ACCOUNT]: Credit...', $request->all());
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();

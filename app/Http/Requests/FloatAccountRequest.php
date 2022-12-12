@@ -17,7 +17,7 @@ class FloatAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'initiator'  => ['required', 'in:' . Initiator::ENTERPRISE->value . ',' . Initiator::AGENT->value],
+            'initiator'  => ['required', 'in:'.Initiator::ENTERPRISE->value.','.Initiator::AGENT->value],
             'account_id' => ['required', 'integer', new SidoohAccountExists],
             'reference'  => [
                 'required',

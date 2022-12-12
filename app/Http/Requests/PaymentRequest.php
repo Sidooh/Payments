@@ -42,15 +42,15 @@ class PaymentRequest extends FormRequest
         ];
     }
 
-    function sourceAccountRule(): InvokableRule|string
+    public function sourceAccountRule(): InvokableRule|string
     {
         $countryCode = config('services.sidooh.country_code');
 
         return match (PaymentMethod::tryFrom($this->input('source'))) {
-            PaymentMethod::MPESA => "phone:$countryCode",
+            PaymentMethod::MPESA   => "phone:$countryCode",
             PaymentMethod::VOUCHER => new SidoohVoucherExists,
-            PaymentMethod::FLOAT => new SidoohFloatAccountExists,
-            default => abort(422, 'Unsupported source')
+            PaymentMethod::FLOAT   => new SidoohFloatAccountExists,
+            default                => abort(422, 'Unsupported source')
         };
     }
 }

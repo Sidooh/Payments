@@ -20,11 +20,11 @@ class DisburseVoucherTypeRequest extends PaymentRequest
         return true;
     }
 
-    function sourceAccountRule(): InvokableRule|string
+    public function sourceAccountRule(): InvokableRule|string
     {
         return match (PaymentMethod::tryFrom($this->input('source'))) {
             PaymentMethod::FLOAT => new SidoohFloatAccountExists,
-            default => abort(422, 'Unsupported source')
+            default              => abort(422, 'Unsupported source')
         };
     }
 }
