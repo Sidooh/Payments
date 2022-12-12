@@ -82,7 +82,7 @@ class VoucherController extends Controller
      */
     public function credit(VoucherCreditRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - VOUCHERv2]: Credit...', $request->all());
+        Log::info('...[CTRL - VOUCHER]: Credit...', $request->all());
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
