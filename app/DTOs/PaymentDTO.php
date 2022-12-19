@@ -23,7 +23,7 @@ class PaymentDTO
         public readonly PaymentType $type,
         public readonly PaymentSubtype $subtype,
         public readonly string $description,
-        public readonly string $reference,
+        public readonly ?string $reference,
         public readonly int $source,
         public bool $isWithdrawal = false,
         public readonly ?PaymentType $destinationType = null,

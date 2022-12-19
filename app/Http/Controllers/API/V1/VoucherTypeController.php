@@ -83,7 +83,7 @@ class VoucherTypeController extends Controller
 
     public function disburse(VoucherType $voucherType, DisburseVoucherTypeRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - VOUCHERTYPE]: Disburse...', $request->all());
+        Log::info('...[CTRL - VOUCHER TYPE]: Disburse...', $request->all());
 
         // TODO: Check voucher type is for account/ is authorized
         // TODO: Check float account is for account/ is authorized
