@@ -14,7 +14,6 @@ class FloatAccountSeeder extends Seeder
      */
     public function run()
     {
-        //
         FloatAccount::create([
             'account_id'     => 1,
             'floatable_id'   => 1,
