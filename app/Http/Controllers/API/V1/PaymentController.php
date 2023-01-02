@@ -85,7 +85,7 @@ class PaymentController extends Controller
 
         if ($payment->destination_subtype === PaymentSubtype::B2B->name) {
             $payment->load([
-                'provider.callback',
+                'destinationProvider.callback',
             ]);
         }
 
