@@ -5,10 +5,8 @@ namespace App\Repositories\EventRepositories;
 use App\Enums\Description;
 use App\Enums\PaymentSubtype;
 use App\Enums\Status;
-use App\Enums\VoucherType;
 use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
-use App\Models\Voucher;
 use App\Repositories\SidoohRepositories\VoucherRepository;
 use App\Services\SidoohService;
 use DrH\TendePay\Models\TendePayCallback;
@@ -33,12 +31,7 @@ class TendePayEventRepository
 
         // TODO: What if float was used? can it be used?
         DB::transaction(function() use ($payment) {
-            $voucher = Voucher::firstOrCreate([
-                'account_id' => $payment->account_id,
-                'type'       => VoucherType::SIDOOH,
-            ]);
-
-            VoucherRepository::credit($voucher->id, $payment->amount, Description::VOUCHER_REFUND->value);
+            VoucherRepository::creditDefaultVoucherForAccount($payment->account_id, $payment->amount, Description::VOUCHER_REFUND->value);
 
             $payment->update(['status' => Status::FAILED->name]);
 
