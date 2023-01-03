@@ -16,7 +16,6 @@ class VoucherRepository
     {
         return Voucher::firstOrCreate([
             'account_id'      => $accountId,
-            'type'            => VoucherType::SIDOOH,
             'voucher_type_id' => 1
         ]);
     }
