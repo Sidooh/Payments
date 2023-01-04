@@ -79,7 +79,7 @@ class PaymentController extends Controller
 
         if ($payment->destination_subtype === PaymentSubtype::B2C->name) {
             $payment->load([
-               'destinationProvider.response.parameter',
+                'destinationProvider.response.parameter',
             ]);
         }
 
@@ -100,9 +100,11 @@ class PaymentController extends Controller
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
             [$type2, $subtype2] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
 
-            if ($subtype2 !== PaymentSubtype::FLOAT) {
-                throw new HttpException(422, "Only float account is supported for destination");
-            }
+            $destinationData = match ($subtype2) {
+                PaymentSubtype::FLOAT   => 'float_account_id',
+                PaymentSubtype::VOUCHER => 'voucher_id',
+                default                 => throw new HttpException(422, 'Only float account and voucher are supported for destination.')
+            };
 
             $repo = new PaymentRepository(
                 new PaymentDTO(
@@ -116,7 +118,7 @@ class PaymentController extends Controller
                     false,
                     $type2,
                     $subtype2,
-                    ['float_account_id' => $request->destination_account],
+                    [$destinationData => $request->destination_account],
                 ),
                 $request->ipn
             );
@@ -129,6 +131,7 @@ class PaymentController extends Controller
             Log::critical($e);
         } catch (HttpException $err) {
             Log::error($err);
+
             return $this->errorResponse($err->getMessage(), $err->getStatusCode());
         } catch (Exception|Throwable|Error $err) {
             if ($err->getCode() === 422) {
@@ -140,7 +143,6 @@ class PaymentController extends Controller
 
         return $this->errorResponse('Failed to process payment request.');
     }
-
 
     public function merchant(MerchantPaymentRequest $request): JsonResponse
     {
@@ -189,7 +191,6 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
-
     public function withdraw(WithdrawalRequest $request): JsonResponse
     {
         Log::info('...[CTRL - PAYMENT]: Withdraw...', $request->all());
@@ -237,7 +238,6 @@ class PaymentController extends Controller
 
         return $this->errorResponse('Failed to process payment request.');
     }
-
 
     public function typeAndSubtype(string $type, string $subType): JsonResponse
     {

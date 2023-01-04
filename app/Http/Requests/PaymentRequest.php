@@ -35,8 +35,10 @@ class PaymentRequest extends FormRequest
             'description' => ['required', 'string'],
             'reference'   => ['nullable', 'string'],
 
-            'source'              => ['required', new Enum(PaymentMethod::class)],
-            'source_account'      => ['required', $this->sourceAccountRule()],
+            'source'         => ['required', new Enum(PaymentMethod::class)],
+            'source_account' => ['required', $this->sourceAccountRule()],
+
+            'destination' => 'in:'.PaymentMethod::VOUCHER->value.','.PaymentMethod::FLOAT->value,
 
             'ipn' => ['nullable', 'url'],
         ];
