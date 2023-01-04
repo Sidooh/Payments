@@ -11,6 +11,7 @@ use App\Enums\PaymentType;
 use App\Enums\ProductType;
 use App\Enums\Status;
 use App\Models\Payment;
+use App\Repositories\SidoohRepositories\VoucherRepository;
 use App\Services\SidoohAccounts;
 use Arr;
 use DrH\TendePay\Facades\TendePay;
@@ -125,15 +126,15 @@ class PaymentRepository
         }
 
         return DB::transaction(function() use ($id, $description, $productType) {
-            [$voucher, $voucherTransaction] = VoucherRepository::debit($id, $this->totalAmount, $description);
+            $voucherTransaction = VoucherRepository::debit($id, $this->totalAmount, $description->value);
 
-            $data['debit_voucher'] = $voucher;
+            $data['debit_voucher'] = $voucherTransaction->voucher;
 
             if ($productType === ProductType::VOUCHER) {
                 foreach ($this->transactions as $transaction) {
                     $account = SidoohAccounts::findByPhone($transaction['destination']);
-                    [$voucher] = VoucherRepository::credit($account['id'], $transaction['amount'], Description::VOUCHER_PURCHASE);
-                    $data['credit_vouchers'][] = $voucher;
+                    $voucherTransactionCredit = VoucherRepository::creditDefaultVoucherForAccount($account['id'], $transaction['amount'], Description::VOUCHER_PURCHASE->value);
+                    $data['credit_vouchers'][] = $voucherTransactionCredit->voucher;
                 }
             }
 
