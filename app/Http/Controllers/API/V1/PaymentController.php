@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\DTOs\PaymentDTO;
+use App\Enums\Description;
 use App\Enums\MerchantType;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
@@ -15,6 +16,7 @@ use App\Http\Requests\WithdrawalRequest;
 use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
+use App\Repositories\SidoohRepositories\VoucherRepository;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Error;
 use Exception;
@@ -98,35 +100,79 @@ class PaymentController extends Controller
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
-            [$type2, $subtype2] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
+            [$destinationType, $destinationSubtype] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
 
-            $destinationData = match ($subtype2) {
+            $destinationData = match ($destinationSubtype) {
                 PaymentSubtype::FLOAT   => 'float_account_id',
                 PaymentSubtype::VOUCHER => 'voucher_id',
                 default                 => throw new HttpException(422, 'Only float account and voucher are supported for destination.')
             };
 
-            $repo = new PaymentRepository(
-                new PaymentDTO(
-                    $request->account_id,
-                    $request->amount,
-                    $type,
-                    $subtype,
-                    $request->description,
-                    $request->reference,
-                    $request->source_account,
-                    false,
-                    $type2,
-                    $subtype2,
-                    [$destinationData => $request->destination_account],
-                ),
-                $request->ipn
-            );
+            $repo = new PaymentRepository(new PaymentDTO(
+                $request->account_id,
+                $request->amount,
+                $type, $subtype,
+                $request->enum('description', Description::class),
+                $request->reference,
+                $request->source_account,
+                false,
+                $destinationType,
+                $destinationSubtype,
+                [$destinationData => $request->destination_account]),
+                $request->ipn);
 
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
             // TODO: Change to PaymentException - create one and use internally
+        } catch (MpesaException $e) {
+            Log::critical($e);
+        } catch (HttpException $err) {
+            Log::error($err);
+
+            return $this->errorResponse($err->getMessage(), $err->getStatusCode());
+        } catch (Exception|Throwable|Error $err) {
+            if ($err->getCode() === 422) {
+                return $this->errorResponse($err->getMessage(), $err->getCode());
+            }
+
+            Log::error($err);
+        }
+
+        return $this->errorResponse('Failed to process payment request.');
+    }
+
+    public function reverse(Payment $payment): JsonResponse
+    {
+        Log::info('...[CTRL - PAYMENT]: Reverse...');
+
+        if ($payment->destination_subtype === PaymentSubtype::FLOAT) {
+            $sourceAccount = 1;
+            $destinationIdField = 'voucher_id';
+            $destinationAccount = VoucherRepository::getDefaultVoucherForAccount($payment->account_id)['id'];
+        } else {
+            $sourceAccount = $payment->destination_data['voucher_id'];
+            $destinationIdField = 'float_account_id';
+            $destinationAccount = 1;
+        }
+
+        try {
+            $repo = new PaymentRepository(new PaymentDTO(
+                $payment->account_id,
+                $payment->amount,
+                $payment->destination_type,
+                $payment->destination_subtype,
+                Description::PAYMENT_REVERSAL,
+                $payment->reference,
+                $sourceAccount,
+                false,
+                $payment->type,
+                $payment->subtype,
+                [$destinationIdField => $destinationAccount]));
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment), 'Payment Reversal Requested.');
         } catch (MpesaException $e) {
             Log::critical($e);
         } catch (HttpException $err) {
@@ -153,26 +199,21 @@ class PaymentController extends Controller
             $merchantType = MerchantType::from($request->merchant_type);
             [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
 
-            $destination = $merchantType === MerchantType::MPESA_PAY_BILL ?
-                $request->only('merchant_type', 'paybill_number', 'account_number') :
-                $request->only('merchant_type', 'till_number', 'account_number');
+            $destination = $merchantType === MerchantType::MPESA_PAY_BILL
+                ? $request->only('merchant_type', 'paybill_number', 'account_number')
+                : $request->only('merchant_type', 'till_number', 'account_number');
 
-            $repo = new PaymentRepository(
-                new PaymentDTO(
-                    $request->account_id,
-                    $request->amount,
-                    $type,
-                    $subtype,
-                    $request->description,
-                    $request->reference,
-                    $request->source_account,
-                    false,
-                    $type2,
-                    $subtype2,
-                    $destination
-                ),
-                $request->ipn
-            );
+            $repo = new PaymentRepository(new PaymentDTO(
+                $request->account_id,
+                $request->amount,
+                $type, $subtype,
+                $request->enum('description', Description::class),
+                $request->reference,
+                $request->source_account,
+                false,
+                $type2,
+                $subtype2,
+                $destination), $request->ipn);
 
             $payment = $repo->processPayment();
 
@@ -205,22 +246,18 @@ class PaymentController extends Controller
                 PaymentSubtype::B2C     => 'phone',
             };
 
-            $repo = new PaymentRepository(
-                new PaymentDTO(
-                    $request->account_id,
-                    $request->amount,
-                    $type,
-                    $subtype,
-                    $request->description,
-                    $request->reference,
-                    $request->source_account,
-                    false,
-                    $type2,
-                    $subtype2,
-                    [$destination => $request->destination_account]
-                ),
-                $request->ipn
-            );
+            $repo = new PaymentRepository(new PaymentDTO(
+                $request->account_id,
+                $request->amount,
+                $type,
+                $subtype,
+                $request->enum('description', Description::class),
+                $request->reference,
+                $request->source_account,
+                false,
+                $type2,
+                $subtype2,
+                [$destination => $request->destination_account]), $request->ipn);
 
             $payment = $repo->processPayment();
 

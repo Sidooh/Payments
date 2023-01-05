@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\DTOs\PaymentDTO;
+use App\Enums\Description;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
@@ -63,7 +64,6 @@ class VoucherController extends Controller
         return $this->successResponse($voucher->toArray());
     }
 
-
     public function store(StoreVoucherRequest $request): JsonResponse
     {
         $voucher = Voucher::firstOrCreate([
@@ -77,7 +77,7 @@ class VoucherController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param VoucherCreditRequest $request
+     * @param  VoucherCreditRequest  $request
      * @return JsonResponse
      */
     public function credit(VoucherCreditRequest $request): JsonResponse
@@ -93,7 +93,7 @@ class VoucherController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->description,
+                    $request->enum('description', Description::class),
                     $request->reference,
                     $request->source_account,
                     false,

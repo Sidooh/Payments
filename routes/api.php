@@ -40,6 +40,8 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::middleware('throttle:api')->get('/{payment}', [PaymentController::class, 'show']);
 
         Route::get('/providers/{type}/{subtype}', [PaymentController::class, 'typeAndSubtype']);
+
+        Route::post('/{payment}/reverse', [PaymentController::class, 'reverse']);
     });
 
     Route::apiResource('voucher-types', VoucherTypeController::class)->only(['index', 'show', 'store']);

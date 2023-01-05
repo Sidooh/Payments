@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\Description;
 use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,7 +34,12 @@ class Payment extends Model
     ];
 
     protected $casts = [
-        'destination_data' => 'array',
+        'destination_data'    => 'array',
+        'description'         => Description::class,
+        'type'                => PaymentType::class,
+        'subtype'             => PaymentSubtype::class,
+        'destination_type'    => PaymentType::class,
+        'destination_subtype' => PaymentSubtype::class,
     ];
 
     public function provider(): MorphTo
