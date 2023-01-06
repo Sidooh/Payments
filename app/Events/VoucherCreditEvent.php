@@ -2,11 +2,12 @@
 
 namespace App\Events;
 
+use App\Models\VoucherTransaction;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PaymentSuccessEvent
+class VoucherCreditEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -15,5 +16,7 @@ class PaymentSuccessEvent
      *
      * @return void
      */
-    public function __construct(public array $transactions, public array $data) { }
+    public function __construct(public VoucherTransaction $transaction)
+    {
+    }
 }

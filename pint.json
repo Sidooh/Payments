@@ -1,0 +1,17 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "binary_operator_spaces": {
+            "operators": {
+                "=>": "align"
+            }
+        },
+        "function_declaration": {
+            "closure_function_spacing": "none"
+        }
+    },
+    "exclude": [
+        "_ide_helper.php",
+        "_ide_helper_models.php"
+    ]
+}

@@ -11,13 +11,17 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('float_accounts', function (Blueprint $table) {
+        Schema::create('float_accounts', function(Blueprint $table) {
             $table->id();
 
             $table->decimal('balance', 10)->default(0);
-            $table->morphs('accountable');
+            $table->morphs('floatable');
+
+            $table->unsignedBigInteger('account_id')->index()->nullable();
+
+            $table->unique(['floatable_type', 'account_id']);
 
             $table->timestamps();
         });
@@ -28,7 +32,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('float_accounts');
     }

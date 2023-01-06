@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @mixin IdeHelperFloatAccount
@@ -15,22 +14,20 @@ class FloatAccount extends Model
     use HasFactory;
 
     protected $fillable = [
-        'accountable_id',
-        'accountable_type',
+        'floatable_id',
+        'floatable_type',
+        'account_id',
+    ];
+
+    protected $casts = [
+        'balance' => 'int',
     ];
 
     /**
      * ---------------------------------------- Relationships ----------------------------------------
      */
-    /**
-     * Get the parent accountable model (agent or enterprise).
-     */
-    public function accountable(): MorphTo
+    public function transactions(): HasMany
     {
-        return $this->morphTo();
-    }
-
-    public function floatAccountTransaction():HasMany {
         return $this->hasMany(FloatAccountTransaction::class);
     }
 }

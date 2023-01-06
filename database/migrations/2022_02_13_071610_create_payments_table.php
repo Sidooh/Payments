@@ -16,12 +16,12 @@ return new class extends Migration
         Schema::create('payments', function(Blueprint $table) {
             $table->id();
 
-            $table->decimal("amount");
-            $table->string("status", 15); // PENDING or COMPLETED
-            $table->string("type", 15); // ['MOBILE', 'SIDOOH', 'BANK', 'PAYPAL', 'OTHER'] payment methods?
-            $table->string("subtype", 15); // 'STK', 'C2B', 'CBA', 'WALLET', 'BONUS'
-            $table->unsignedBigInteger("provider_id");
-            $table->string("description")->nullable();
+            $table->decimal('amount');
+            $table->string('status', 15); // PENDING or COMPLETED
+            $table->string('type', 15); // ['MOBILE', 'SIDOOH', 'BANK', 'PAYPAL', 'OTHER'] payment methods?
+            $table->string('subtype', 15); // 'STK', 'C2B', 'CBA', 'WALLET', 'BONUS'
+            $table->unsignedBigInteger('provider_id');
+            $table->string('description')->nullable();
             $table->string('reference')->nullable(); // external party reference
 
             $table->timestamps();

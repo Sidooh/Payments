@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Helpers\ApiResponse;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -40,21 +41,23 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
-        $this->reportable(function(Throwable $e) { });
+        $this->reportable(function(Throwable $e) {
+        });
     }
 
     public function render($request, Throwable $e): JsonResponse
     {
         return match (true) {
             $e instanceof MethodNotAllowedHttpException => $this->errorResponse('The specified method for the request is invalid', 405),
-            $e instanceof NotFoundHttpException => $this->errorResponse('The specified URL cannot be found', 404),
-            $e instanceof ValidationException => $this->errorResponse("The request is invalid", 422, $e->errors()),
-            $e instanceof ModelNotFoundException => $this->errorResponse('The specified resource cannot be found', 404),
-            $e instanceof HttpException => $this->errorResponse($e->getMessage(), $e->getStatusCode()),
-            $e instanceof AuthenticationException => $this->errorResponse($e->getMessage(), 401),
-            default => $this->errorResponse("Something went wrong, please contact support")
+            $e instanceof NotFoundHttpException         => $this->errorResponse('The specified URL cannot be found', 404),
+            $e instanceof ValidationException           => $this->errorResponse('The request is invalid', 422, $e->errors()),
+            $e instanceof ModelNotFoundException        => $this->errorResponse('The specified resource cannot be found', 404),
+            $e instanceof HttpException                 => $this->errorResponse($e->getMessage(), $e->getStatusCode()),
+            $e instanceof AuthenticationException       => $this->errorResponse($e->getMessage(), 401),
+            $e instanceof AuthorizationException        => $this->errorResponse($e->getMessage(), 403),
+            default                                     => $this->errorResponse('Something went wrong, please contact support')
         };
     }
 }

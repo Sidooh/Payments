@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Log;
 
 class SidoohSavings extends SidoohService
 {
-
     /**
      * @throws RequestException
      */
@@ -18,7 +17,7 @@ class SidoohSavings extends SidoohService
     {
         Log::info('...[SRV - Savings]: Payment Callback...');
 
-        $url = config("services.sidooh.services.savings.url") . "/payments/callback";
+        $url = config('services.sidooh.services.savings.url').'/payments/callback';
 
         return parent::fetch($url, 'POST', $payment->toArray())->throw();
     }

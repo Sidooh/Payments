@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\VoucherType;
-use Exception;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -18,29 +16,21 @@ class Voucher extends Model
 
     protected $fillable = [
         'account_id',
-        'type'
+        'type',
+        'voucher_type_id',
     ];
 
-    public function voucherTopUpAmount(): Attribute
-    {
-        return new Attribute(get: function($value, $attributes) {
-
-            $disburseType = match (VoucherType::from($this->type)) {
-                VoucherType::ENTERPRISE_LUNCH => 'lunch',
-                VoucherType::ENTERPRISE_GENERAL => 'general',
-                default => throw new Exception('Unexpected match value'),
-            };
-
-            ['max' => $max] = collect($this->enterprise->settings)->firstWhere('type', $disburseType);
-
-            return $max - $attributes['balance'];
-        });
-    }
+    protected $with = ['voucherType'];
 
     /**
      * ---------------------------------------- Relationships ----------------------------------------
      */
-    public function voucherTransactions(): HasMany
+    public function voucherType(): BelongsTo
+    {
+        return $this->belongsTo(VoucherType::class);
+    }
+
+    public function transactions(): HasMany
     {
         return $this->hasMany(VoucherTransaction::class);
     }

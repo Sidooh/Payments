@@ -2,12 +2,12 @@
 
 namespace App\Enums;
 
-enum PaymentType
+enum PaymentType: string
 {
-    case MOBILE;
-    case MPESA;
-    case SIDOOH;
-    case BANK;
-    case PAYPAL;
-    case OTHER;
+    case MPESA = 'MPESA';
+    case SIDOOH = 'SIDOOH';
+    case TENDE = 'TENDE';
+//    case BANK = 'BANK';
+//    case PAYPAL = 'PAYPAL';
+//    case OTHER = 'OTHER';
 }

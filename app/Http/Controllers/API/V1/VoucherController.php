@@ -2,111 +2,122 @@
 
 namespace App\Http\Controllers\API\V1;
 
-use App\Enums\Description;
-use App\Enums\VoucherType;
+use App\DTOs\PaymentDTO;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\VoucherRequest;
+use App\Http\Requests\StoreVoucherRequest;
+use App\Http\Requests\VoucherCreditRequest;
+use App\Http\Resources\PaymentResource;
 use App\Models\Voucher;
-use App\Models\VoucherTransaction;
-use App\Repositories\VoucherRepository;
+use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Services\SidoohAccounts;
+use DrH\Mpesa\Exceptions\MpesaException;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Throwable;
+use Illuminate\Support\Facades\Log;
 
 class VoucherController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $relations = explode(",", $request->query("with"));
+        $relations = explode(',', $request->query('with'));
 
         $vouchers = Voucher::latest();
 
-        if(in_array("voucher_transactions", $relations)) {
-            $vouchers = $vouchers->with("voucherTransactions:id,voucher_id,type,amount,description,created_at")
-                ->limit(50);
+        if ($id = $request->integer('account_id')) {
+            $vouchers->whereAccountId($id);
         }
 
-        $vouchers = $vouchers->get();
+        if (in_array('transactions', $relations)) {
+            $vouchers->with('transactions:id,voucher_id,type,amount,description,created_at')
+                ->latest()
+                ->limit(10);
+        }
 
-        if(in_array("account", $relations)) {
-            $vouchers = withRelation("account", $vouchers, "account_id", "id");
+        $vouchers = $vouchers->limit(1000)->get();
+
+        if (in_array('account', $relations)) {
+            $vouchers = withRelation('account', $vouchers, 'account_id', 'id');
         }
 
         return $this->successResponse($vouchers);
     }
 
-    public function getTransactions(Request $request): JsonResponse
+    public function show(Voucher $voucher, Request $request): JsonResponse
     {
-        $relations = explode(",", $request->query("with"));
+        $relations = explode(',', $request->query('with'));
 
-        $transactions = VoucherTransaction::query();
-
-        if(in_array("voucher", $relations)) {
-            $transactions = $transactions->with("voucher:id,account_id,type,balance");
-        }
-
-        if(in_array("payment", $relations)) {
-            $transactions = $transactions->with("payment:id,provider_id,subtype,status");
-        }
-
-        $transactions->orderBy('id', 'desc')->limit(100);
-
-        return $this->successResponse($transactions->get());
-    }
-
-    public function show(Request $request, Voucher $voucher): JsonResponse
-    {
-        $relations = explode(",", $request->query("with"));
-
-        if(in_array("transactions", $relations)) {
-            $voucher->load("voucherTransactions:id,voucher_id,type,amount,description,created_at")->latest()
+        if (in_array('transactions', $relations)) {
+            $voucher->load('transactions:id,voucher_id,type,amount,description,created_at')
+                ->latest()
                 ->limit(100);
         }
 
-        if(in_array("account", $relations)) {
+        if (in_array('account', $relations)) {
             $voucher->account = SidoohAccounts::find($voucher->account_id, true);
         }
 
         return $this->successResponse($voucher->toArray());
     }
 
-    public function getAccountVouchers(int $accountId): JsonResponse
+
+    public function store(StoreVoucherRequest $request): JsonResponse
     {
-        $vouchers = Voucher::select(["id", "type", "balance"])->whereAccountId($accountId)->get();
-
-        if($vouchers->isEmpty()) {
-            $vouchers = [Voucher::create(["account_id" => $accountId, "type" => VoucherType::SIDOOH])];
-        }
-
-        return $this->successResponse($vouchers);
-    }
-
-    public function credit(Request $request): JsonResponse
-    {
-        $request->validate([
-            'account_id'  => ['required'],
-            'amount'      => ['required'],
-            "description" => ["required", "string"],
-            "notify"      => ['required', 'boolean']
+        $voucher = Voucher::firstOrCreate([
+            'account_id'      => $request->account_id,
+            'voucher_type_id' => $request->voucher_type_id,
         ]);
 
-        $accountId = $request->input("account_id");
-        $amount = $request->input("amount");
-        $description = Description::from($request->input("description"));
-
-        $response = VoucherRepository::credit($accountId, $amount, $description);
-
-        return $this->successResponse($response);
+        return $this->successResponse($voucher);
     }
 
     /**
-     * @throws Throwable
+     * Handle the incoming request.
+     *
+     * @param VoucherCreditRequest $request
+     * @return JsonResponse
      */
-    public function disburse(VoucherRequest $request): JsonResponse
+    public function credit(VoucherCreditRequest $request): JsonResponse
     {
-        $response = VoucherRepository::disburse($request->input('enterprise_id'), $request->input('data'));
+        Log::info('...[CTRL - VOUCHER]: Credit...', $request->all());
 
-        return $this->successResponse($response);
+        try {
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
+
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    $request->reference,
+                    $request->source_account,
+                    false,
+                    PaymentType::SIDOOH,
+                    PaymentSubtype::VOUCHER,
+                    ['voucher_id' => $request->voucher]
+                ),
+                $request->ipn
+            );
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment->refresh()), 'Payment Requested.');
+            // TODO: Change to PaymentException - create one and use internally
+        } catch (MpesaException $e) {
+            Log::critical($e);
+        } catch (Exception $err) {
+            if ($err->getCode() === 422) {
+                return $this->errorResponse($err->getMessage(), $err->getCode());
+            }
+
+            Log::error($err);
+        }
+
+        return $this->errorResponse('Failed to process credit request.');
     }
 }

@@ -194,9 +194,8 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // ...
 
-        'LocalCarbon' => App\Facades\LocalCarbon::class
+        'LocalCarbon' => App\Facades\LocalCarbon::class,
 
     ])->toArray(),
-
 
 ];
