@@ -24,7 +24,7 @@ class MpesaEventRepository
     {
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        if ($payment->status !== Status::PENDING) {
             Log::critical('Payment is not pending...', [$payment, $stkCallback->request]);
 
             return;
@@ -47,7 +47,7 @@ class MpesaEventRepository
     {
         $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        if ($payment->status !== Status::PENDING) {
             Log::critical('Payment is not pending...', [$payment, $stkCallback->request]);
 
             return;
@@ -73,7 +73,7 @@ class MpesaEventRepository
         try {
             $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
                 ->firstOrFail();
-            if ($payment->status !== Status::PENDING->name) {
+            if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
 
@@ -91,7 +91,7 @@ class MpesaEventRepository
             $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
                 ->firstOrFail();
 
-            if ($payment->status !== Status::PENDING->name) {
+            if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
 

@@ -23,7 +23,7 @@ class TendePayEventRepository
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        if ($payment->status !== Status::PENDING) {
             Log::error('Payment is not pending...', [$payment, $callback->request]);
 
             return;
@@ -43,7 +43,7 @@ class TendePayEventRepository
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        if ($payment->status !== Status::PENDING) {
             Log::error('Payment is not pending...', [$payment, $callback->request]);
 
             return;
