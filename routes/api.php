@@ -37,11 +37,16 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::post('/merchant', [PaymentController::class, 'merchant']);
         Route::post('/withdraw', [PaymentController::class, 'withdraw']);
 
-        Route::middleware('throttle:api')->get('/{payment}', [PaymentController::class, 'show']);
-
         Route::get('/providers/{type}/{subtype}', [PaymentController::class, 'typeAndSubtype']);
 
-        Route::post('/{payment}/reverse', [PaymentController::class, 'reverse']);
+        Route::prefix('/{payment}')->group(function() {
+            Route::middleware('throttle:api')->get('/', [PaymentController::class, 'show']);
+
+            Route::post('/check-payment', [PaymentController::class, 'checkPayment']);
+            Route::post('/reverse', [PaymentController::class, 'reverse']);
+            Route::post('/complete', [PaymentController::class, 'complete']);
+            Route::post('/fail', [PaymentController::class, 'fail']);
+        });
     });
 
     Route::apiResource('voucher-types', VoucherTypeController::class)->only(['index', 'show', 'store']);

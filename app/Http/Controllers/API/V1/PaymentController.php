@@ -17,6 +17,7 @@ use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
+use App\Services\SidoohAccounts;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Error;
 use Exception;
@@ -42,54 +43,57 @@ class PaymentController extends Controller
         return $this->successResponse($payments);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function show(Payment $payment): JsonResponse
     {
         // TODO: Add auth check functionality for this
-
-        if ($payment->subtype === PaymentSubtype::STK->name) {
+        if ($payment->subtype === PaymentSubtype::STK) {
             $payment->load([
                 'provider:id,status,reference,description,checkout_request_id,amount,phone,created_at',
                 'provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at',
             ]);
         }
 
-        if ($payment->subtype === PaymentSubtype::VOUCHER->name) {
+        if ($payment->subtype === PaymentSubtype::VOUCHER) {
             $payment->load([
                 'provider:id,type,amount,description,created_at',
             ]);
         }
 
         // TODO: Confirm columns for all the below subtypes
-
-        if ($payment->subtype === PaymentSubtype::C2B->name) {
+        if ($payment->subtype === PaymentSubtype::C2B) {
             $payment->load([
                 'provider',
             ]);
         }
 
-        if ($payment->destination_subtype === PaymentSubtype::FLOAT->name) {
+        if ($payment->destination_subtype === PaymentSubtype::FLOAT) {
             $payment->load([
                 'destinationProvider:id,type,amount,description,created_at',
             ]);
         }
 
-        if ($payment->destination_subtype === PaymentSubtype::VOUCHER->name) {
+        if ($payment->destination_subtype === PaymentSubtype::VOUCHER) {
             $payment->load([
                 'destinationProvider:id,type,amount,description,created_at',
             ]);
         }
 
-        if ($payment->destination_subtype === PaymentSubtype::B2C->name) {
+        if ($payment->destination_subtype === PaymentSubtype::B2C) {
             $payment->load([
                 'destinationProvider.response.parameter',
             ]);
         }
 
-        if ($payment->destination_subtype === PaymentSubtype::B2B->name) {
+        if ($payment->destination_subtype === PaymentSubtype::B2B) {
             $payment->load([
                 'destinationProvider.callback',
             ]);
         }
+
+        $payment->account = SidoohAccounts::find($payment->account_id);
 
         return $this->successResponse($payment);
     }
@@ -291,6 +295,37 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
+    public function checkPayment(Payment $payment): JsonResponse
+    {
+        //  TODO: Implement this method.
+
+        return $this->successResponse($payment->refresh());
+    }
+
+    public function complete(Payment $payment): JsonResponse
+    {
+        // Check payment
+        if ($payment->status !== Status::PENDING) {
+            return $this->errorResponse('There is a problem with this transaction - Payment. Contact Support.');
+        }
+
+        $payment->update(['status' => Status::COMPLETED]);
+
+        return $this->successResponse($payment->refresh());
+    }
+
+    public function fail(Payment $payment): JsonResponse
+    {
+        // Check payment
+        if ($payment->status !== Status::PENDING) {
+            return $this->errorResponse('There is a problem with this transaction - Status. Contact Support.');
+        }
+
+        $payment->update(['status' => Status::FAILED]);
+
+        return $this->successResponse($payment->refresh());
+    }
+
     public function typeAndSubtype(string $type, string $subType): JsonResponse
     {
         return match (PaymentType::tryFrom(strtoupper($type))) {
@@ -298,13 +333,13 @@ class PaymentController extends Controller
                 PaymentSubtype::B2B => $this->getB2BPayments(),
                 default             => throw new HttpException(422, "Unexpected sub-type $subType for type $type")
             },
-            PaymentType::MPESA => match (PaymentSubtype::tryFrom(strtoupper($subType))) {
+            PaymentType::MPESA  => match (PaymentSubtype::tryFrom(strtoupper($subType))) {
                 PaymentSubtype::B2C => $this->getB2CPayments(),
                 PaymentSubtype::STK => $this->getSTKPayments(),
                 PaymentSubtype::C2B => $this->getC2BPayments(),
                 default             => throw new HttpException(422, "Unexpected sub-type $subType for type $type"),
             },
-            default => throw new HttpException(422, "Unexpected payment type $type")
+            default             => throw new HttpException(422, "Unexpected payment type $type")
         };
     }
 

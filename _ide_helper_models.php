@@ -72,7 +72,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $amount
- * @property string $status
+ * @property \App\Enums\Status $status
  * @property \App\Enums\PaymentType $type
  * @property \App\Enums\PaymentSubtype $subtype
  * @property int $provider_id
