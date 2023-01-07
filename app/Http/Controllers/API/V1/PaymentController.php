@@ -56,41 +56,29 @@ class PaymentController extends Controller
             ]);
         }
 
-        if ($payment->subtype === PaymentSubtype::VOUCHER) {
-            $payment->load([
-                'provider:id,type,amount,description,created_at',
-            ]);
+        if (in_array($payment->subtype, [PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT])) {
+            $payment->load('provider:id,type,amount,description,created_at');
         }
 
         // TODO: Confirm columns for all the below subtypes
         if ($payment->subtype === PaymentSubtype::C2B) {
-            $payment->load([
-                'provider',
-            ]);
+            $payment->load('provider');
         }
 
         if ($payment->destination_subtype === PaymentSubtype::FLOAT) {
-            $payment->load([
-                'destinationProvider:id,type,amount,description,created_at',
-            ]);
+            $payment->load('destinationProvider:id,type,amount,description,created_at');
         }
 
         if ($payment->destination_subtype === PaymentSubtype::VOUCHER) {
-            $payment->load([
-                'destinationProvider:id,type,amount,description,created_at',
-            ]);
+            $payment->load('destinationProvider:id,type,amount,description,created_at');
         }
 
         if ($payment->destination_subtype === PaymentSubtype::B2C) {
-            $payment->load([
-                'destinationProvider.response.parameter',
-            ]);
+            $payment->load('destinationProvider.response.parameter');
         }
 
         if ($payment->destination_subtype === PaymentSubtype::B2B) {
-            $payment->load([
-                'destinationProvider.callback',
-            ]);
+            $payment->load('destinationProvider.callback');
         }
 
         $payment->account = SidoohAccounts::find($payment->account_id);
@@ -109,7 +97,9 @@ class PaymentController extends Controller
             $destinationData = match ($destinationSubtype) {
                 PaymentSubtype::FLOAT   => 'float_account_id',
                 PaymentSubtype::VOUCHER => 'voucher_id',
-                default                 => throw new HttpException(422, 'Only float account and voucher are supported for destination.')
+                default                 => throw new HttpException(
+                    422, 'Only float account and voucher are supported for destination.'
+                )
             };
 
             $repo = new PaymentRepository(
@@ -163,6 +153,10 @@ class PaymentController extends Controller
             $destinationAccount = 1;
         }
 
+        if ($payment->type !== PaymentType::SIDOOH) {
+            [$payment->type, $payment->subtype] = PaymentMethod::VOUCHER->getTypeAndSubtype();
+        }
+
         try {
             $repo = new PaymentRepository(
                 new PaymentDTO(
@@ -176,7 +170,7 @@ class PaymentController extends Controller
                     false,
                     $payment->type,
                     $payment->subtype,
-                    [$destinationIdField => $destinationAccount]
+                    [$destinationIdField => $destinationAccount, 'payment_id' => $payment->id]
                 )
             );
 

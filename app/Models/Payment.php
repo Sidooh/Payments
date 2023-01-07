@@ -44,10 +44,6 @@ class Payment extends Model
         'destination_subtype' => PaymentSubtype::class,
     ];
 
-    public function account()
-    {
-    }
-
     public function provider(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'subtype', 'provider_id');
