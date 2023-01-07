@@ -23,7 +23,7 @@ class VoucherRepository
     /**
      * @throws \Throwable
      */
-    public static function creditDefaultVoucherForAccount(int $accountId, float $amount, string $description): VoucherTransaction
+    public static function creditDefaultVoucherForAccount(int $accountId, float $amount, Description $description): VoucherTransaction
     {
         $voucher = VoucherRepository::getDefaultVoucherForAccount($accountId);
 

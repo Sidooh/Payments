@@ -61,6 +61,9 @@ class SidoohProvider implements PaymentContract
         };
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function voucher(): int
     {
         $voucherId = $this->paymentDTO->destinationData['voucher_id'];
@@ -70,6 +73,9 @@ class SidoohProvider implements PaymentContract
         return $transaction->id;
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function float(): int
     {
         $accountId = $this->paymentDTO->destinationData['float_account_id'];

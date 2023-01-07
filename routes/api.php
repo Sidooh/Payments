@@ -53,7 +53,6 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/', [VoucherController::class, 'index']);
         Route::post('/', [VoucherController::class, 'store']);
         Route::get('/{voucher}', [VoucherController::class, 'show']);
-        Route::post('/credit', [VoucherController::class, 'credit']);
     });
 
     Route::prefix('/voucher-transactions')->group(function() {

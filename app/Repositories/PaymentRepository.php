@@ -133,7 +133,7 @@ class PaymentRepository
             if ($productType === ProductType::VOUCHER) {
                 foreach ($this->transactions as $transaction) {
                     $account = SidoohAccounts::findByPhone($transaction['destination']);
-                    $voucherTransactionCredit = VoucherRepository::creditDefaultVoucherForAccount($account['id'], $transaction['amount'], Description::VOUCHER_PURCHASE->value);
+                    $voucherTransactionCredit = VoucherRepository::creditDefaultVoucherForAccount($account['id'], $transaction['amount'], Description::VOUCHER_PURCHASE);
                     $data['credit_vouchers'][] = $voucherTransactionCredit->voucher;
                 }
             }
