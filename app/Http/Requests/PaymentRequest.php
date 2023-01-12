@@ -30,17 +30,15 @@ class PaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_id'  => ['required', 'integer', new SidoohAccountExists],
-            'amount'      => ['required', 'integer'],
-            'description' => ['required', 'string'],
-            'reference'   => ['nullable', 'string'],
+            'account_id'     => ['required', 'integer', new SidoohAccountExists],
+            'amount'         => ['required', 'integer'],
+            'description'    => ['required', 'string'],
+            'reference'      => ['nullable', 'string'],
 
             'source'         => ['required', new Enum(PaymentMethod::class)],
             'source_account' => ['required', $this->sourceAccountRule()],
 
-            'destination' => 'in:'.PaymentMethod::VOUCHER->value.','.PaymentMethod::FLOAT->value,
-
-            'ipn' => ['nullable', 'url'],
+            'ipn'            => ['nullable', 'url'],
         ];
     }
 
