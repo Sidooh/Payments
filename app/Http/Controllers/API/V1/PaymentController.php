@@ -18,6 +18,7 @@ use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
 use App\Services\SidoohAccounts;
+use App\Services\SidoohService;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Error;
 use Exception;
@@ -192,6 +193,17 @@ class PaymentController extends Controller
         }
 
         return $this->errorResponse('Failed to process payment request.');
+    }
+
+    public function retry(Payment $payment): JsonResponse
+    {
+        if ($payment->status !== Status::COMPLETED) {
+            return $this->errorResponse('There is a problem with this transaction - Status. Contact Support.');
+        }
+
+        SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+
+        return $this->successResponse($payment->refresh());
     }
 
     public function merchant(MerchantPaymentRequest $request): JsonResponse
