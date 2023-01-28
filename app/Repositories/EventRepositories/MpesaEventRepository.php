@@ -85,6 +85,9 @@ class MpesaEventRepository
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
     public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
@@ -97,7 +100,7 @@ class MpesaEventRepository
 
             $account = $payment->provider->floatAccount;
 
-            FloatAccountRepository::credit($account->id, $payment->amount, Description::VOUCHER_REFUND->value);
+            FloatAccountRepository::credit($account->id, $payment->amount, Description::VOUCHER_REFUND);
 
             $payment->update(['status' => Status::FAILED->name]);
 
