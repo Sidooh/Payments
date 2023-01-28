@@ -311,6 +311,10 @@ class PaymentController extends Controller
 
         $payment->update(['status' => Status::COMPLETED]);
 
+        if ($payment->ipn) {
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        }
+
         return $this->successResponse($payment->refresh());
     }
 
@@ -322,6 +326,10 @@ class PaymentController extends Controller
         }
 
         $payment->update(['status' => Status::FAILED]);
+
+        if ($payment->ipn) {
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        }
 
         return $this->successResponse($payment->refresh());
     }
