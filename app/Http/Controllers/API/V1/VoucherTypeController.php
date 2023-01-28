@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Enums\Description;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DisburseVoucherTypeRequest;
 use App\Http\Requests\StoreVoucherTypeRequest;
@@ -98,9 +99,9 @@ class VoucherTypeController extends Controller
                     throw new Exception('invalid voucher selected', 422);
                 }
 
-                $fT = FloatAccountRepository::debit($request->source_account, $request->amount, $request->description);
+                $fT = FloatAccountRepository::debit($request->source_account, $request->amount, $request->enum('description', Description::class));
 
-                $vT = VoucherRepository::credit($voucher->id, $request->amount, $request->description);
+                $vT = VoucherRepository::credit($voucher->id, $request->amount, $request->enum('description', Description::class));
 
                 return [$fT, $vT];
             }, 2);

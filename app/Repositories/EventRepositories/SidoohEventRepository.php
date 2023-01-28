@@ -21,7 +21,7 @@ class SidoohEventRepository
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::VOUCHER, $transaction->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        if ($payment->status !== Status::PENDING) {
             Log::critical('Payment is not pending...', [$payment, $transaction]);
 
             return;
@@ -41,7 +41,7 @@ class SidoohEventRepository
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::FLOAT, $transaction->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        if ($payment->status !== Status::PENDING) {
             Log::critical('Payment is not pending...', [$payment, $transaction]);
 
             return;
@@ -49,7 +49,8 @@ class SidoohEventRepository
 
         $payment->update(['status' => Status::COMPLETED->name]);
 
-        if ($payment->subtype === PaymentSubtype::STK->name)
+        if ($payment->subtype === PaymentSubtype::STK) {
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        }
     }
 }

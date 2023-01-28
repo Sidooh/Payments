@@ -2,6 +2,7 @@
 
 namespace App\DTOs;
 
+use App\Enums\Description;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Models\FloatAccount;
@@ -22,7 +23,7 @@ class PaymentDTO
         public readonly int $amount,
         public readonly PaymentType $type,
         public readonly PaymentSubtype $subtype,
-        public readonly string $description,
+        public readonly Description|string $description,
         public readonly ?string $reference,
         public readonly int $source,
         public bool $isWithdrawal = false,
@@ -66,14 +67,14 @@ class PaymentDTO
         $dto = new PaymentDTO(
             $payment->account_id,
             $payment->amount,
-            PaymentType::tryFrom($payment->type),
-            PaymentSubtype::tryFrom($payment->subtype),
+            $payment->type,
+            $payment->subtype,
             $payment->description,
             $payment->reference,
             $payment->provider_id,
             true,
-            PaymentType::tryFrom($payment->destination_type),
-            PaymentSubtype::tryFrom($payment->destination_subtype),
+            $payment->destination_type,
+            $payment->destination_subtype,
             $payment->destination_data
         );
         $dto->payment = $payment;

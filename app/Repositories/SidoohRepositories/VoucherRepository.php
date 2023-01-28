@@ -2,8 +2,8 @@
 
 namespace App\Repositories\SidoohRepositories;
 
+use App\Enums\Description;
 use App\Enums\TransactionType;
-use App\Enums\VoucherType;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use Exception;
@@ -16,11 +16,14 @@ class VoucherRepository
     {
         return Voucher::firstOrCreate([
             'account_id'      => $accountId,
-            'voucher_type_id' => 1
+            'voucher_type_id' => 1,
         ]);
     }
 
-    public static function creditDefaultVoucherForAccount(int $accountId, float $amount, string $description): VoucherTransaction
+    /**
+     * @throws \Throwable
+     */
+    public static function creditDefaultVoucherForAccount(int $accountId, float $amount, Description $description): VoucherTransaction
     {
         $voucher = VoucherRepository::getDefaultVoucherForAccount($accountId);
 
@@ -30,7 +33,7 @@ class VoucherRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function credit(int $id, float $amount, string $description): VoucherTransaction
+    public static function credit(int $id, float $amount, Description $description): VoucherTransaction
     {
         $voucher = Voucher::findOrFail($id);
 
@@ -39,7 +42,7 @@ class VoucherRepository
             throw new Exception('Amount will exceed voucher limit.', 422);
         }
 
-        return DB::transaction(function () use ($description, $amount, $voucher) {
+        return DB::transaction(function() use ($description, $amount, $voucher) {
             $voucher->balance += $amount;
             $voucher->save();
 
@@ -54,7 +57,7 @@ class VoucherRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function debit(int $id, float $amount, string $description): VoucherTransaction
+    public static function debit(int $id, float $amount, Description $description): VoucherTransaction
     {
         $voucher = Voucher::findOrFail($id);
 
@@ -63,7 +66,7 @@ class VoucherRepository
             throw new Exception('Insufficient voucher balance.', 422);
         }
 
-        return DB::transaction(function () use ($description, $amount, $voucher) {
+        return DB::transaction(function() use ($description, $amount, $voucher) {
             $voucher->balance -= $amount;
             $voucher->save();
 

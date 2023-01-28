@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\DTOs\PaymentDTO;
+use App\Enums\Description;
 use App\Enums\Initiator;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
@@ -56,6 +57,9 @@ class FloatAccountController extends Controller
         return $this->successResponse($account);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function show(Request $request, FloatAccount $floatAccount): JsonResponse
     {
         $relations = explode(',', $request->query('with'));
@@ -91,7 +95,7 @@ class FloatAccountController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->description,
+                    $request->enum('description', Description::class),
                     $request->reference,
                     $request->source_account,
                     false,

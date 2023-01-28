@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\DTOs\PaymentDTO;
+use App\Enums\Description;
 use App\Enums\MerchantType;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
@@ -13,8 +14,12 @@ use App\Http\Requests\MerchantPaymentRequest;
 use App\Http\Requests\PaymentRequest;
 use App\Http\Requests\WithdrawalRequest;
 use App\Http\Resources\PaymentResource;
+use App\Models\FloatAccount;
 use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
+use App\Repositories\SidoohRepositories\VoucherRepository;
+use App\Services\SidoohAccounts;
+use App\Services\SidoohService;
 use DrH\Mpesa\Exceptions\MpesaException;
 use Error;
 use Exception;
@@ -40,54 +45,45 @@ class PaymentController extends Controller
         return $this->successResponse($payments);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function show(Payment $payment): JsonResponse
     {
         // TODO: Add auth check functionality for this
-
-        if ($payment->subtype === PaymentSubtype::STK->name) {
+        if ($payment->subtype === PaymentSubtype::STK) {
             $payment->load([
                 'provider:id,status,reference,description,checkout_request_id,amount,phone,created_at',
                 'provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at',
             ]);
         }
 
-        if ($payment->subtype === PaymentSubtype::VOUCHER->name) {
-            $payment->load([
-                'provider:id,type,amount,description,created_at',
-            ]);
+        if (in_array($payment->subtype, [PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT])) {
+            $payment->load('provider:id,type,amount,description,created_at');
         }
 
         // TODO: Confirm columns for all the below subtypes
-
-        if ($payment->subtype === PaymentSubtype::C2B->name) {
-            $payment->load([
-                'provider',
-            ]);
+        if ($payment->subtype === PaymentSubtype::C2B) {
+            $payment->load('provider');
         }
 
-        if ($payment->destination_subtype === PaymentSubtype::FLOAT->name) {
-            $payment->load([
-                'destinationProvider:id,type,amount,description,created_at',
-            ]);
+        if ($payment->destination_subtype === PaymentSubtype::FLOAT) {
+            $payment->load('destinationProvider:id,type,amount,description,created_at');
         }
 
-        if ($payment->destination_subtype === PaymentSubtype::VOUCHER->name) {
-            $payment->load([
-                'destinationProvider:id,type,amount,description,created_at',
-            ]);
+        if ($payment->destination_subtype === PaymentSubtype::VOUCHER) {
+            $payment->load('destinationProvider:id,type,amount,description,created_at');
         }
 
-        if ($payment->destination_subtype === PaymentSubtype::B2C->name) {
-            $payment->load([
-               'destinationProvider.response.parameter',
-            ]);
+        if ($payment->destination_subtype === PaymentSubtype::B2C) {
+            $payment->load('destinationProvider.response.result');
         }
 
-        if ($payment->destination_subtype === PaymentSubtype::B2B->name) {
-            $payment->load([
-                'destinationProvider.callback',
-            ]);
+        if ($payment->destination_subtype === PaymentSubtype::B2B) {
+            $payment->load('destinationProvider.callback');
         }
+
+        $payment->account = SidoohAccounts::find($payment->account_id);
 
         return $this->successResponse($payment);
     }
@@ -98,11 +94,15 @@ class PaymentController extends Controller
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
-            [$type2, $subtype2] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
+            [$destinationType, $destinationSubtype] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
 
-            if ($subtype2 !== PaymentSubtype::FLOAT) {
-                throw new HttpException(422, "Only float account is supported for destination");
-            }
+            $destinationData = match ($destinationSubtype) {
+                PaymentSubtype::FLOAT   => 'float_account_id',
+                PaymentSubtype::VOUCHER => 'voucher_id',
+                default                 => throw new HttpException(
+                    422, 'Only float account and voucher are supported for destination.'
+                )
+            };
 
             $repo = new PaymentRepository(
                 new PaymentDTO(
@@ -110,15 +110,14 @@ class PaymentController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->description,
+                    $request->enum('description', Description::class),
                     $request->reference,
                     $request->source_account,
                     false,
-                    $type2,
-                    $subtype2,
-                    ['float_account_id' => $request->destination_account],
-                ),
-                $request->ipn
+                    $destinationType,
+                    $destinationSubtype,
+                    [$destinationData => $request->destination_account]
+                ), $request->ipn
             );
 
             $payment = $repo->processPayment();
@@ -129,6 +128,7 @@ class PaymentController extends Controller
             Log::critical($e);
         } catch (HttpException $err) {
             Log::error($err);
+
             return $this->errorResponse($err->getMessage(), $err->getStatusCode());
         } catch (Exception|Throwable|Error $err) {
             if ($err->getCode() === 422) {
@@ -141,6 +141,71 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
+    public function reverse(Payment $payment): JsonResponse
+    {
+        Log::info('...[CTRL - PAYMENT]: Reverse...');
+
+        if ($payment->destination_subtype === PaymentSubtype::FLOAT) {
+            $sourceAccount = $payment->destination_data['float_account_id'];
+            $destinationIdField = 'voucher_id';
+            $destinationAccount = VoucherRepository::getDefaultVoucherForAccount($payment->account_id)['id'];
+        } else {
+            $sourceAccount = $payment->destination_data['voucher_id'];
+            $destinationIdField = 'float_account_id';
+            $destinationAccount = FloatAccount::firstWhere('account_id', $payment->account_id)->id;
+        }
+
+        if ($payment->type !== PaymentType::SIDOOH) {
+            [$payment->type, $payment->subtype] = PaymentMethod::VOUCHER->getTypeAndSubtype();
+        }
+
+        try {
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $payment->account_id,
+                    $payment->amount,
+                    $payment->destination_type,
+                    $payment->destination_subtype,
+                    Description::PAYMENT_REVERSAL,
+                    $payment->reference,
+                    $sourceAccount,
+                    false,
+                    $payment->type,
+                    $payment->subtype,
+                    [$destinationIdField => $destinationAccount, 'payment_id' => $payment->id]
+                )
+            );
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment), 'Payment Reversal Requested.');
+        } catch (MpesaException $e) {
+            Log::critical($e);
+        } catch (HttpException $err) {
+            Log::error($err);
+
+            return $this->errorResponse($err->getMessage(), $err->getStatusCode());
+        } catch (Exception|Throwable|Error $err) {
+            if ($err->getCode() === 422) {
+                return $this->errorResponse($err->getMessage(), $err->getCode());
+            }
+
+            Log::error($err);
+        }
+
+        return $this->errorResponse('Failed to process payment request.');
+    }
+
+    public function retryCallback(Payment $payment): JsonResponse
+    {
+        if ($payment->status !== Status::COMPLETED) {
+            return $this->errorResponse('There is a problem with this transaction - Status. Contact Support.');
+        }
+
+        SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+
+        return $this->successResponse($payment->refresh());
+    }
 
     public function merchant(MerchantPaymentRequest $request): JsonResponse
     {
@@ -151,9 +216,11 @@ class PaymentController extends Controller
             $merchantType = MerchantType::from($request->merchant_type);
             [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
 
-            $destination = $merchantType === MerchantType::MPESA_PAY_BILL ?
-                $request->only('merchant_type', 'paybill_number', 'account_number') :
-                $request->only('merchant_type', 'till_number', 'account_number');
+            $destination = $merchantType === MerchantType::MPESA_PAY_BILL ? $request->only(
+                'merchant_type',
+                'paybill_number',
+                'account_number'
+            ) : $request->only('merchant_type', 'till_number', 'account_number');
 
             $repo = new PaymentRepository(
                 new PaymentDTO(
@@ -161,15 +228,14 @@ class PaymentController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->description,
+                    $request->enum('description', Description::class),
                     $request->reference,
                     $request->source_account,
                     false,
                     $type2,
                     $subtype2,
                     $destination
-                ),
-                $request->ipn
+                ), $request->ipn
             );
 
             $payment = $repo->processPayment();
@@ -188,7 +254,6 @@ class PaymentController extends Controller
 
         return $this->errorResponse('Failed to process payment request.');
     }
-
 
     public function withdraw(WithdrawalRequest $request): JsonResponse
     {
@@ -210,15 +275,14 @@ class PaymentController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->description,
+                    $request->enum('description', Description::class),
                     $request->reference,
                     $request->source_account,
                     false,
                     $type2,
                     $subtype2,
                     [$destination => $request->destination_account]
-                ),
-                $request->ipn
+                ), $request->ipn
             );
 
             $payment = $repo->processPayment();
@@ -238,6 +302,37 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
+    public function complete(Payment $payment): JsonResponse
+    {
+        // Check payment
+        if ($payment->status !== Status::PENDING) {
+            return $this->errorResponse('There is a problem with this transaction - Payment. Contact Support.');
+        }
+
+        $payment->update(['status' => Status::COMPLETED]);
+
+        if ($payment->ipn) {
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        }
+
+        return $this->successResponse($payment->refresh());
+    }
+
+    public function fail(Payment $payment): JsonResponse
+    {
+        // Check payment
+        if ($payment->status !== Status::PENDING) {
+            return $this->errorResponse('There is a problem with this transaction - Status. Contact Support.');
+        }
+
+        $payment->update(['status' => Status::FAILED]);
+
+        if ($payment->ipn) {
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        }
+
+        return $this->successResponse($payment->refresh());
+    }
 
     public function typeAndSubtype(string $type, string $subType): JsonResponse
     {
@@ -246,13 +341,13 @@ class PaymentController extends Controller
                 PaymentSubtype::B2B => $this->getB2BPayments(),
                 default             => throw new HttpException(422, "Unexpected sub-type $subType for type $type")
             },
-            PaymentType::MPESA => match (PaymentSubtype::tryFrom(strtoupper($subType))) {
+            PaymentType::MPESA  => match (PaymentSubtype::tryFrom(strtoupper($subType))) {
                 PaymentSubtype::B2C => $this->getB2CPayments(),
                 PaymentSubtype::STK => $this->getSTKPayments(),
                 PaymentSubtype::C2B => $this->getC2BPayments(),
                 default             => throw new HttpException(422, "Unexpected sub-type $subType for type $type"),
             },
-            default => throw new HttpException(422, "Unexpected payment type $type")
+            default             => throw new HttpException(422, "Unexpected payment type $type")
         };
     }
 
@@ -286,7 +381,7 @@ class PaymentController extends Controller
     public function getB2BPayments(): JsonResponse
     {
         $payments = Payment::whereDestinationType(PaymentType::TENDE)->whereDestinationSubtype(PaymentSubtype::B2B)
-            ->latest()->limit(100)->get();
+                           ->latest()->limit(100)->get();
 
         return $this->successResponse($payments);
     }

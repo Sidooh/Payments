@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
             'B2C'     => MpesaBulkPaymentRequest::class,
             'B2B'     => TendePayRequest::class,
 
-            'FLOAT' => FloatAccountTransaction::class,
+            'FLOAT'   => FloatAccountTransaction::class,
         ]);
     }
 }

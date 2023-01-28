@@ -23,7 +23,7 @@ class TendePayEventRepository
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        if ($payment->status !== Status::PENDING) {
             Log::error('Payment is not pending...', [$payment, $callback->request]);
 
             return;
@@ -31,7 +31,7 @@ class TendePayEventRepository
 
         // TODO: What if float was used? can it be used?
         DB::transaction(function() use ($payment) {
-            VoucherRepository::creditDefaultVoucherForAccount($payment->account_id, $payment->amount, Description::VOUCHER_REFUND->value);
+            VoucherRepository::creditDefaultVoucherForAccount($payment->account_id, $payment->amount, Description::VOUCHER_REFUND);
 
             $payment->update(['status' => Status::FAILED->name]);
 
@@ -43,7 +43,7 @@ class TendePayEventRepository
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        if ($payment->status !== Status::PENDING) {
             Log::error('Payment is not pending...', [$payment, $callback->request]);
 
             return;

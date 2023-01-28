@@ -25,11 +25,13 @@ class WithdrawalRequest extends PaymentRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     *
+     * @throws \Exception
      */
     public function rules(): array
     {
         return parent::rules() + [
-            'destination'         => ['required', new Enum(PaymentMethod::class)],
+            'destination'         => ['bail', 'required', new Enum(PaymentMethod::class)],
             'destination_account' => ['required', $this->destinationAccountRule()],
         ];
     }
