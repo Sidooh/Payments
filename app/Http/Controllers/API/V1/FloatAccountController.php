@@ -57,6 +57,9 @@ class FloatAccountController extends Controller
         return $this->successResponse($account);
     }
 
+    /**
+     * @throws \Exception
+     */
     public function show(Request $request, FloatAccount $floatAccount): JsonResponse
     {
         $relations = explode(',', $request->query('with'));

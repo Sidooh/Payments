@@ -42,9 +42,8 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::prefix('/{payment}')->group(function() {
             Route::middleware('throttle:api')->get('/', [PaymentController::class, 'show']);
 
-            Route::post('/check-payment', [PaymentController::class, 'checkPayment']);
             Route::post('/reverse', [PaymentController::class, 'reverse']);
-            Route::post('/retry', [PaymentController::class, 'retry']);
+            Route::post('/retry-callback', [PaymentController::class, 'retryCallback']);
             Route::post('/complete', [PaymentController::class, 'complete']);
             Route::post('/fail', [PaymentController::class, 'fail']);
         });

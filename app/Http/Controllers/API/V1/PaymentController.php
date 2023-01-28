@@ -14,6 +14,7 @@ use App\Http\Requests\MerchantPaymentRequest;
 use App\Http\Requests\PaymentRequest;
 use App\Http\Requests\WithdrawalRequest;
 use App\Http\Resources\PaymentResource;
+use App\Models\FloatAccount;
 use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
@@ -145,13 +146,13 @@ class PaymentController extends Controller
         Log::info('...[CTRL - PAYMENT]: Reverse...');
 
         if ($payment->destination_subtype === PaymentSubtype::FLOAT) {
-            $sourceAccount = 1;
+            $sourceAccount = $payment->destination_data['float_account_id'];
             $destinationIdField = 'voucher_id';
             $destinationAccount = VoucherRepository::getDefaultVoucherForAccount($payment->account_id)['id'];
         } else {
             $sourceAccount = $payment->destination_data['voucher_id'];
             $destinationIdField = 'float_account_id';
-            $destinationAccount = 1;
+            $destinationAccount = FloatAccount::firstWhere('account_id', $payment->account_id)->id;
         }
 
         if ($payment->type !== PaymentType::SIDOOH) {
@@ -195,7 +196,7 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
-    public function retry(Payment $payment): JsonResponse
+    public function retryCallback(Payment $payment): JsonResponse
     {
         if ($payment->status !== Status::COMPLETED) {
             return $this->errorResponse('There is a problem with this transaction - Status. Contact Support.');
@@ -301,13 +302,6 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
-    public function checkPayment(Payment $payment): JsonResponse
-    {
-        //  TODO: Implement this method.
-
-        return $this->successResponse($payment->refresh());
-    }
-
     public function complete(Payment $payment): JsonResponse
     {
         // Check payment
@@ -379,7 +373,7 @@ class PaymentController extends Controller
     public function getB2BPayments(): JsonResponse
     {
         $payments = Payment::whereDestinationType(PaymentType::TENDE)->whereDestinationSubtype(PaymentSubtype::B2B)
-            ->latest()->limit(100)->get();
+                           ->latest()->limit(100)->get();
 
         return $this->successResponse($payments);
     }
