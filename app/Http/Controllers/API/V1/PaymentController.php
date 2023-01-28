@@ -79,7 +79,7 @@ class PaymentController extends Controller
 
         if ($payment->destination_subtype === PaymentSubtype::B2C->name) {
             $payment->load([
-               'destinationProvider.response.parameter',
+               'destinationProvider.response.result',
             ]);
         }
 
