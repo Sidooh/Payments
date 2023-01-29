@@ -196,7 +196,7 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
-    public function retryCallback(Payment $payment): JsonResponse
+    public function retryPurchase(Payment $payment): JsonResponse
     {
         if ($payment->status !== Status::COMPLETED) {
             return $this->errorResponse('There is a problem with this transaction - Status. Contact Support.');
