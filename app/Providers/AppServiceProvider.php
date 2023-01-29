@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\FloatAccountTransaction;
 use App\Models\VoucherTransaction;
 use DrH\Mpesa\Entities\MpesaBulkPaymentRequest;
+use DrH\Mpesa\Entities\MpesaC2bCallback;
 use DrH\Mpesa\Entities\MpesaStkRequest;
 use DrH\TendePay\Models\TendePayRequest;
 use Illuminate\Database\Eloquent\Model;
@@ -50,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
             'STK'     => MpesaStkRequest::class,
             'VOUCHER' => VoucherTransaction::class,
             'B2C'     => MpesaBulkPaymentRequest::class,
+            'C2B'     => MpesaC2bCallback::class,
             'B2B'     => TendePayRequest::class,
 
             'FLOAT'   => FloatAccountTransaction::class,

@@ -100,7 +100,7 @@ class MpesaEventRepository
 
             $account = $payment->provider->floatAccount;
 
-            FloatAccountRepository::credit($account->id, $payment->amount, Description::VOUCHER_REFUND);
+            FloatAccountRepository::credit($account->id, $payment->amount, Description::VOUCHER_REFUND->value);
 
             $payment->update(['status' => Status::FAILED->name]);
 

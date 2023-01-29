@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\Description;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Enums\Status;
@@ -36,7 +35,6 @@ class Payment extends Model
 
     protected $casts = [
         'destination_data'    => 'array',
-        'description'         => Description::class,
         'type'                => PaymentType::class,
         'status'              => Status::class,
         'subtype'             => PaymentSubtype::class,

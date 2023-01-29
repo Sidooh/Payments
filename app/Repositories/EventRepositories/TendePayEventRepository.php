@@ -31,7 +31,7 @@ class TendePayEventRepository
 
         // TODO: What if float was used? can it be used?
         DB::transaction(function() use ($payment) {
-            VoucherRepository::creditDefaultVoucherForAccount($payment->account_id, $payment->amount, Description::VOUCHER_REFUND);
+            VoucherRepository::creditDefaultVoucherForAccount($payment->account_id, $payment->amount, Description::VOUCHER_REFUND->value);
 
             $payment->update(['status' => Status::FAILED->name]);
 

@@ -2,7 +2,6 @@
 
 namespace App\Repositories\SidoohRepositories;
 
-use App\Enums\Description;
 use App\Enums\TransactionType;
 use App\Models\FloatAccount;
 use App\Models\FloatAccountTransaction;
@@ -15,7 +14,7 @@ class FloatAccountRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function credit(int $id, int $amount, Description $description): FloatAccountTransaction
+    public static function credit(int $id, int $amount, string $description): FloatAccountTransaction
     {
         $account = FloatAccount::findOrFail($id);
 
@@ -34,7 +33,7 @@ class FloatAccountRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function debit(int $id, float $amount, Description $description): FloatAccountTransaction
+    public static function debit(int $id, float $amount, string $description): FloatAccountTransaction
     {
         $account = FloatAccount::findOrFail($id);
 
