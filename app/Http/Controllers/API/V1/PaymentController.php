@@ -32,6 +32,59 @@ use Throwable;
 
 class PaymentController extends Controller
 {
+    public function __invoke(PaymentRequest $request): JsonResponse
+    {
+        Log::info('...[CTRL - PAYMENT]: Invoke...', $request->all());
+
+        try {
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
+            [$destinationType, $destinationSubtype] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
+
+            $destinationData = match ($destinationSubtype) {
+                PaymentSubtype::FLOAT   => 'float_account_id',
+                PaymentSubtype::VOUCHER => 'voucher_id',
+                default                 => throw new HttpException(
+                    422, 'Only float account and voucher are supported for destination.'
+                )
+            };
+
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    $request->reference,
+                    $request->source_account,
+                    false,
+                    $destinationType,
+                    $destinationSubtype,
+                    [$destinationData => $request->destination_account]
+                ), $request->ipn
+            );
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
+            // TODO: Change to PaymentException - create one and use internally
+        } catch (MpesaException $e) {
+            Log::critical($e);
+        } catch (HttpException $err) {
+            Log::error($err);
+
+            return $this->errorResponse($err->getMessage(), $err->getStatusCode());
+        } catch (Exception|Throwable|Error $err) {
+            if ($err->getCode() === 422) {
+                return $this->errorResponse($err->getMessage(), $err->getCode());
+            }
+
+            Log::error($err);
+        }
+
+        return $this->errorResponse('Failed to process payment request.');
+    }
+
     public function index(Request $request): JsonResponse
     {
         $payments = Payment::latest();
@@ -86,59 +139,6 @@ class PaymentController extends Controller
         $payment->account = SidoohAccounts::find($payment->account_id);
 
         return $this->successResponse($payment);
-    }
-
-    public function __invoke(PaymentRequest $request): JsonResponse
-    {
-        Log::info('...[CTRL - PAYMENT]: Invoke...', $request->all());
-
-        try {
-            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
-            [$destinationType, $destinationSubtype] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
-
-            $destinationData = match ($destinationSubtype) {
-                PaymentSubtype::FLOAT   => 'float_account_id',
-                PaymentSubtype::VOUCHER => 'voucher_id',
-                default                 => throw new HttpException(
-                    422, 'Only float account and voucher are supported for destination.'
-                )
-            };
-
-            $repo = new PaymentRepository(
-                new PaymentDTO(
-                    $request->account_id,
-                    $request->amount,
-                    $type,
-                    $subtype,
-                    $request->description,
-                    $request->reference,
-                    $request->source_account,
-                    false,
-                    $destinationType,
-                    $destinationSubtype,
-                    [$destinationData => $request->destination_account]
-                ), $request->ipn
-            );
-
-            $payment = $repo->processPayment();
-
-            return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
-            // TODO: Change to PaymentException - create one and use internally
-        } catch (MpesaException $e) {
-            Log::critical($e);
-        } catch (HttpException $err) {
-            Log::error($err);
-
-            return $this->errorResponse($err->getMessage(), $err->getStatusCode());
-        } catch (Exception|Throwable|Error $err) {
-            if ($err->getCode() === 422) {
-                return $this->errorResponse($err->getMessage(), $err->getCode());
-            }
-
-            Log::error($err);
-        }
-
-        return $this->errorResponse('Failed to process payment request.');
     }
 
     public function reverse(Payment $payment): JsonResponse
