@@ -2,7 +2,6 @@
 
 namespace App\Repositories\SidoohRepositories;
 
-use App\Enums\Description;
 use App\Enums\TransactionType;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
@@ -23,7 +22,7 @@ class VoucherRepository
     /**
      * @throws \Throwable
      */
-    public static function creditDefaultVoucherForAccount(int $accountId, float $amount, Description $description): VoucherTransaction
+    public static function creditDefaultVoucherForAccount(int $accountId, float $amount, string $description): VoucherTransaction
     {
         $voucher = VoucherRepository::getDefaultVoucherForAccount($accountId);
 
@@ -33,7 +32,7 @@ class VoucherRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function credit(int $id, float $amount, Description $description): VoucherTransaction
+    public static function credit(int $id, float $amount, string $description): VoucherTransaction
     {
         $voucher = Voucher::findOrFail($id);
 
@@ -57,7 +56,7 @@ class VoucherRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function debit(int $id, float $amount, Description $description): VoucherTransaction
+    public static function debit(int $id, float $amount, string $description): VoucherTransaction
     {
         $voucher = Voucher::findOrFail($id);
 

@@ -67,7 +67,7 @@ class SidoohProvider implements PaymentContract
     private function voucher(): int
     {
         $voucherId = $this->paymentDTO->destinationData['voucher_id'];
-        $description = Description::tryFrom($this->paymentDTO->description) ?? Description::VOUCHER_PURCHASE;
+        $description = $this->paymentDTO->description ?? Description::VOUCHER_PURCHASE->value;
         $transaction = VoucherRepository::credit($voucherId, $this->paymentDTO->amount, $description);
 
         return $transaction->id;
@@ -79,7 +79,7 @@ class SidoohProvider implements PaymentContract
     private function float(): int
     {
         $accountId = $this->paymentDTO->destinationData['float_account_id'];
-        $description = Description::tryFrom($this->paymentDTO->description) ?? Description::FLOAT_PURCHASE;
+        $description = $this->paymentDTO->description ?? Description::FLOAT_PURCHASE->value;
         $transaction = FloatAccountRepository::credit($accountId, $this->paymentDTO->amount, $description);
 
         return $transaction->id;

@@ -110,7 +110,7 @@ class PaymentController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->enum('description', Description::class),
+                    $request->description,
                     $request->reference,
                     $request->source_account,
                     false,
@@ -149,10 +149,12 @@ class PaymentController extends Controller
             $sourceAccount = $payment->destination_data['float_account_id'];
             $destinationIdField = 'voucher_id';
             $destinationAccount = VoucherRepository::getDefaultVoucherForAccount($payment->account_id)['id'];
-        } else {
+        } elseif ($payment->destination_subtype === PaymentSubtype::VOUCHER) {
             $sourceAccount = $payment->destination_data['voucher_id'];
             $destinationIdField = 'float_account_id';
             $destinationAccount = FloatAccount::firstWhere('account_id', $payment->account_id)->id;
+        } else {
+            throw new HttpException(422, 'Irreversible payment.');
         }
 
         if ($payment->type !== PaymentType::SIDOOH) {
@@ -166,7 +168,7 @@ class PaymentController extends Controller
                     $payment->amount,
                     $payment->destination_type,
                     $payment->destination_subtype,
-                    Description::PAYMENT_REVERSAL,
+                    Description::PAYMENT_REVERSAL->value,
                     $payment->reference,
                     $sourceAccount,
                     false,
@@ -228,7 +230,7 @@ class PaymentController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->enum('description', Description::class),
+                    $request->description,
                     $request->reference,
                     $request->source_account,
                     false,
@@ -275,7 +277,7 @@ class PaymentController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->enum('description', Description::class),
+                    $request->description,
                     $request->reference,
                     $request->source_account,
                     false,
@@ -364,8 +366,7 @@ class PaymentController extends Controller
     public function getC2BPayments(): JsonResponse
     {
         $payments = Payment::whereSubtype(PaymentSubtype::C2B)->with([
-            'provider:id,status,reference,checkout_request_id,amount,phone,created_at',
-            'provider.response:id,checkout_request_id,result_desc,created_at',
+            'provider:id,transaction_type,trans_id,trans_amount,first_name,middle_name,last_name,msisdn,created_at',
         ])->latest()->limit(100)->get();
 
         return $this->successResponse($payments);

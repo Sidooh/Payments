@@ -2,7 +2,6 @@
 
 namespace App\DTOs;
 
-use App\Enums\Description;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Models\FloatAccount;
@@ -23,7 +22,7 @@ class PaymentDTO
         public readonly int $amount,
         public readonly PaymentType $type,
         public readonly PaymentSubtype $subtype,
-        public readonly Description|string $description,
+        public readonly string $description,
         public readonly ?string $reference,
         public readonly int $source,
         public bool $isWithdrawal = false,

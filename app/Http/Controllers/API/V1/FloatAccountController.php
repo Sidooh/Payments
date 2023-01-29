@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\DTOs\PaymentDTO;
-use App\Enums\Description;
 use App\Enums\Initiator;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
@@ -95,7 +94,7 @@ class FloatAccountController extends Controller
                     $request->amount,
                     $type,
                     $subtype,
-                    $request->enum('description', Description::class),
+                    $request->description,
                     $request->reference,
                     $request->source_account,
                     false,
