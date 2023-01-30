@@ -391,6 +391,6 @@ class PaymentController extends Controller
     {
         $exitCode = Artisan::call('mpesa:query_stk_status');
 
-        return $this->successResponse(['Status' => $exitCode]);
+        return $this->successResponse(['status' => $exitCode]);
     }
 }
