@@ -33,11 +33,6 @@ class MpesaEventRepository
         $payment->update(['status' => Status::FAILED->name]);
 
         SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
-//        SidoohService::sendCallback($payment->ipn, 'POST', [
-//            PaymentResource::make($payment),
-//            "code"    => $stkCallback->result_code,
-//            "message" => $stkCallback->result_desc,
-//        ]);
     }
 
     /**
@@ -55,7 +50,7 @@ class MpesaEventRepository
 
         //Complete payment
         if (! $payment->destination_type) {
-            $payment->update(['status' => Status::COMPLETED->name]);
+            $payment->update(['status' => Status::COMPLETED]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
 
@@ -72,7 +67,7 @@ class MpesaEventRepository
     {
         try {
             $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
-                ->firstOrFail();
+                              ->firstOrFail();
             if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
@@ -92,7 +87,7 @@ class MpesaEventRepository
     {
         try {
             $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
-                ->firstOrFail();
+                              ->firstOrFail();
 
             if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");

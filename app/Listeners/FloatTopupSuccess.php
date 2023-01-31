@@ -32,7 +32,7 @@ class FloatTopupSuccess
         Log::info('...[EVENT]: Float topped up...');
 
         try {
-            SidoohEventRepository::floatTopup($event->transaction);
+            SidoohEventRepository::floatTopUp($event->transaction);
         } catch (Exception $e) {
             Log::critical($e);
         }
