@@ -27,9 +27,9 @@ class SidoohEventRepository
             return;
         }
 
-        $payment->update(['status' => Status::COMPLETED->name]);
+        $payment->update(['status' => Status::COMPLETED]);
 
-        if ($payment->subtype === PaymentSubtype::STK->name) {
+        if ($payment->subtype === PaymentSubtype::STK) {
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
         }
     }
@@ -37,7 +37,7 @@ class SidoohEventRepository
     /**
      * @throws Throwable
      */
-    public static function floatTopup(FloatAccountTransaction $transaction): void
+    public static function floatTopUp(FloatAccountTransaction $transaction): void
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::FLOAT, $transaction->id)->firstOrFail();
 
