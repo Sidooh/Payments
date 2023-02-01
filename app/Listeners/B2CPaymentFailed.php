@@ -13,6 +13,8 @@ class B2CPaymentFailed
      *
      * @param  B2CPaymentFailedEvent  $event
      * @return void
+     *
+     * @throws \Throwable
      */
     public function handle(B2CPaymentFailedEvent $event): void
     {
