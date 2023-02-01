@@ -97,13 +97,9 @@ class MpesaEventRepository
 
             FloatAccountRepository::credit($account->id, $payment->amount, Description::VOUCHER_REFUND->value);
 
-            $payment->update(['status' => Status::FAILED->name]);
+            $payment->update(['status' => Status::FAILED]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
-//            SidoohService::sendCallback($payment->ipn, 'POST', [
-//                PaymentResource::make($payment),
-//                "message" => "Withdrawal to Mpesa failed",
-//            ]);
         } catch (Exception $e) {
             Log::error($e);
         }
