@@ -129,7 +129,7 @@ class PaymentController extends Controller
         }
 
         if ($payment->destination_subtype === PaymentSubtype::B2C) {
-            $payment->load('destinationProvider.response.result');
+            $payment->load('destinationProvider.response');
         }
 
         if ($payment->destination_subtype === PaymentSubtype::B2B) {
