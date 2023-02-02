@@ -21,35 +21,31 @@ class SidoohEventRepository
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::VOUCHER, $transaction->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
-            Log::critical('Payment is not pending...', [$payment, $transaction]);
-
-            return;
-        }
-
-        $payment->update(['status' => Status::COMPLETED->name]);
-
-        if ($payment->subtype === PaymentSubtype::STK->name) {
-            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
-        }
+        self::processEvent($transaction, $payment);
     }
 
     /**
      * @throws Throwable
      */
-    public static function floatTopup(FloatAccountTransaction $transaction): void
+    public static function floatTopUp(FloatAccountTransaction $transaction): void
     {
         $payment = Payment::whereDestinationProvider(PaymentSubtype::FLOAT, $transaction->id)->firstOrFail();
 
-        if ($payment->status !== Status::PENDING->name) {
+        self::processEvent($transaction, $payment);
+    }
+
+    public static function processEvent(VoucherTransaction|FloatAccountTransaction $transaction, Payment $payment): void
+    {
+        if ($payment->status !== Status::PENDING) {
             Log::critical('Payment is not pending...', [$payment, $transaction]);
 
             return;
         }
 
-        $payment->update(['status' => Status::COMPLETED->name]);
+        $payment->update(['status' => Status::COMPLETED]);
 
-        if ($payment->subtype === PaymentSubtype::STK->name)
+        if ($payment->subtype === PaymentSubtype::STK) {
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        }
     }
 }

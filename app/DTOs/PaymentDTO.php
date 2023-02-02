@@ -66,14 +66,14 @@ class PaymentDTO
         $dto = new PaymentDTO(
             $payment->account_id,
             $payment->amount,
-            PaymentType::tryFrom($payment->type),
-            PaymentSubtype::tryFrom($payment->subtype),
+            $payment->type,
+            $payment->subtype,
             $payment->description,
             $payment->reference,
             $payment->provider_id,
             true,
-            PaymentType::tryFrom($payment->destination_type),
-            PaymentSubtype::tryFrom($payment->destination_subtype),
+            $payment->destination_type,
+            $payment->destination_subtype,
             $payment->destination_data
         );
         $dto->payment = $payment;

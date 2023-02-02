@@ -54,7 +54,7 @@ class PaymentRepository
      */
     public function process(): array
     {
-        $pass = $this->transactions->every(fn($t) => $t['product_id'] === $this->firstTransaction['product_id']);
+        $pass = $this->transactions->every(fn ($t) => $t['product_id'] === $this->firstTransaction['product_id']);
         if (! $pass) {
             throw new Exception('Transactions mismatch on product', 422);
         }
@@ -63,7 +63,7 @@ class PaymentRepository
             PaymentMethod::MPESA   => $this->mpesa(),
             PaymentMethod::VOUCHER => $this->voucher(),
 //            PaymentMethod::FLOAT->name => $this->float(),
-            default => throw new Exception('Unsupported payment method!')
+            default                => throw new Exception('Unsupported payment method!')
         };
     }
 
@@ -90,7 +90,7 @@ class PaymentRepository
 
         // TODO: Improve with: Payment insert with return
         $data['payments'] = $paymentData->map(
-            fn($data) => Arr::only(
+            fn ($data) => Arr::only(
                 Payment::create($data)->toArray(),
                 ['id', 'amount', 'type', 'subtype', 'status', 'reference']
             )
@@ -119,7 +119,7 @@ class PaymentRepository
         };
 
         if ($productType === ProductType::VOUCHER) {
-            $pass = $this->transactions->every(fn($t) => isset($t['destination']) && SidoohAccounts::findByPhone($t['destination']));
+            $pass = $this->transactions->every(fn ($t) => isset($t['destination']) && SidoohAccounts::findByPhone($t['destination']));
             if (! $pass) {
                 throw new Exception('Transactions need destination to be valid', 422);
             }
@@ -142,7 +142,7 @@ class PaymentRepository
 
             // TODO: Improve with: Payment insert with return
             $data['payments'] = $paymentData->map(
-                fn($data) => Arr::only(
+                fn ($data) => Arr::only(
                     Payment::create($data)->toArray(),
                     ['id', 'amount', 'type', 'subtype', 'status', 'reference']
                 )
@@ -179,7 +179,7 @@ class PaymentRepository
 
     public function processB2b(MerchantType $merchantType, string $tillOrPaybill, string $accountNumber = ''): array
     {
-        $pass = $this->transactions->every(fn($t) => $t['product_id'] === $this->firstTransaction['product_id']);
+        $pass = $this->transactions->every(fn ($t) => $t['product_id'] === $this->firstTransaction['product_id']);
         if (! $pass) {
             throw new Exception('Transactions mismatch on product', 422);
         }
@@ -192,13 +192,13 @@ class PaymentRepository
             PaymentMethod::MPESA   => $this->mpesa(),
             PaymentMethod::VOUCHER => $this->voucher(),
 //            PaymentMethod::FLOAT->name => $this->float(),
-            default => throw new Exception('Unsupported payment method!')
+            default                => throw new Exception('Unsupported payment method!')
         };
     }
 
     public function getPaymentData(int $providerId, PaymentType $type, PaymentSubtype $subtype, Status $status = null): Collection
     {
-        return $this->transactions->map(fn($transaction) => [
+        return $this->transactions->map(fn ($transaction) => [
             'amount'      => $transaction['amount'],
             'type'        => $type->name,
             'subtype'     => $subtype->name,

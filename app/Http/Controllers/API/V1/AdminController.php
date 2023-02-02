@@ -11,7 +11,7 @@ class AdminController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return string
      *
      * @throws \Exception
@@ -22,5 +22,4 @@ class AdminController extends Controller
 
         return Artisan::output();
     }
-
 }

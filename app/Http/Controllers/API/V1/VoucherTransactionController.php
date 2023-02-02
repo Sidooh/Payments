@@ -22,6 +22,10 @@ class VoucherTransactionController extends Controller
             $transactions->with('voucher:id,account_id,voucher_type_id,balance');
         }
 
+        if (in_array('payment', $relations)) {
+            $transactions->with('payment');
+        }
+
         if ($id = $request->integer('account_id')) {
             $transactions->whereHas('voucher.voucherType', function(Builder $qry) use ($id) {
                 $qry->whereAccountId($id);

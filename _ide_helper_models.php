@@ -72,17 +72,17 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $amount
- * @property string $status
- * @property string $type
- * @property string $subtype
+ * @property \App\Enums\Status $status
+ * @property \App\Enums\PaymentType $type
+ * @property \App\Enums\PaymentSubtype $subtype
  * @property int $provider_id
- * @property string|null $description
+ * @property \App\Enums\Description|null $description
  * @property string|null $reference
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $account_id
- * @property string|null $destination_type
- * @property string|null $destination_subtype
+ * @property \App\Enums\PaymentType|null $destination_type
+ * @property \App\Enums\PaymentSubtype|null $destination_subtype
  * @property int|null $destination_provider_id
  * @property array|null $destination_data
  * @property string|null $ipn
@@ -119,7 +119,6 @@ namespace App\Models{
  * App\Models\Voucher
  *
  * @property int $id
- * @property string|null $type
  * @property int $balance
  * @property int $account_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -136,7 +135,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereVoucherTypeId($value)
  */

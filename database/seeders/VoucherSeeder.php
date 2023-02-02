@@ -16,7 +16,7 @@ class VoucherSeeder extends Seeder
     {
         Voucher::create([
             'balance'         => 5000,
-            'account_id'      => 6,
+            'account_id'      => 2,
             'voucher_type_id' => 1,
         ]);
 
