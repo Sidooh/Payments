@@ -19,4 +19,5 @@ enum Description: string
     case PAYMENT_REVERSAL = 'Payment Reversal';
 
     case ACCOUNT_WITHDRAWAL = 'Account Withdrawal';
+    case ACCOUNT_WITHDRAWAL_REFUND = 'Account Withdrawal Refund';
 }
