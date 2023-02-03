@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\V1\AdminController;
+use App\Http\Controllers\API\V1\ChargeController;
 use App\Http\Controllers\API\V1\DashboardController;
 use App\Http\Controllers\API\V1\FloatAccountController;
 use App\Http\Controllers\API\V1\FloatAccountTransactionController;
@@ -86,4 +87,8 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/', DashboardController::class);
         Route::get('/revenue-chart', [DashboardController::class, 'revenueChart']);
     });
+
+    //  UTILITIES
+    Route::get('/charges/withdrawal', [ChargeController::class, 'getWithdrawalCharges']);
+    Route::get('/charges/withdrawal/{amount}', [ChargeController::class, 'getWithdrawalChargeAmount']);
 });
