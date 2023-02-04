@@ -90,5 +90,5 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
 
     //  UTILITIES
     Route::get('/charges/withdrawal', [ChargeController::class, 'getWithdrawalCharges']);
-    Route::get('/charges/withdrawal/{amount}', [ChargeController::class, 'getWithdrawalChargeAmount']);
+    Route::get('/charges/withdrawal/{amount}', [ChargeController::class, 'getWithdrawalCharge']);
 });

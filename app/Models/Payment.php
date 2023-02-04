@@ -20,6 +20,7 @@ class Payment extends Model
     protected $fillable = [
         'account_id',
         'amount',
+        'charge',
         'status',
         'type',
         'subtype',
