@@ -58,14 +58,13 @@ class FloatAccountRepository
                     'type'        => TransactionType::CHARGE,
                     'description' => $description.' Charge',
                 ]);
-                $account->transactions()->create([
+
+                FloatAccount::findOrFail(1)->transactions()->create([
                     'amount'      => $charge,
                     'type'        => TransactionType::CREDIT,
                     'description' => $description.' Charge',
                     'extra'       => ['charge_transaction_id' => $chargeTransaction->id],
-                ]);
-
-                FloatAccount::whereKey(1)->increment('balance', $charge);
+                ])->floatAccount()->increment('balance', $charge);
 
                 $transaction['extra'] = ['charge_transaction_id' => $chargeTransaction->id];
             }
