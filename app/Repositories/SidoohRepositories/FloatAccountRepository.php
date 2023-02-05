@@ -33,7 +33,7 @@ class FloatAccountRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function debit(int $id, float $amount, string $description): FloatAccountTransaction
+    public static function debit(int $id, float $amount, string $description, int $charge = 0): FloatAccountTransaction
     {
         $account = FloatAccount::findOrFail($id);
 
@@ -42,15 +42,29 @@ class FloatAccountRepository
             throw new Exception('Insufficient float balance.', 422);
         }
 
-        return DB::transaction(function() use ($description, $amount, $account) {
-            $account->balance -= $amount;
+        return DB::transaction(function() use ($charge, $description, $amount, $account) {
+            $account->balance -= $amount + $charge;
             $account->save();
 
-            return $account->transactions()->create([
+            $transaction = $account->transactions()->create([
                 'amount'      => $amount,
                 'type'        => TransactionType::DEBIT,
                 'description' => $description,
             ]);
+
+            if ($charge > 0) {
+                $transaction->update([
+                    'extra' => [
+                        'charge_transaction_id' => $account->transactions()->create([
+                            'amount'      => $charge,
+                            'type'        => TransactionType::CHARGE,
+                            'description' => $description.' Charge',
+                        ])->id,
+                    ],
+                ]);
+            }
+
+            return $transaction;
         }, 2);
     }
 }

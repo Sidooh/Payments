@@ -38,3 +38,21 @@ if (! function_exists('withRelation')) {
         });
     }
 }
+
+if (! function_exists('withdrawal_charge')) {
+    /**
+     * @throws \Exception
+     */
+    function withdrawal_charge(int $amount): int
+    {
+        $charges = config('services.sidooh.charges.withdrawal');
+
+        $charge = Arr::first($charges, fn ($ch) => $ch['max'] > $amount && $ch['min'] <= $amount);
+
+        if (! $charge) {
+            throw new Exception('Withdrawal charge not found!');
+        }
+
+        return $charge['charge'];
+    }
+}

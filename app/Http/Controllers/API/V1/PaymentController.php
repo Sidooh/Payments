@@ -269,6 +269,7 @@ class PaymentController extends Controller
             $destination = match ($subtype2) {
                 PaymentSubtype::VOUCHER => 'voucher_id',
                 PaymentSubtype::B2C     => 'phone',
+                default                 => throw new Exception('Unexpected payment subtype'),
             };
 
             $repo = new PaymentRepository(
@@ -283,7 +284,8 @@ class PaymentController extends Controller
                     false,
                     $type2,
                     $subtype2,
-                    [$destination => $request->destination_account]
+                    [$destination => $request->destination_account],
+                    withdrawal_charge($request->amount)
                 ), $request->ipn
             );
 

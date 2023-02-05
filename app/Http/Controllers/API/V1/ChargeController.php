@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
-use Arr;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class ChargeController extends Controller
@@ -18,16 +18,14 @@ class ChargeController extends Controller
     /**
      * @throws \Exception
      */
-    public function getWithdrawalChargeAmount(int $amount): JsonResponse
+    public function getWithdrawalCharge(int $amount): JsonResponse
     {
-        $charges = config('services.sidooh.charges.withdrawal');
+        try {
+            $charge = withdrawal_charge($amount);
 
-        $charge = Arr::first($charges, fn ($ch) => $ch['max'] > $amount && $ch['min'] <= $amount);
-
-        if (! $charge) {
+            return $this->successResponse($charge);
+        } catch (Exception) {
             return $this->errorResponse('Invalid amount.', 422);
         }
-
-        return $this->successResponse($charge['charge']);
     }
 }
