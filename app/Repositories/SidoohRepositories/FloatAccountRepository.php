@@ -14,13 +14,17 @@ class FloatAccountRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function credit(int $id, int $amount, string $description): FloatAccountTransaction
+    public static function credit(int $id, int $amount, string $description, int $charge = 0): FloatAccountTransaction
     {
         $account = FloatAccount::findOrFail($id);
 
-        return DB::transaction(function() use ($description, $amount, $account) {
-            $account->balance += $amount;
+        return DB::transaction(function() use ($charge, $description, $amount, $account) {
+            $account->balance += $amount + $charge;
             $account->save();
+
+            if ($charge > 0) {
+                FloatAccount::findOrFail(1)->floatAccount()->decrement('balance', $charge);
+            }
 
             return $account->transactions()->create([
                 'amount'      => $amount,
