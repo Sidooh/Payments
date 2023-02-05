@@ -26,12 +26,12 @@ class FloatAccountRepository
                 FloatAccount::findOrFail(1)->transactions()->create([
                     'amount'      => $charge,
                     'type'        => TransactionType::DEBIT,
-                    'description' => $description.' Charge',
+                    'description' => $description.' Charge Refund',
                 ])->floatAccount()->decrement('balance', $charge);
             }
 
             return $account->transactions()->create([
-                'amount'      => $amount,
+                'amount'      => $amount + $charge,
                 'type'        => TransactionType::CREDIT,
                 'description' => $description,
             ]);
