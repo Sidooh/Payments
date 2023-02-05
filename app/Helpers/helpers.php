@@ -22,6 +22,9 @@ if (! function_exists('base_64_url_encode')) {
 }
 
 if (! function_exists('withRelation')) {
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
     function withRelation($relation, $parentRecords, $parentKey, $childKey)
     {
         $childRecords = match ($relation) {
