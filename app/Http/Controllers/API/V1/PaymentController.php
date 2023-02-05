@@ -151,7 +151,7 @@ class PaymentController extends Controller
         } elseif ($payment->destination_subtype === PaymentSubtype::VOUCHER) {
             $sourceAccount = $payment->destination_data['voucher_id'];
             $destinationIdField = 'float_account_id';
-            $destinationAccount = $payment->provider()->float_account_id;
+            $destinationAccount = $payment->provider->float_account_id;
         } else {
             throw new HttpException(422, 'Irreversible payment.');
         }
