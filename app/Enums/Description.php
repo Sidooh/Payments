@@ -20,4 +20,5 @@ enum Description: string
 
     case ACCOUNT_WITHDRAWAL = 'Account Withdrawal';
     case ACCOUNT_WITHDRAWAL_REFUND = 'Account Withdrawal Refund';
+    case ACCOUNT_WITHDRAWAL_CHARGE_REFUND = 'Account Withdrawal Charge Refund';
 }
