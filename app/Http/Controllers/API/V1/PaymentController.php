@@ -14,7 +14,6 @@ use App\Http\Requests\MerchantPaymentRequest;
 use App\Http\Requests\PaymentRequest;
 use App\Http\Requests\WithdrawalRequest;
 use App\Http\Resources\PaymentResource;
-use App\Models\FloatAccount;
 use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
@@ -152,7 +151,7 @@ class PaymentController extends Controller
         } elseif ($payment->destination_subtype === PaymentSubtype::VOUCHER) {
             $sourceAccount = $payment->destination_data['voucher_id'];
             $destinationIdField = 'float_account_id';
-            $destinationAccount = FloatAccount::firstWhere('account_id', $payment->account_id)->id;
+            $destinationAccount = $payment->destinationProvider()->floatAccount()->id;
         } else {
             throw new HttpException(422, 'Irreversible payment.');
         }
