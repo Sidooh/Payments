@@ -84,8 +84,13 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
     public function index(Request $request): JsonResponse
     {
+        $relations = explode(',', $request->query('with'));
+
         $payments = Payment::latest();
 
         if ($request->has('status') && $status = Status::tryFrom($request->status)) {
@@ -93,6 +98,10 @@ class PaymentController extends Controller
         }
 
         $payments = $payments->limit(1000)->get();
+
+        if (in_array('account', $relations)) {
+            $payments = withRelation('account', $payments, 'account_id', 'id');
+        }
 
         return $this->successResponse($payments);
     }
@@ -135,7 +144,9 @@ class PaymentController extends Controller
             $payment->load('destinationProvider.callback');
         }
 
-        $payment->account = SidoohAccounts::find($payment->account_id);
+        if ($payment->account_id) {
+            $payment->account = $payment->account_id && SidoohAccounts::find($payment->account_id);
+        }
 
         return $this->successResponse($payment);
     }

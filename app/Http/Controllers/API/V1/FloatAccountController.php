@@ -72,7 +72,7 @@ class FloatAccountController extends Controller
         }
 
         if (in_array('account', $relations)) {
-            $floatAccount->account = SidoohAccounts::find($floatAccount->account_id, true);
+            $floatAccount->account = SidoohAccounts::find($floatAccount->account_id);
         }
 
         return $this->successResponse($floatAccount);

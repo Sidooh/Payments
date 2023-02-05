@@ -50,7 +50,7 @@ class VoucherController extends Controller
         }
 
         if (in_array('account', $relations)) {
-            $voucher->account = SidoohAccounts::find($voucher->account_id, true);
+            $voucher->account = SidoohAccounts::find($voucher->account_id);
         }
 
         return $this->successResponse($voucher->toArray());
