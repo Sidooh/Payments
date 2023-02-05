@@ -2,6 +2,7 @@
 
 namespace App\Repositories\SidoohRepositories;
 
+use App\Enums\Description;
 use App\Enums\TransactionType;
 use App\Models\FloatAccount;
 use App\Models\FloatAccountTransaction;
@@ -26,7 +27,7 @@ class FloatAccountRepository
                 FloatAccount::findOrFail(1)->transactions()->create([
                     'amount'      => $charge,
                     'type'        => TransactionType::DEBIT,
-                    'description' => $description.' Charge Refund',
+                    'description' => Description::ACCOUNT_WITHDRAWAL_CHARGE_REFUND->value,
                 ])->floatAccount()->decrement('balance', $charge);
             }
 
