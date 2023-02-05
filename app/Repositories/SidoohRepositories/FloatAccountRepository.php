@@ -23,7 +23,11 @@ class FloatAccountRepository
             $account->save();
 
             if ($charge > 0) {
-                FloatAccount::findOrFail(1)->floatAccount()->decrement('balance', $charge);
+                FloatAccount::findOrFail(1)->transactions()->create([
+                    'amount'      => $charge,
+                    'type'        => TransactionType::DEBIT,
+                    'description' => $description.' Charge',
+                ])->floatAccount()->decrement('balance', $charge);
             }
 
             return $account->transactions()->create([
