@@ -46,25 +46,31 @@ class FloatAccountRepository
             $account->balance -= $amount + $charge;
             $account->save();
 
-            $transaction = $account->transactions()->create([
+            $transaction = [
                 'amount'      => $amount,
                 'type'        => TransactionType::DEBIT,
                 'description' => $description,
-            ]);
+            ];
 
             if ($charge > 0) {
-                $transaction->update([
-                    'extra' => [
-                        'charge_transaction_id' => $account->transactions()->create([
-                            'amount'      => $charge,
-                            'type'        => TransactionType::CHARGE,
-                            'description' => $description.' Charge',
-                        ])->id,
-                    ],
+                $chargeTransaction = $account->transactions()->create([
+                    'amount'      => $charge,
+                    'type'        => TransactionType::CHARGE,
+                    'description' => $description.' Charge',
                 ]);
+                $account->transactions()->create([
+                    'amount'      => $charge,
+                    'type'        => TransactionType::CREDIT,
+                    'description' => $description.' Charge',
+                    'extra'       => ['charge_transaction_id' => $chargeTransaction->id],
+                ]);
+
+                FloatAccount::whereKey(1)->increment('balance', $charge);
+
+                $transaction['extra'] = ['charge_transaction_id' => $chargeTransaction->id];
             }
 
-            return $transaction;
+            return $account->transactions()->create($transaction);
         }, 2);
     }
 }
