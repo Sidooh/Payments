@@ -30,7 +30,7 @@ class MpesaEventRepository
             return;
         }
 
-        $payment->update(['status' => Status::FAILED->name]);
+        $payment->update(['status' => Status::FAILED]);
 
         SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
     }
@@ -72,7 +72,7 @@ class MpesaEventRepository
                 throw new Error("Payment is not pending... - $payment->id");
             }
 
-            $payment->update(['status' => Status::COMPLETED->name]);
+            $payment->update(['status' => Status::COMPLETED]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
         } catch (Exception $e) {
