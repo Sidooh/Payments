@@ -2,6 +2,7 @@
 
 namespace App\Repositories\SidoohRepositories;
 
+use App\Enums\Status;
 use App\Enums\TransactionType;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
@@ -59,6 +60,10 @@ class VoucherRepository
     public static function debit(int $id, float $amount, string $description): VoucherTransaction
     {
         $voucher = Voucher::findOrFail($id);
+
+        if ($voucher->status !== Status::ACTIVE) {
+            throw new Exception('Voucher is inactive.');
+        }
 
         // TODO: Return proper response/ create specific error type, rather than throwing error
         if ($voucher->balance < $amount) {
