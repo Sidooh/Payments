@@ -145,7 +145,7 @@ class PaymentController extends Controller
         }
 
         if ($payment->account_id) {
-            $payment->account = $payment->account_id && SidoohAccounts::find($payment->account_id);
+            $payment->account = SidoohAccounts::find($payment->account_id);
         }
 
         return $this->successResponse($payment);
