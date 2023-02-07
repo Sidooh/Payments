@@ -23,13 +23,13 @@ class SidoohAccounts extends SidoohService
     /**
      * @throws Exception
      */
-    public static function find(int|string $id, $withUser = false): array
+    public static function find(int|string $id): array
     {
         Log::info('...[SRV - ACCOUNTS]: Find...', ['id' => $id]);
 
-        $url = config('services.sidooh.services.accounts.url')."/accounts/$id?with_user=".$withUser;
+        $url = config('services.sidooh.services.accounts.url')."/accounts/$id?with_user=true";
 
-        $acc = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));
+        $acc = Cache::remember($id, (60 * 60 * 24), fn () => parent::fetch($url));
 
         if (! $acc) {
             throw new Exception("Account doesn't exist!");

@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Log;
 
 class FloatAccountController extends Controller
 {
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
     public function index(Request $request): JsonResponse
     {
         $relations = explode(',', $request->query('with'));
@@ -69,7 +72,7 @@ class FloatAccountController extends Controller
         }
 
         if (in_array('account', $relations)) {
-            $floatAccount->account = SidoohAccounts::find($floatAccount->account_id, true);
+            $floatAccount->account = SidoohAccounts::find($floatAccount->account_id);
         }
 
         return $this->successResponse($floatAccount);
