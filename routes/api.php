@@ -59,6 +59,8 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/', [VoucherController::class, 'index']);
         Route::post('/', [VoucherController::class, 'store']);
         Route::get('/{voucher}', [VoucherController::class, 'show']);
+        Route::put('/{voucher}/activate', [VoucherController::class, 'activate']);
+        Route::put('/{voucher}/deactivate', [VoucherController::class, 'deactivate']);
     });
 
     Route::prefix('/voucher-transactions')->group(function() {
