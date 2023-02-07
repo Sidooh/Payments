@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Log;
 
 class SidoohNotify extends SidoohService
 {
-    public static function notify(array $to, string $message, EventType $eventType)
+    public static function notify(array|string|int $to, string $message, EventType $eventType)
     {
         Log::info('...[SRV - NOTIFY]: Send Notification...', [
             'channel'     => 'SMS',
             'event_type'  => $eventType->value,
-            'destination' => implode(', ', $to),
+            'destination' => is_array($to) ? implode(', ', $to) : $to,
             'content'     => $message,
         ]);
 
