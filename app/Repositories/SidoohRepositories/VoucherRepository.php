@@ -62,7 +62,7 @@ class VoucherRepository
         $voucher = Voucher::findOrFail($id);
 
         if ($voucher->status !== Status::ACTIVE) {
-            throw new Exception('Voucher is inactive.');
+            throw new Exception('Voucher is inactive.', 400);
         }
 
         // TODO: Return proper response/ create specific error type, rather than throwing error

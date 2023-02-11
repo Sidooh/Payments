@@ -79,9 +79,9 @@ class VoucherController extends Controller
         $account = SidoohAccounts::find($voucher->account_id);
 
         $message = 'Hi'.($account['user']['name'] ? ' '.$account['user']['name'] : '');
-        $message .= ",\nYour voucher has temporarily been suspended. We shall notify you once it has been reactivated.\nSorry for the inconvenience.";
+        $message .= ",\nYour voucher has been activated. \n\n".config('sidooh.tagline');
 
-        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_DEACTIVATED);
+        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_ACTIVATED);
 
         return $this->successResponse($voucher);
     }
@@ -100,7 +100,7 @@ class VoucherController extends Controller
         $account = SidoohAccounts::find($voucher->account_id);
 
         $message = 'Hi'.($account['user']['name'] ? ' '.$account['user']['name'] : '');
-        $message .= ",\nYour voucher has been activated. \n\n".config('sidooh.tagline');
+        $message .= ",\nYour voucher has temporarily been suspended. We shall notify you once it has been reactivated.\nSorry for the inconvenience.";
 
         SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_DEACTIVATED);
 
