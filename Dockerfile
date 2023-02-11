@@ -1,41 +1,22 @@
-FROM php:8.1-apache
+FROM composer:2.2 as build
 
-# Install system libraries
-RUN apt-get update -y && apt-get install -y \
-    build-essential \
-    libicu-dev \
-    zlib1g-dev \
-    libmemcached-dev \
-    zip \
-    unzip
+COPY . /app
 
-# Install docker dependencies
-RUN apt-get install -y libc-client-dev libkrb5-dev \
-    && pecl install memcached-3.1.5 \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install intl \
-    && docker-php-ext-install sockets \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-enable memcached
+# TODO: Return --no-dev for production (removed for us to use clockwork in playdooh)
+RUN composer install --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-reqs --no-progress
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+FROM trafex/php-nginx as production
 
-# Download composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Configure nginx
+COPY --from=build /app/docker/nginx/ /etc/nginx/
 
-# Define working directory
-WORKDIR /home/app
+# Configure supervisord
+COPY --from=build /app/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy project
-COPY . /home/app
+COPY --chown=nobody --from=build /app /var/www/html
 
-# Run composer install && update
-RUN composer install
-#RUN php /home/app/artisan queue:work --verbose --sleep=3 --tries=3 &
-
-# Expose the port
-EXPOSE 8080
-
-# Start artisan
-CMD php artisan serve --host=0.0.0.0 --port=8080
+# Cache configs
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan event:cache
