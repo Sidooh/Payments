@@ -4,6 +4,7 @@ namespace App\Repositories\EventRepositories;
 
 use App\DTOs\PaymentDTO;
 use App\Enums\Description;
+use App\Enums\PaymentCodes;
 use App\Enums\PaymentSubtype;
 use App\Enums\Status;
 use App\Http\Resources\PaymentResource;
@@ -32,7 +33,16 @@ class MpesaEventRepository
 
         $payment->update(['status' => Status::FAILED]);
 
-        SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        $x = (object) $payment->toArray();
+
+        [$x->error_code, $x->error_message] = match ($stkCallback->result_code) {
+            1, '1' => [PaymentCodes::MPESA_INSUFFICIENT_BALANCE, 'Mpesa - Insufficient balance'],
+            1031, 1032, '1031', '1032' => [PaymentCodes::MPESA_CANCELLED, 'Mpesa - Cancelled'],
+            1037, '1037' => [PaymentCodes::MPESA_TIMEOUT, 'Mpesa - Timed out'],
+            default => [PaymentCodes::MPESA_FAILED, 'Mpesa - Failed']
+        };
+
+        SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($x));
     }
 
     /**
