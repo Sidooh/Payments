@@ -74,7 +74,7 @@ class PaymentController extends Controller
 
             return $this->errorResponse($err->getMessage(), $err->getStatusCode());
         } catch (Exception|Throwable|Error $err) {
-            if ($err->getCode() === 422) {
+            if ($err->getCode() === 422 || $err->getCode() === 400) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
             }
 
