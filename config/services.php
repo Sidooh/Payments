@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'mailgun' => [
+    'mailgun'  => [
         'domain'   => env('MAILGUN_DOMAIN'),
         'secret'   => env('MAILGUN_SECRET'),
         'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
@@ -24,16 +24,16 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
-    'ses' => [
+    'ses'      => [
         'key'    => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'sidooh' => [
-        'jwt_key'            => env('JWT_KEY'),
-        'tagline'            => 'Sidooh, Makes You Money with Every Purchase.',
-        'mpesa'              => [
+    'sidooh'   => [
+        'jwt_key'      => env('JWT_KEY'),
+        'tagline'      => 'Sidooh, Makes You Money with Every Purchase.',
+        'mpesa'        => [
             'env' => 'local',
             'b2c' => [
                 'phone'      => '254708374149',
@@ -41,8 +41,8 @@ return [
                 'max_amount' => '70000',
             ],
         ],
-        'country_code'       => env('COUNTRY_CODE', 'KE'),
-        'services'           => [
+        'country_code' => env('COUNTRY_CODE', 'KE'),
+        'services'     => [
             'notify'   => [
                 'enabled' => true,
                 'url'     => env('SIDOOH_NOTIFY_API_URL'),
@@ -55,11 +55,24 @@ return [
                 'enabled' => true,
                 'url'     => env('SIDOOH_PRODUCTS_API_URL'),
             ],
-            'savings' => [
+            'savings'  => [
                 'enabled' => true,
                 'url'     => env('SIDOOH_SAVINGS_API_URL'),
             ],
         ],
+        'charges'      => [
+            'withdrawal' => [
+                [
+                    'min'    => 50,
+                    'max'    => 1000,
+                    'charge' => 50,
+                ],
+                [
+                    'min'    => 1000,
+                    'max'    => 10000,
+                    'charge' => 100,
+                ],
+            ],
+        ],
     ],
-
 ];

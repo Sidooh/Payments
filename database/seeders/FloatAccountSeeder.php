@@ -12,11 +12,16 @@ class FloatAccountSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         FloatAccount::create([
             'account_id'     => 1,
             'floatable_id'   => 1,
+            'floatable_type' => 'ENTERPRISE',
+        ]);
+        FloatAccount::create([
+            'account_id'     => 2,
+            'floatable_id'   => 2,
             'floatable_type' => 'ENTERPRISE',
         ]);
     }

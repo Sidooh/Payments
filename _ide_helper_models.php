@@ -46,6 +46,7 @@ namespace App\Models{
  * @property \App\Enums\TransactionType $type
  * @property int $amount
  * @property string $description
+ * @property array|null $extra
  * @property int $float_account_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -58,6 +59,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereExtra($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereFloatAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccountTransaction whereType($value)
@@ -72,11 +74,12 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $amount
+ * @property int $charge
  * @property \App\Enums\Status $status
  * @property \App\Enums\PaymentType $type
  * @property \App\Enums\PaymentSubtype $subtype
  * @property int $provider_id
- * @property \App\Enums\Description|null $description
+ * @property string|null $description
  * @property string|null $reference
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -94,6 +97,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Payment query()
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereCharge($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationData($value)
@@ -120,6 +124,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property int $balance
+ * @property \App\Enums\Status $status
  * @property int $account_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -135,6 +140,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Voucher whereVoucherTypeId($value)
  */

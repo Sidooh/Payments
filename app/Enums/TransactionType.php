@@ -10,4 +10,5 @@ enum TransactionType: string
 
     case DEBIT = 'DEBIT';
     case CREDIT = 'CREDIT';
+    case CHARGE = 'CHARGE';
 }

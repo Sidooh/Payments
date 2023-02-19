@@ -23,7 +23,7 @@ class StkPaymentFailed
      * @param  StkPushPaymentFailedEvent  $event
      * @return void
      */
-    public function handle(StkPushPaymentFailedEvent $event)
+    public function handle(StkPushPaymentFailedEvent $event): void
     {
         Log::info('...[EVENT]: STK Payment Failed...', [
             'result_description' => $event->stkCallback->result_desc,
