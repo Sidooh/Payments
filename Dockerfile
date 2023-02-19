@@ -26,8 +26,8 @@ WORKDIR /home/app
 COPY --from=build /app /home/app
 
 # Cache configs
-RUN php artisan config:cache \
-    && php artisan route:cache
+#RUN php artisan config:cache \
+#    && php artisan route:cache
 
 # Expose the port
 EXPOSE 8080
