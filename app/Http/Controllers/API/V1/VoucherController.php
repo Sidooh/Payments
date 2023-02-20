@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Enums\Description;
 use App\Enums\EventType;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVoucherRequest;
 use App\Models\Voucher;
+use App\Repositories\SidoohRepositories\VoucherRepository;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use Illuminate\Http\JsonResponse;
@@ -63,6 +65,25 @@ class VoucherController extends Controller
         ]);
 
         return $this->successResponse($voucher);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function credit(Request $request, Voucher $voucher): JsonResponse
+    {
+        $data = $request->validate([
+            'amount' => 'required|integer|min:10',
+        ]);
+
+        $vT = VoucherRepository::credit($voucher->id, $data['amount'], Description::VOUCHER_CREDIT);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function debit(Voucher $voucher): JsonResponse
+    {
     }
 
     /**
