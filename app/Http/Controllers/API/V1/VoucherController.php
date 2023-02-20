@@ -69,6 +69,7 @@ class VoucherController extends Controller
 
     /**
      * @throws \Exception
+     * @throws \Throwable
      */
     public function credit(Request $request, Voucher $voucher): JsonResponse
     {
@@ -76,14 +77,42 @@ class VoucherController extends Controller
             'amount' => 'required|integer|min:10',
         ]);
 
-        $vT = VoucherRepository::credit($voucher->id, $data['amount'], Description::VOUCHER_CREDIT);
+        $vt = VoucherRepository::credit($voucher->id, $data['amount'], Description::VOUCHER_CREDIT->value);
+
+        $account = SidoohAccounts::find($voucher->account_id);
+
+        $message = 'Hi'.($account['user']['name'] ? " {$account['user']['name']}," : ',');
+        $message .= "\nWe have added {$data['amount']} to your voucher. New voucher balance is {$vt->voucher->balance}. Use it in your next purchase.";
+
+        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
+
+        return $this->successResponse($voucher);
     }
 
     /**
      * @throws \Exception
+     * @throws \Throwable
      */
-    public function debit(Voucher $voucher): JsonResponse
+    public function debit(Request $request, Voucher $voucher): JsonResponse
     {
+        $data = $request->validate([
+            'amount' => 'required|integer|min:10',
+        ]);
+
+        $vt = VoucherRepository::debit($voucher->id, $data['amount'], Description::VOUCHER_DEBIT->value);
+
+        $account = SidoohAccounts::find($voucher->account_id);
+
+        $message = 'Hi'.($account['user']['name'] ? " {$account['user']['name']}," : ',');
+        $message .= "\nWe have deducted {$data['amount']} from your voucher. New voucher balance is {$vt->voucher->balance}. ";
+
+        if ($vt->voucher->balance > 19) {
+            $message .= 'Use it in your next purchase.';
+        }
+
+        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_DEBITED);
+
+        return $this->successResponse($voucher);
     }
 
     /**
