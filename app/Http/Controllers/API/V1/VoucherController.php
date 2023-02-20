@@ -16,6 +16,9 @@ use Illuminate\Http\Request;
 
 class VoucherController extends Controller
 {
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
     public function index(Request $request): JsonResponse
     {
         $relations = explode(',', $request->query('with'));
@@ -47,7 +50,7 @@ class VoucherController extends Controller
         $relations = explode(',', $request->query('with'));
 
         if (in_array('transactions', $relations)) {
-            $voucher->load('transactions:id,voucher_id,type,amount,description,created_at')->latest()->limit(100);
+            $voucher->load('transactions:id,voucher_id,type,amount,description,created_at')->limit(100);
         }
 
         if (in_array('account', $relations)) {
