@@ -75,18 +75,24 @@ class VoucherController extends Controller
     {
         $data = $request->validate([
             'amount' => 'required|integer|min:10',
+            'reason' => 'string',
         ]);
 
         $vt = VoucherRepository::credit($voucher->id, $data['amount'], Description::VOUCHER_CREDIT->value);
 
         $account = SidoohAccounts::find($voucher->account_id);
+        $amount = 'Ksh'.number_format($data['amount'], 2);
+        $date = $vt->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
 
-        $message = 'Hi'.($account['user']['name'] ? " {$account['user']['name']}," : ',');
-        $message .= "\nWe have added {$data['amount']} to your voucher. New voucher balance is {$vt->voucher->balance}. Use it in your next purchase.";
+        $message = "You have received $amount voucher ";
+        $message .= "from Sidooh account 254742066333 on $date.\n";
+        $message .= "New voucher balance is {$vt->voucher->balance}.\n\n";
+        $message .= "Dial *384*99# NOW for FREE on your Safaricom line to BUY AIRTIME or PAY BILLS & PAY USING the voucher received.\n\n";
+        $message .= config('services.sidooh.tagline');
 
         SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
 
-        return $this->successResponse($voucher);
+        return $this->successResponse($vt->voucher);
     }
 
     /**
@@ -104,11 +110,8 @@ class VoucherController extends Controller
         $account = SidoohAccounts::find($voucher->account_id);
 
         $message = 'Hi'.($account['user']['name'] ? " {$account['user']['name']}," : ',');
-        $message .= "\nWe have deducted {$data['amount']} from your voucher. New voucher balance is {$vt->voucher->balance}. ";
-
-        if ($vt->voucher->balance > 19) {
-            $message .= 'Use it in your next purchase.';
-        }
+        $message .= "\nWe have deducted {$data['amount']} from your voucher as a result of user over drawn. ";
+        $message .= "New voucher balance is {$vt->voucher->balance}.";
 
         SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_DEBITED);
 
