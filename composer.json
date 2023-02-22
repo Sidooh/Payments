@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.2",
         "drh/laravel-tendepay": "^1.2",
-        "drh/mpesa": "^2.3",
+        "drh/mpesa": "dev-main",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",

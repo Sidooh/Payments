@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6217b27c40c11cb678c8a90253be81f2",
+    "content-hash": "a21fa6b82d37880088edd56eae5999cb",
     "packages": [
         {
             "name": "brick/math",
@@ -847,7 +847,7 @@
         },
         {
             "name": "drh/mpesa",
-            "version": "v2.3.0",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/mpesa.git",
@@ -877,6 +877,7 @@
                 "phpunit/phpunit": "^9.5",
                 "squizlabs/php_codesniffer": "3.*"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -10155,7 +10156,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "drh/mpesa": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
