@@ -74,7 +74,7 @@ class PaymentController extends Controller
 
             return $this->errorResponse($err->getMessage(), $err->getStatusCode());
         } catch (Exception|Throwable|Error $err) {
-            if ($err->getCode() === 422) {
+            if ($err->getCode() === 422 || $err->getCode() === 400) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
             }
 
@@ -84,8 +84,13 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
     public function index(Request $request): JsonResponse
     {
+        $relations = explode(',', $request->query('with'));
+
         $payments = Payment::latest();
 
         if ($request->has('status') && $status = Status::tryFrom($request->status)) {
@@ -93,6 +98,10 @@ class PaymentController extends Controller
         }
 
         $payments = $payments->limit(1000)->get();
+
+        if (in_array('account', $relations)) {
+            $payments = withRelation('account', $payments, 'account_id', 'id');
+        }
 
         return $this->successResponse($payments);
     }
@@ -135,7 +144,9 @@ class PaymentController extends Controller
             $payment->load('destinationProvider.callback');
         }
 
-        $payment->account = SidoohAccounts::find($payment->account_id);
+        if ($payment->account_id) {
+            $payment->account = SidoohAccounts::find($payment->account_id);
+        }
 
         return $this->successResponse($payment);
     }
@@ -268,6 +279,7 @@ class PaymentController extends Controller
             $destination = match ($subtype2) {
                 PaymentSubtype::VOUCHER => 'voucher_id',
                 PaymentSubtype::B2C     => 'phone',
+                default                 => throw new Exception('Unexpected payment subtype'),
             };
 
             $repo = new PaymentRepository(
@@ -282,7 +294,8 @@ class PaymentController extends Controller
                     false,
                     $type2,
                     $subtype2,
-                    [$destination => $request->destination_account]
+                    [$destination => $request->destination_account],
+                    withdrawal_charge($request->amount)
                 ), $request->ipn
             );
 

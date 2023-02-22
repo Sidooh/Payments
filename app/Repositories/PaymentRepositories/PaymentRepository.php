@@ -46,10 +46,12 @@ class PaymentRepository
             // TODO: Should we fire event on voucher debit then consume?
             //Handle internal payment requests by immediately paying to intended
             if (in_array($this->paymentData->subtype, [PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT])) {
-                if (in_array($this->paymentData->destinationSubtype, [PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT, PaymentSubtype::B2B, PaymentSubtype::B2C])) {
+                if (in_array(
+                    $this->paymentData->destinationSubtype,
+                    [PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT, PaymentSubtype::B2B, PaymentSubtype::B2C]
+                )) {
                     $repo = new PaymentRepository(
-                        PaymentDTO::fromPayment($payment->refresh()),
-                        $payment->ipn
+                        PaymentDTO::fromPayment($payment->refresh()), $payment->ipn
                     );
 
                     $repo->processPayment();
@@ -94,6 +96,7 @@ class PaymentRepository
             'destination_type'    => $this->paymentData->destinationType,
             'destination_subtype' => $this->paymentData->destinationSubtype,
             'destination_data'    => $this->paymentData->destinationData,
+            'charge'              => $this->paymentData->charge,
         ];
 
         return Payment::create($paymentData);

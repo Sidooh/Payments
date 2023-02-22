@@ -19,11 +19,13 @@ class FloatAccountTransaction extends Model
         'amount',
         'type',
         'description',
+        'extra',
     ];
 
     protected $casts = [
         'amount' => 'int',
         'type'   => TransactionType::class,
+        'extra'  => 'array',
     ];
 
     /**

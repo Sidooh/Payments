@@ -29,6 +29,7 @@ class PaymentDTO
         public readonly ?PaymentType $destinationType = null,
         public readonly ?PaymentSubtype $destinationSubtype = null,
         public readonly ?array $destinationData = null,
+        public readonly int $charge = 0,
     ) {
         $this->validate();
     }

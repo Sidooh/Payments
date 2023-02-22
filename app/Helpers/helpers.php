@@ -22,6 +22,9 @@ if (! function_exists('base_64_url_encode')) {
 }
 
 if (! function_exists('withRelation')) {
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
     function withRelation($relation, $parentRecords, $parentKey, $childKey)
     {
         $childRecords = match ($relation) {
@@ -36,5 +39,23 @@ if (! function_exists('withRelation')) {
 
             return $record;
         });
+    }
+}
+
+if (! function_exists('withdrawal_charge')) {
+    /**
+     * @throws \Exception
+     */
+    function withdrawal_charge(int $amount): int
+    {
+        $charges = config('services.sidooh.charges.withdrawal');
+
+        $charge = Arr::first($charges, fn ($ch) => $ch['max'] > $amount && $ch['min'] <= $amount);
+
+        if (! $charge) {
+            throw new Exception('Withdrawal charge not found!');
+        }
+
+        return $charge['charge'];
     }
 }

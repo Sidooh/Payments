@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Pint" type="ShConfigurationType">
+  <configuration default="false" name="pint" type="ShConfigurationType">
     <option name="SCRIPT_TEXT" value="./vendor/bin/pint -v  " />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />

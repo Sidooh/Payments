@@ -14,16 +14,24 @@ class FloatAccountRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function credit(int $id, int $amount, string $description): FloatAccountTransaction
+    public static function credit(int $id, int $amount, string $description, int $charge = 0): FloatAccountTransaction
     {
         $account = FloatAccount::findOrFail($id);
 
-        return DB::transaction(function() use ($description, $amount, $account) {
-            $account->balance += $amount;
+        return DB::transaction(function() use ($charge, $description, $amount, $account) {
+            $account->balance += $amount + $charge;
             $account->save();
 
+            if ($charge > 0) {
+                FloatAccount::findOrFail(1)->transactions()->create([
+                    'amount'      => $charge,
+                    'type'        => TransactionType::DEBIT,
+                    'description' => "$description CHARGE REFUND",
+                ])->floatAccount()->decrement('balance', $charge);
+            }
+
             return $account->transactions()->create([
-                'amount'      => $amount,
+                'amount'      => $amount + $charge,
                 'type'        => TransactionType::CREDIT,
                 'description' => $description,
             ]);
@@ -33,7 +41,7 @@ class FloatAccountRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function debit(int $id, float $amount, string $description): FloatAccountTransaction
+    public static function debit(int $id, float $amount, string $description, int $charge = 0): FloatAccountTransaction
     {
         $account = FloatAccount::findOrFail($id);
 
@@ -42,15 +50,34 @@ class FloatAccountRepository
             throw new Exception('Insufficient float balance.', 422);
         }
 
-        return DB::transaction(function() use ($description, $amount, $account) {
-            $account->balance -= $amount;
+        return DB::transaction(function() use ($charge, $description, $amount, $account) {
+            $account->balance -= $amount + $charge;
             $account->save();
 
-            return $account->transactions()->create([
+            $transaction = [
                 'amount'      => $amount,
                 'type'        => TransactionType::DEBIT,
                 'description' => $description,
-            ]);
+            ];
+
+            if ($charge > 0) {
+                $chargeTransaction = $account->transactions()->create([
+                    'amount'      => $charge,
+                    'type'        => TransactionType::CHARGE,
+                    'description' => $description.' Charge',
+                ]);
+
+                FloatAccount::findOrFail(1)->transactions()->create([
+                    'amount'      => $charge,
+                    'type'        => TransactionType::CREDIT,
+                    'description' => $description.' Charge',
+                    'extra'       => ['charge_transaction_id' => $chargeTransaction->id],
+                ])->floatAccount()->increment('balance', $charge);
+
+                $transaction['extra'] = ['charge_transaction_id' => $chargeTransaction->id];
+            }
+
+            return $account->transactions()->create($transaction);
         }, 2);
     }
 }
