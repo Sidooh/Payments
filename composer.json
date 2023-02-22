@@ -7,14 +7,13 @@
     "require": {
         "php": "^8.2",
         "drh/laravel-tendepay": "^1.2",
-        "drh/mpesa": "^2.2",
-        "fruitcake/laravel-cors": "^2.0.5",
+        "drh/mpesa": "^2.3",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^9.46",
-        "laravel/sanctum": "^2.15",
+        "laravel/framework": "^10.0",
+        "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.7",
-        "propaganistas/laravel-phone": "^4.4",
-        "sentry/sentry-laravel": "^2.14"
+        "propaganistas/laravel-phone": "^5.0",
+        "sentry/sentry-laravel": "^3.2"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
@@ -22,9 +21,9 @@
         "itsgoingd/clockwork": "^5.1",
         "laravel/pint": "^1.3",
         "mockery/mockery": "^1.5",
-        "nunomaduro/collision": "^6.4",
-        "phpunit/phpunit": "^9.5.26",
-        "spatie/laravel-ignition": "^1.6"
+        "nunomaduro/collision": "^7.0",
+        "phpunit/phpunit": "^10.0",
+        "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
         "psr-4": {
