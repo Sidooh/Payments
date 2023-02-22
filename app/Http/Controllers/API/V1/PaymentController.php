@@ -35,6 +35,14 @@ class PaymentController extends Controller
     {
         Log::info('...[CTRL - PAYMENT]: Invoke...', $request->all());
 
+        Log::emergency('Emergency Example');
+        Log::alert('Alert Example');
+        Log::critical('Critical Example');
+        Log::error('Error Example');
+        Log::warning('Warning Example');
+        Log::notice('Notice Example');
+        Log::debug('Debug Example');
+
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
             [$destinationType, $destinationSubtype] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
