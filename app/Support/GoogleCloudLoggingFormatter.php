@@ -8,7 +8,7 @@ use Monolog\LogRecord;
 
 class GoogleCloudLoggingFormatter extends JsonFormatter
 {
-    public function format(LogRecord $record): string
+    public function normalizeRecord(LogRecord $record): array
     {
         // Re-key level for GCP logging
         $record['severity'] = $record['level_name'];
@@ -17,6 +17,6 @@ class GoogleCloudLoggingFormatter extends JsonFormatter
         // Remove keys that are not used by GCP
         unset($record['level'], $record['level_name'], $record['datetime']);
 
-        return parent::format($record);
+        return parent::normalizeRecord($record);
     }
 }

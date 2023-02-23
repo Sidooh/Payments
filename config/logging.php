@@ -1,6 +1,6 @@
 <?php
 
-use App\Support\GoogleCloudLoggingFormatter;
+use Monolog\Formatter\GoogleCloudLoggingFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
