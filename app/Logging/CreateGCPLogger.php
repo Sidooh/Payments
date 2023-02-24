@@ -11,6 +11,6 @@ class CreateGCPLogger
      */
     public function __invoke(array $config): Logger
     {
-        return new Logger('gcr');
+        return new Logger('gcp');
     }
 }

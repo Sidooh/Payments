@@ -1,5 +1,6 @@
 <?php
 
+//use App\Support\GoogleCloudLoggingFormatter;
 use Monolog\Formatter\GoogleCloudLoggingFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
@@ -103,7 +104,8 @@ return [
             'driver'    => 'monolog',
             'level'     => env('LOG_LEVEL', 'debug'),
             'handler'   => StreamHandler::class,
-            'formatter' => env('LOG_STDERR_FORMATTER'),
+            //            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'formatter' => GoogleCloudLoggingFormatter::class,
             'with'      => [
                 'stream' => 'php://stderr',
             ],
