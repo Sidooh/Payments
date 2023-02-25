@@ -11,6 +11,7 @@ use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class VoucherController extends Controller
 {
@@ -42,6 +43,14 @@ class VoucherController extends Controller
      */
     public function show(Voucher $voucher, Request $request): JsonResponse
     {
+        Log::emergency('Emergency Example');
+        Log::alert('Alert Example');
+        Log::critical('Critical Example');
+        Log::error('Error Example');
+        Log::warning('Warning Example');
+        Log::notice('Notice Example');
+        Log::debug('Debug Example');
+
         $relations = explode(',', $request->query('with'));
 
         if (in_array('transactions', $relations)) {
@@ -79,9 +88,9 @@ class VoucherController extends Controller
         $account = SidoohAccounts::find($voucher->account_id);
 
         $message = 'Hi'.($account['user']['name'] ? ' '.$account['user']['name'] : '');
-        $message .= ",\nYour voucher has temporarily been suspended. We shall notify you once it has been reactivated.\nSorry for the inconvenience.";
+        $message .= ",\nYour voucher has been activated. \n\n".config('sidooh.tagline');
 
-        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_DEACTIVATED);
+        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_ACTIVATED);
 
         return $this->successResponse($voucher);
     }
@@ -100,7 +109,7 @@ class VoucherController extends Controller
         $account = SidoohAccounts::find($voucher->account_id);
 
         $message = 'Hi'.($account['user']['name'] ? ' '.$account['user']['name'] : '');
-        $message .= ",\nYour voucher has been activated. \n\n".config('sidooh.tagline');
+        $message .= ",\nYour voucher has temporarily been suspended. We shall notify you once it has been reactivated.\nSorry for the inconvenience.";
 
         SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_DEACTIVATED);
 

@@ -17,7 +17,7 @@ class PaymentResource extends JsonResource
      */
     public function toArray($request): array|JsonSerializable|Arrayable
     {
-        return [
+        $base = [
             'id'          => $this->id,
             'amount'      => $this->amount,
             'status'      => $this->status,
@@ -27,5 +27,12 @@ class PaymentResource extends JsonResource
             'reference'   => $this->reference,
             'destination' => $this->destination_data,
         ];
+
+        if (isset($this->error_code)) {
+            $base['error_code'] = $this->error_code;
+            $base['error_message'] = $this->error_message;
+        }
+
+        return $base;
     }
 }

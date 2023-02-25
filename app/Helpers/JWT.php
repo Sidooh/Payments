@@ -31,7 +31,7 @@ class JWT extends Guard
             $secret = config('services.sidooh.jwt_key');
 
             if (! isset($secret)) {
-                exit('Invalid JWT key!');
+                throw new Exception('Invalid JWT key! '.$secret);
             }
 
             // split the token
