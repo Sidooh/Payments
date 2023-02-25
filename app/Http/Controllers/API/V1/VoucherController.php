@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\DTOs\PaymentDTO;
 use App\Enums\Description;
 use App\Enums\EventType;
+use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVoucherRequest;
 use App\Models\Voucher;
-use App\Repositories\SidoohRepositories\VoucherRepository;
+use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use Illuminate\Http\JsonResponse;
@@ -81,21 +84,41 @@ class VoucherController extends Controller
             'reason' => 'string',
         ]);
 
-        $vt = VoucherRepository::credit($voucher->id, $data['amount'], Description::VOUCHER_CREDIT->value);
+        $repo = new PaymentRepository(
+            new PaymentDTO(
+                3,
+                $data['amount'],
+                PaymentType::SIDOOH,
+                PaymentSubtype::FLOAT,
+                Description::VOUCHER_CREDIT->value,
+                null,
+                1,
+                false,
+                PaymentType::SIDOOH,
+                PaymentSubtype::VOUCHER,
+                ['voucher_id' => $voucher->id]
+            )
+        );
 
-        $account = SidoohAccounts::find($voucher->account_id);
-        $amount = 'Ksh'.number_format($data['amount'], 2);
-        $date = $vt->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
+        $payment = $repo->processPayment();
+
+        $voucher = $voucher->refresh();
+
+        $account = SidoohAccounts::find(3);
+        $amount = 'Ksh'.number_format($payment->amount, 2);
+        $balance = 'Ksh'.number_format($voucher->balance, 2);
+        $date = $payment->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
 
         $message = "You have received $amount voucher ";
-        $message .= "from Sidooh account 254742066333 on $date.\n";
-        $message .= "New voucher balance is {$vt->voucher->balance}.\n\n";
+        $message .= "from Sidooh account {$account['phone']} on $date.\n";
+        $message .= "New voucher balance is $balance.\n\n";
         $message .= "Dial *384*99# NOW for FREE on your Safaricom line to BUY AIRTIME or PAY BILLS & PAY USING the voucher received.\n\n";
         $message .= config('services.sidooh.tagline');
 
+        $account = SidoohAccounts::find($voucher->account_id);
         SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
 
-        return $this->successResponse($vt->voucher);
+        return $this->successResponse($voucher, 'Payment Completed.');
     }
 
     /**
@@ -108,13 +131,33 @@ class VoucherController extends Controller
             'amount' => 'required|integer|min:10',
         ]);
 
-        $vt = VoucherRepository::debit($voucher->id, $data['amount'], Description::VOUCHER_DEBIT->value);
+        $repo = new PaymentRepository(
+            new PaymentDTO(
+                3,
+                $data['amount'],
+                PaymentType::SIDOOH,
+                PaymentSubtype::VOUCHER,
+                Description::VOUCHER_DEBIT->value,
+                null,
+                1,
+                false,
+                PaymentType::SIDOOH,
+                PaymentSubtype::FLOAT,
+                ['float_account_id' => 1]
+            )
+        );
+
+        $payment = $repo->processPayment();
+
+        $voucher = $voucher->refresh();
 
         $account = SidoohAccounts::find($voucher->account_id);
+        $amount = 'Ksh'.number_format($payment->amount, 2);
+        $balance = 'Ksh'.number_format($voucher->balance, 2);
 
         $message = 'Hi'.($account['user']['name'] ? " {$account['user']['name']}," : ',');
-        $message .= "\nWe have deducted {$data['amount']} from your voucher as a result of user over drawn. ";
-        $message .= "New voucher balance is {$vt->voucher->balance}.";
+        $message .= "\nWe have deducted $amount from your voucher as a result of user over drawn. ";
+        $message .= "New voucher balance is $balance.";
 
         SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_DEBITED);
 
