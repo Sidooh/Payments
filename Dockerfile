@@ -17,7 +17,7 @@ USER nobody
 COPY --from=build /app/docker/nginx/ /etc/nginx/
 
 # Configure PHP-FPM
-COPY --from=build /app/docker/fpm-pool.conf /etc/php81/php-fpm.d/www.conf
+#COPY --from=build /app/docker/fpm-pool.conf /etc/php81/php-fpm.d/www.conf
 
 # Configure supervisord
 COPY --from=build /app/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
