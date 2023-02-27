@@ -10,7 +10,8 @@ FROM trafex/php-nginx:3.0.0 as production
 USER root
 RUN apk add --no-cache \
   php81-pdo \
-  php81-pdo_mysql
+  php81-pdo_mysql \
+  php81-tokenizer
 USER nobody
 
 # Configure nginx
@@ -23,6 +24,6 @@ COPY --from=build /app/docker/supervisord.conf /etc/supervisor/conf.d/supervisor
 COPY --chown=nobody --from=build /app /var/www/html
 
 # Cache configs
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan event:cache
+#RUN php artisan config:cache \
+#    && php artisan route:cache \
+#    && php artisan event:cache
