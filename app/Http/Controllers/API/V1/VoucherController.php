@@ -14,6 +14,9 @@ use Illuminate\Http\Request;
 
 class VoucherController extends Controller
 {
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
     public function index(Request $request): JsonResponse
     {
         $relations = explode(',', $request->query('with'));
