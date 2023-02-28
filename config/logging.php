@@ -55,7 +55,6 @@ return [
             'level'             => env('LOG_LEVEL', 'debug'),
             'handler'           => StreamHandler::class,
             'formatter'         => GoogleCloudLoggingFormatter::class,
-            'via'               => App\Logging\CreateGCPLogger::class,
             'with'              => [
                 'stream' => 'php://stderr',
             ],
