@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVoucherRequest;
 use App\Models\Voucher;
 use App\Repositories\PaymentRepositories\PaymentRepository;
+use App\Rules\SidoohAccountExists;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use Illuminate\Http\JsonResponse;
@@ -80,13 +81,13 @@ class VoucherController extends Controller
     public function credit(Request $request, Voucher $voucher): JsonResponse
     {
         $data = $request->validate([
-            'amount' => 'required|integer|min:10',
-            'reason' => 'string',
+            'amount'     => 'required|integer|min:10',
+            'account_id' => ['required', 'integer', new SidoohAccountExists],
         ]);
 
         $repo = new PaymentRepository(
             new PaymentDTO(
-                3,
+                $data['account_id'],
                 $data['amount'],
                 PaymentType::SIDOOH,
                 PaymentSubtype::FLOAT,
@@ -104,7 +105,7 @@ class VoucherController extends Controller
 
         $voucher = $voucher->refresh();
 
-        $account = SidoohAccounts::find(3);
+        $account = SidoohAccounts::find($data['account_id']);
         $amount = 'Ksh'.number_format($payment->amount, 2);
         $balance = 'Ksh'.number_format($voucher->balance, 2);
         $date = $payment->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
@@ -128,12 +129,13 @@ class VoucherController extends Controller
     public function debit(Request $request, Voucher $voucher): JsonResponse
     {
         $data = $request->validate([
-            'amount' => 'required|integer|min:10',
+            'amount'     => 'required|integer|min:10',
+            'account_id' => ['required', 'integer', new SidoohAccountExists],
         ]);
 
         $repo = new PaymentRepository(
             new PaymentDTO(
-                3,
+                $data['account_id'],
                 $data['amount'],
                 PaymentType::SIDOOH,
                 PaymentSubtype::VOUCHER,
