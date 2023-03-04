@@ -2,19 +2,27 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\DTOs\PaymentDTO;
+use App\Enums\Description;
 use App\Enums\EventType;
+use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVoucherRequest;
 use App\Models\Voucher;
+use App\Repositories\PaymentRepositories\PaymentRepository;
+use App\Rules\SidoohAccountExists;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class VoucherController extends Controller
 {
+    /**
+     * @throws \Illuminate\Auth\AuthenticationException
+     */
     public function index(Request $request): JsonResponse
     {
         $relations = explode(',', $request->query('with'));
@@ -43,18 +51,10 @@ class VoucherController extends Controller
      */
     public function show(Voucher $voucher, Request $request): JsonResponse
     {
-        Log::emergency('Emergency Example');
-        Log::alert('Alert Example');
-        Log::critical('Critical Example');
-        Log::error('Error Example');
-        Log::warning('Warning Example');
-        Log::notice('Notice Example');
-        Log::debug('Debug Example');
-
         $relations = explode(',', $request->query('with'));
 
         if (in_array('transactions', $relations)) {
-            $voucher->load('transactions:id,voucher_id,type,amount,description,created_at')->latest()->limit(100);
+            $voucher->load('transactions:id,voucher_id,type,amount,description,created_at')->limit(100);
         }
 
         if (in_array('account', $relations)) {
@@ -70,6 +70,98 @@ class VoucherController extends Controller
             'account_id'      => $request->account_id,
             'voucher_type_id' => $request->voucher_type_id,
         ]);
+
+        return $this->successResponse($voucher);
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function credit(Request $request, Voucher $voucher): JsonResponse
+    {
+        $data = $request->validate([
+            'amount'     => 'required|integer|min:10',
+            'account_id' => ['required', 'integer', new SidoohAccountExists],
+        ]);
+
+        $repo = new PaymentRepository(
+            new PaymentDTO(
+                $data['account_id'],
+                $data['amount'],
+                PaymentType::SIDOOH,
+                PaymentSubtype::FLOAT,
+                Description::VOUCHER_CREDIT->value,
+                null,
+                1,
+                false,
+                PaymentType::SIDOOH,
+                PaymentSubtype::VOUCHER,
+                ['voucher_id' => $voucher->id]
+            )
+        );
+
+        $payment = $repo->processPayment();
+
+        $voucher = $voucher->refresh();
+
+        $account = SidoohAccounts::find($data['account_id']);
+        $amount = 'Ksh'.number_format($payment->amount, 2);
+        $balance = 'Ksh'.number_format($voucher->balance, 2);
+        $date = $payment->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
+
+        $message = "You have received $amount voucher ";
+        $message .= "from Sidooh account {$account['phone']} on $date.\n";
+        $message .= "New voucher balance is $balance.\n\n";
+        $message .= "Dial *384*99# NOW for FREE on your Safaricom line to BUY AIRTIME or PAY BILLS & PAY USING the voucher received.\n\n";
+        $message .= config('services.sidooh.tagline');
+
+        $account = SidoohAccounts::find($voucher->account_id);
+        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
+
+        return $this->successResponse($voucher, 'Payment Completed.');
+    }
+
+    /**
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function debit(Request $request, Voucher $voucher): JsonResponse
+    {
+        $data = $request->validate([
+            'amount'     => 'required|integer|min:10',
+            'account_id' => ['required', 'integer', new SidoohAccountExists],
+        ]);
+
+        $repo = new PaymentRepository(
+            new PaymentDTO(
+                $data['account_id'],
+                $data['amount'],
+                PaymentType::SIDOOH,
+                PaymentSubtype::VOUCHER,
+                Description::VOUCHER_DEBIT->value,
+                null,
+                1,
+                false,
+                PaymentType::SIDOOH,
+                PaymentSubtype::FLOAT,
+                ['float_account_id' => 1]
+            )
+        );
+
+        $payment = $repo->processPayment();
+
+        $voucher = $voucher->refresh();
+
+        $account = SidoohAccounts::find($voucher->account_id);
+        $amount = 'Ksh'.number_format($payment->amount, 2);
+        $balance = 'Ksh'.number_format($voucher->balance, 2);
+
+        $message = 'Hi'.($account['user']['name'] ? " {$account['user']['name']}," : ',');
+        $message .= "\nWe have deducted $amount from your voucher as a result of user over drawn. ";
+        $message .= "New voucher balance is $balance.";
+
+        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_DEBITED);
 
         return $this->successResponse($voucher);
     }

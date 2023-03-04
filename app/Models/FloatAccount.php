@@ -28,6 +28,6 @@ class FloatAccount extends Model
      */
     public function transactions(): HasMany
     {
-        return $this->hasMany(FloatAccountTransaction::class);
+        return $this->hasMany(FloatAccountTransaction::class)->latest();
     }
 }

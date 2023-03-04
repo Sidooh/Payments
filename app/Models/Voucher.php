@@ -38,6 +38,6 @@ class Voucher extends Model
 
     public function transactions(): HasMany
     {
-        return $this->hasMany(VoucherTransaction::class);
+        return $this->hasMany(VoucherTransaction::class)->latest();
     }
 }
