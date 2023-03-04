@@ -18,7 +18,7 @@ USER nobody
 COPY --from=build /app/docker/nginx/ /etc/nginx/
 
 # Configure supervisord
-COPY --from=build /app/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+#COPY --from=build /app/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy project
 COPY --chown=nobody --from=build /app /var/www/html
