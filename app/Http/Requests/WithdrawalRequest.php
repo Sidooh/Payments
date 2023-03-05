@@ -6,15 +6,12 @@ use App\Enums\PaymentMethod;
 use App\Rules\SidoohFloatAccountExists;
 use App\Rules\SidoohVoucherExists;
 use Exception;
-use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Validation\Rules\Enum;
 
 class WithdrawalRequest extends PaymentRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -24,7 +21,6 @@ class WithdrawalRequest extends PaymentRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
      *
      * @throws \Exception
      */
@@ -39,7 +35,7 @@ class WithdrawalRequest extends PaymentRequest
     /**
      * @throws Exception
      */
-    public function sourceAccountRule(): InvokableRule|string
+    public function sourceAccountRule(): SidoohFloatAccountExists|string
     {
         return match (PaymentMethod::tryFrom($this->input('source'))) {
             PaymentMethod::FLOAT => new SidoohFloatAccountExists,
@@ -50,7 +46,7 @@ class WithdrawalRequest extends PaymentRequest
     /**
      * @throws Exception
      */
-    public function destinationAccountRule(): InvokableRule|string
+    public function destinationAccountRule(): SidoohVoucherExists|string
     {
         $countryCode = config('services.sidooh.country_code');
 

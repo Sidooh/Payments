@@ -3,20 +3,18 @@
 namespace App\Rules;
 
 use App\Services\SidoohProducts;
+use Closure;
 use Exception;
-use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 
-class SidoohEnterpriseExists implements InvokableRule
+class SidoohEnterpriseExists implements ValidationRule
 {
     /**
      * Run the validation rule.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
-     * @return void
      */
-    public function __invoke($attribute, $value, $fail): void
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         try {
             $account = SidoohProducts::findEnterprise($value);

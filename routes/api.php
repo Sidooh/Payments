@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:5,60')->prefix('/v1')->group(function() {
     Route::get('payments/mpesa/status/query', [PaymentController::class, 'queryMpesaStatus'])
-        ->name('payments.mpesa.status.query');
+         ->name('payments.mpesa.status.query');
 });
 
 //=========================================================================================================
