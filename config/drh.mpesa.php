@@ -167,7 +167,7 @@ return [
             'syslog',
             'single' => [
                 'driver' => 'single',
-                'path'   => storage_path('logs/tanda.log'),
+                'path'   => storage_path('logs/mpesa.log'),
                 'level'  => env('LOG_LEVEL', 'debug'),
             ],
         ],
