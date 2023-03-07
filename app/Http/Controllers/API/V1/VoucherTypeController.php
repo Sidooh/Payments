@@ -21,10 +21,6 @@ class VoucherTypeController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        mpesaLogInfo('I - WORK!!!');
-        mpesaLogError('E - WORK!!!');
-
-        return response()->json('Logged');
         $relations = explode(',', $request->query('with'));
 
         $types = VoucherType::latest();
