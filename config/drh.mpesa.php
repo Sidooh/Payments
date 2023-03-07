@@ -157,10 +157,16 @@ return [
      */
     'sandbox_test_amount' => env('MPESA_SANDBOX_AMOUNT', 1),
 
+    /*'logging' => [
+        'enabled' => env('MPESA_ENABLE_LOGGING', false),
+        'channels' => [
+            'single', 'stderr'
+        ]
+    ]*/
     'logging' => [
         'enabled'  => env('MPESA_ENABLE_LOGGING', false),
         'channels' => [
-            'gcp',
+            'single', 'stderr',
             /*'single' => [
                 'driver' => 'single',
                 'path'   => storage_path('logs/mpesa.log'),
