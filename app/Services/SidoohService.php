@@ -96,9 +96,11 @@ class SidoohService
 
         dispatch(function() use ($options, $url, $method) {
             $t = microtime(true);
+
             try {
                 $response = Http::timeout(2)->send($method, $url, $options);
                 $latency = round((microtime(true) - $t) * 1000, 2);
+
                 Log::info('...[SRV - SIDOOH]: RES... '.$latency.'ms', [$response]);
             } catch (Exception $err) {
                 $latency = round((microtime(true) - $t) * 1000, 2);
