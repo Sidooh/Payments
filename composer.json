@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.1",
         "drh/laravel-tendepay": "^1.2",
-        "drh/mpesa": "^2.2",
+        "drh/mpesa": "^2.5",
         "fruitcake/laravel-cors": "^2.0.5",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.46",
