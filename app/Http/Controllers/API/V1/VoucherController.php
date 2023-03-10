@@ -85,7 +85,7 @@ class VoucherController extends Controller
             'amount'           => 'required|integer|min:10',
             'account_id'       => ['required', 'integer', new SidoohAccountExists],
             'float_account_id' => ['required', 'integer', new SidoohFloatAccountExists],
-            'reason'           => ['string'],
+            'reason'           => ['nullable|string'],
         ]);
 
         $repo = new PaymentRepository(
@@ -138,7 +138,7 @@ class VoucherController extends Controller
             'amount'           => 'required|integer|min:10',
             'account_id'       => ['required', 'integer', new SidoohAccountExists],
             'float_account_id' => ['required', 'integer', new SidoohFloatAccountExists],
-            'reason'           => ['string'],
+            'reason'           => ['nullable|string'],
         ]);
 
         $repo = new PaymentRepository(
