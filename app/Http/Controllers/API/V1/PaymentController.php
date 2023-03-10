@@ -97,7 +97,7 @@ class PaymentController extends Controller
             $payments->whereStatus($status);
         }
 
-        $payments = $payments->limit(1000)->get();
+        $payments = $payments->limit(150)->get();
 
         if (in_array('account', $relations)) {
             $payments = withRelation('account', $payments, 'account_id', 'id');
