@@ -88,18 +88,21 @@ class VoucherController extends Controller
             'reason'           => ['string'],
         ]);
 
-        $repo = new PaymentRepository(new PaymentDTO(
-            $data['account_id'],
-            $data['amount'],
-            PaymentType::SIDOOH,
-            PaymentSubtype::FLOAT,
-            Description::VOUCHER_CREDIT->value,
-            $request->input('reason'),
-            $data['float_account_id'],
-            false,
-            PaymentType::SIDOOH,
-            PaymentSubtype::VOUCHER,
-            ['voucher_id' => $voucher->id]));
+        $repo = new PaymentRepository(
+            new PaymentDTO(
+                $data['account_id'],
+                $data['amount'],
+                PaymentType::SIDOOH,
+                PaymentSubtype::FLOAT,
+                Description::VOUCHER_CREDIT->value,
+                $request->input('reason'),
+                $data['float_account_id'],
+                false,
+                PaymentType::SIDOOH,
+                PaymentSubtype::VOUCHER,
+                ['voucher_id' => $voucher->id]
+            )
+        );
 
         $payment = $repo->processPayment();
 
@@ -138,18 +141,21 @@ class VoucherController extends Controller
             'reason'           => ['string'],
         ]);
 
-        $repo = new PaymentRepository(new PaymentDTO(
-            $data['account_id'],
-            $data['amount'],
-            PaymentType::SIDOOH,
-            PaymentSubtype::VOUCHER,
-            Description::VOUCHER_DEBIT->value,
-            $request->input('reason'),
-            $data['float_account_id'],
-            false,
-            PaymentType::SIDOOH,
-            PaymentSubtype::FLOAT,
-            ['float_account_id' => $data['float_account_id']]));
+        $repo = new PaymentRepository(
+            new PaymentDTO(
+                $data['account_id'],
+                $data['amount'],
+                PaymentType::SIDOOH,
+                PaymentSubtype::VOUCHER,
+                Description::VOUCHER_DEBIT->value,
+                $request->input('reason'),
+                $data['float_account_id'],
+                false,
+                PaymentType::SIDOOH,
+                PaymentSubtype::FLOAT,
+                ['float_account_id' => $data['float_account_id']]
+            )
+        );
 
         $payment = $repo->processPayment();
 
