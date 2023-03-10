@@ -3,34 +3,30 @@ FROM composer:2.2 as build
 COPY . /app
 
 # TODO: Return --no-dev for production (removed for us to use clockwork in playdooh)
-RUN composer install --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-reqs
+RUN composer install --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-reqs --no-progress --no-dev
 
-FROM php:8.2-buster as production
+FROM trafex/php-nginx:3.0.0 as production
 
-# Install system libraries
-RUN apt-get update -y && apt-get install -y \
-    libicu-dev
+USER root
+RUN apk add --no-cache \
+  php81-pdo \
+  php81-pdo_mysql \
+  php81-tokenizer
+USER nobody
 
-# Install docker dependencies
-RUN docker-php-ext-install mysqli \
-    && docker-php-ext-install intl \
-    && docker-php-ext-install pdo_mysql
+# Configure nginx
+COPY --from=build /app/docker/nginx/ /etc/nginx/
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Configure PHP-FPM
+#COPY --from=build /app/docker/php/fpm-pool.conf /etc/php81/php-fpm.d/www.conf
+COPY --from=build /app/docker/php/php.ini /etc/php81/conf.d/custom.ini
 
-# Define working directory
-WORKDIR /home/app
+# Configure supervisord
+COPY --from=build /app/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy project
-COPY --from=build /app /home/app
+COPY --chown=nobody --from=build /app /var/www/html
 
 # Cache configs
-#RUN php artisan config:cache \
-#    && php artisan route:cache
-
-# Expose the port
-EXPOSE 8080
-
-# Start artisan
-CMD php artisan serve --host=0.0.0.0 --port=8080
+RUN php artisan route:cache \
+    && php artisan event:cache

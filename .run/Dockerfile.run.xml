@@ -1,10 +1,26 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Dockerfile.old: Compose Deployment" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+  <configuration default="false" name="Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="payments.sidooh" />
         <option name="containerName" value="payments.sidooh" />
-        <option name="sourceFilePath" value="Dockerfile.old" />
+        <option name="envVars">
+          <list>
+            <DockerEnvVarImpl>
+              <option name="name" value="JWT_KEY" />
+              <option name="value" value="asd" />
+            </DockerEnvVarImpl>
+          </list>
+        </option>
+        <option name="portBindings">
+          <list>
+            <DockerPortBindingImpl>
+              <option name="containerPort" value="8080" />
+              <option name="hostPort" value="8080" />
+            </DockerPortBindingImpl>
+          </list>
+        </option>
+        <option name="sourceFilePath" value="Dockerfile" />
       </settings>
     </deployment>
     <method v="2" />

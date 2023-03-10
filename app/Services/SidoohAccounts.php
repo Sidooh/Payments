@@ -17,7 +17,15 @@ class SidoohAccounts extends SidoohService
 
         $url = config('services.sidooh.services.accounts.url').'/accounts?with_user=true';
 
-        return parent::fetch($url);
+        return Cache::remember('all_accounts', (60 * 60 * 24), function() use ($url) {
+            $accounts = parent::fetch($url) ?? [];
+
+            foreach ($accounts as $acc) {
+                Cache::put($acc['id'], $acc, (60 * 60 * 24));
+            }
+
+            return $accounts;
+        });
     }
 
     /**

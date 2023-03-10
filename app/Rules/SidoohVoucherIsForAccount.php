@@ -3,21 +3,19 @@
 namespace App\Rules;
 
 use App\Models\Voucher;
+use Closure;
 use Exception;
-use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
 
-class SidoohVoucherIsForAccount implements InvokableRule
+class SidoohVoucherIsForAccount implements ValidationRule
 {
     /**
      * Run the validation rule.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
      * @param  \Closure(string): PotentiallyTranslatedString  $fail
-     * @return void
      */
-    public function __invoke($attribute, $value, $fail): void
+    public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         try {
             Voucher::whereId($value)->whereAccountId(request('account_id'))->firstOrFail();

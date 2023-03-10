@@ -10,6 +10,8 @@ enum Description: string
     case VOUCHER_DISBURSEMENT = 'Voucher Disbursement';
     case VOUCHER_REFUND = 'Voucher Refund';
     case VOUCHER_PURCHASE = 'Voucher Purchase';
+    case VOUCHER_CREDIT = 'Voucher Credit';
+    case VOUCHER_DEBIT = 'Voucher Debit';
 
     case FLOAT_PURCHASE = 'Float Purchase';
 

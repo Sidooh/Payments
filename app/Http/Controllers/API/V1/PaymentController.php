@@ -123,7 +123,6 @@ class PaymentController extends Controller
             $payment->load('provider:id,type,amount,description,created_at');
         }
 
-        // TODO: Confirm columns for all the below subtypes
         if ($payment->subtype === PaymentSubtype::C2B) {
             $payment->load('provider');
         }

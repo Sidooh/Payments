@@ -1,5 +1,8 @@
 <?php
 
+use Monolog\Formatter\GoogleCloudLoggingFormatter;
+use Monolog\Handler\StreamHandler;
+
 return [
     /*
      |------------------------------------------------------
@@ -136,7 +139,10 @@ return [
          * Go to https://developer.safaricom.co.ke/test_credentials and paste your initiator password to generate
          * security credential
          */
-        'security_credential' => env('MPESA_B2C_SECURITY_CREDENTIAL', 'ZW20xkR58Tm4E1CZxliomiGC9wKPnM+RE/+bbxPgFSbhU10PKRYFjjO2W0HVRjdpZQcw9VInadmPVrsN+SramgZBg6Jix6NslJa+npItFRZyiI5eodSOKR2h7Fm/HpjOJAYvPBBBbBwvom+fJv06l4wIpDOkiiTY5+qx8J+FSZ/c4iVRSaDN5VHVXvUXJqsIRvoc0sLSU+EwJYgE4lx/J8gyhokWVBUCvxjOW/mOymi0rbESByKU2IXA3D2+ds5n+XwcrxB+n0Ub7WDw+ia0N1ixn2HqHpfaizp20FywVlw3AxHpueyRWrbzeo8jzCmG3ZBU0xdIMCiTeVBPGNUz1A=='),
+        'security_credential' => 'GXiVXirQFaJvEFOQyn+VJ4Gp3Ccvpoq6aqzFiNgvH18UMU59Qxc+UTAX7Blzo6L0+tQG2wUJ1fKH4YlPagt'.
+            'zDHT37796uu0NysS85uPjxZMjnbGhPNeHnhJLzwyrjppl8mZpnmVg4CaVrEdcriuyifKIiF1hmc0A/RnjBMzY6yevbIV0kAgrn5cDvCN'.
+            '99O1rr1nl69GaVbP7a/6AWnRkVUldnalQmqQhfgLbOdxjGOVGU2arqjuvgQ6glo1uK9PUnp3UH2Vv66Lu99JglWyjlcWufZhJXUmFFB9'.
+            'tfoKAX2URnPGi4PvvJ6OgJNdsJmTsevnG2c/KKOa45rzdvwrwKA==',
         /*
          * Notification URL for timeout
          */
@@ -152,20 +158,24 @@ return [
      | Set sandbox amount
      | ------------------------------------------------------
      | Specify whether to use actual amount on sandbox
-     | 0 - actual amount, any other value will use that value
+     | 0 - actual amount, any other positive value will use that value
      |
      */
     'sandbox_test_amount' => env('MPESA_SANDBOX_AMOUNT', 1),
 
-    'logging' => [
+    'logging'           => [
         'enabled'  => env('MPESA_ENABLE_LOGGING', false),
         'channels' => [
-            'gcp',
-            /*'single' => [
-                'driver' => 'single',
-                'path'   => storage_path('logs/mpesa.log'),
-                'level'  => env('LOG_LEVEL', 'debug'),
-            ],*/
+            'gcp'        => [
+                'level'             => env('LOG_LEVEL', 'debug'),
+                'driver'            => 'monolog',
+                'ignore_exceptions' => false,
+                'handler'           => StreamHandler::class,
+                'formatter'         => GoogleCloudLoggingFormatter::class,
+                'with'              => [
+                    'stream' => 'php://stderr',
+                ],
+            ],
         ],
     ],
 ];

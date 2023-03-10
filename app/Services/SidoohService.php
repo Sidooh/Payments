@@ -16,7 +16,7 @@ class SidoohService
 {
     public static function http(): PendingRequest
     {
-        $token = Cache::remember('auth_token', (60 * 14), fn() => self::authenticate());
+        $token = Cache::remember('auth_token', (60 * 14), fn () => self::authenticate());
 
         return Http::withToken($token)->/*retry(1)->*/acceptJson();
     }
@@ -96,14 +96,16 @@ class SidoohService
 
         dispatch(function() use ($options, $url, $method) {
             $t = microtime(true);
+
             try {
-                $response = Http::timeout(2)->send($method, $url, $options);
+                $response = Http::send($method, $url, $options);
                 $latency = round((microtime(true) - $t) * 1000, 2);
+
                 Log::info('...[SRV - SIDOOH]: RES... '.$latency.'ms', [$response]);
             } catch (Exception $err) {
                 $latency = round((microtime(true) - $t) * 1000, 2);
 
-                Log::info('...[SRV - SIDOOH]: ERR... '.$latency.'ms', [$err]);
+                Log::error('...[SRV - SIDOOH]: ERR... '.$latency.'ms', [$err]);
             }
         })->afterResponse();
     }
