@@ -1,5 +1,8 @@
 <?php
 
+use Monolog\Formatter\GoogleCloudLoggingFormatter;
+use Monolog\Handler\StreamHandler;
+
 return [
     /*
      |------------------------------------------------------
@@ -162,6 +165,17 @@ return [
 
     'logging'           => [
         'enabled'  => env('MPESA_ENABLE_LOGGING', false),
-        'channels' => ['gcp'],
+        'channels' => [
+            'gcp'        => [
+                'level'             => env('LOG_LEVEL', 'debug'),
+                'driver'            => 'monolog',
+                'ignore_exceptions' => false,
+                'handler'           => StreamHandler::class,
+                'formatter'         => GoogleCloudLoggingFormatter::class,
+                'with'              => [
+                    'stream' => 'php://stderr',
+                ],
+            ],
+        ],
     ],
 ];
