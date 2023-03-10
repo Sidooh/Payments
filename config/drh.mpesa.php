@@ -162,14 +162,6 @@ return [
 
     'logging'           => [
         'enabled'  => env('MPESA_ENABLE_LOGGING', false),
-        'channels' => [
-            'gcp',
-            'syslog',
-            'single' => [
-                'driver' => 'single',
-                'path'   => storage_path('logs/mpesa.log'),
-                'level'  => env('LOG_LEVEL', 'debug'),
-            ],
-        ],
+        'channels' => 'gcp',
     ],
 ];
