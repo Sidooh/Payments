@@ -162,6 +162,6 @@ return [
 
     'logging'           => [
         'enabled'  => env('MPESA_ENABLE_LOGGING', false),
-        'channels' => 'gcp',
+        'channels' => ['gcp'],
     ],
 ];
