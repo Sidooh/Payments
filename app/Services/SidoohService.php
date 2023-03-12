@@ -45,7 +45,7 @@ class SidoohService
     /**
      * @throws \Illuminate\Auth\AuthenticationException
      */
-    public static function fetch(string $url, string $method = 'GET', array $data = [])
+    public static function fetch(string $url, string $method = 'GET', array $data = [], bool $log = true)
     {
         Log::info('...[SRV - SIDOOH]: REQ...', [
             'url'    => $url,
@@ -60,7 +60,7 @@ class SidoohService
             $response = self::http()->send($method, $url, $options)->throw()->json();
             $latency = round((microtime(true) - $t) * 1000, 2);
 
-            Log::info('...[SRV - SIDOOH]: RES... '.$latency.'ms', [$response]);
+            Log::info('...[SRV - SIDOOH]: RES... '.$latency.'ms', $log ? (is_array($response) ? $response : [$response]) : []);
 
             return $response['data'];
         } catch (Exception|RequestException $err) {
