@@ -848,16 +848,16 @@
         },
         {
             "name": "drh/mpesa",
-            "version": "v2.5.2",
+            "version": "v2.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/mpesa.git",
-                "reference": "4fd4a6a2d262035d171354f14a6f34f8d7f21d15"
+                "reference": "815926186a84daeeb1f043c284fcf9117472b5ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/4fd4a6a2d262035d171354f14a6f34f8d7f21d15",
-                "reference": "4fd4a6a2d262035d171354f14a6f34f8d7f21d15",
+                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/815926186a84daeeb1f043c284fcf9117472b5ae",
+                "reference": "815926186a84daeeb1f043c284fcf9117472b5ae",
                 "shasum": ""
             },
             "require": {
@@ -916,9 +916,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/mpesa/issues",
-                "source": "https://github.com/DrH97/mpesa/tree/v2.5.2"
+                "source": "https://github.com/DrH97/mpesa/tree/v2.5.3"
             },
-            "time": "2023-03-10T17:58:39+00:00"
+            "time": "2023-03-12T11:58:57+00:00"
         },
         {
             "name": "egulias/email-validator",
