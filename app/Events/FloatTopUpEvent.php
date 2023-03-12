@@ -7,7 +7,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class FloatTopupEvent
+class FloatTopUpEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
