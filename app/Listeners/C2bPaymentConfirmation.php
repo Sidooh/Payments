@@ -6,6 +6,7 @@ use App\Repositories\EventRepositories\MpesaEventRepository;
 use DrH\Mpesa\Entities\MpesaStkCallback;
 use DrH\Mpesa\Events\C2bConfirmationEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class C2bPaymentConfirmation implements ShouldQueue
 {
@@ -27,7 +28,7 @@ class C2bPaymentConfirmation implements ShouldQueue
         //Try to check if this was from STK
         $request = MpesaStkCallback::whereMpesaReceiptNumber($c2b->trans_id);
 
-        mpesaLogInfo('C2B Listener: ', [
+        Log::info('C2B Listener: ', [
             'c2b'           => $c2b,
             'api_json_data' => $event->apiJsonData,
             'stk_req'       => $request->get(),
