@@ -64,7 +64,7 @@ class MpesaEventRepository
             return;
         }
 
-        //Complete payment
+        // Complete payment
         if (! $payment->destination_type) {
             $payment->update(['status' => Status::COMPLETED]);
 

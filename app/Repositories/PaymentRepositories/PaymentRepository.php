@@ -44,7 +44,7 @@ class PaymentRepository
             $payment = $this->createPayment($providerId);
 
             // TODO: Should we fire event on voucher debit then consume?
-            //Handle internal payment requests by immediately paying to intended
+            // Handle internal payment requests by immediately paying to intended
             if (in_array($this->paymentData->subtype, [PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT])) {
                 if (in_array(
                     $this->paymentData->destinationSubtype,

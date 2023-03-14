@@ -76,7 +76,6 @@ class SidoohService
             }
 
             Log::critical('...[SRV - SIDOOH]: ERR... '.$latency.'ms', [$err]);
-            throw new Error($err);
             throw new Error('Something went wrong, please try again later.');
         }
     }
