@@ -28,7 +28,7 @@ class VoucherCreditSuccess implements ShouldQueue
      */
     public function handle(VoucherCreditEvent $event): void
     {
-        Log::info('...[EVENT]: Voucher credited...');
+        Log::info('...[EVENT]: Voucher Credited...');
 
         // TODO: Handle async?
         try {
