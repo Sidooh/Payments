@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class SidoohAccounts extends SidoohService
 {
     /**
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @throws Exception
      */
     public static function getAll(): array
     {
@@ -18,7 +18,7 @@ class SidoohAccounts extends SidoohService
         $url = config('services.sidooh.services.accounts.url').'/accounts?with_user=true';
 
         return Cache::remember('all_accounts', (60 * 60 * 24), function() use ($url) {
-            $accounts = parent::fetch($url) ?? [];
+            $accounts = parent::fetch($url, log: false) ?? [];
 
             foreach ($accounts as $acc) {
                 Cache::put($acc['id'], $acc, (60 * 60 * 24));
