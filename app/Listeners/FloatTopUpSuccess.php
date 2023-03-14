@@ -5,11 +5,10 @@ namespace App\Listeners;
 use App\Events\FloatTopUpEvent;
 use App\Repositories\EventRepositories\SidoohEventRepository;
 use Exception;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class FloatTopUpSuccess implements ShouldQueue
+class FloatTopUpSuccess
 {
     /**
      * Create the event listener.
