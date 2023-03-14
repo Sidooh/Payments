@@ -5,10 +5,11 @@ namespace App\Listeners;
 use App\Events\VoucherCreditEvent;
 use App\Repositories\EventRepositories\SidoohEventRepository;
 use Exception;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class VoucherCreditSuccess
+class VoucherCreditSuccess implements ShouldQueue
 {
     /**
      * Create the event listener.
