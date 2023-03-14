@@ -6,7 +6,7 @@ use App\DTOs\PaymentDTO;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Enums\Status;
-use App\Events\FloatTopupEvent;
+use App\Events\FloatTopUpEvent;
 use App\Events\VoucherCreditEvent;
 use App\Models\Payment;
 use Exception;
@@ -75,7 +75,7 @@ class PaymentRepository
         if ($this->paymentData->destinationSubtype === PaymentSubtype::VOUCHER) {
             event(new VoucherCreditEvent($this->paymentData->payment->destinationProvider));
         } elseif ($this->paymentData->destinationSubtype === PaymentSubtype::FLOAT) {
-            event(new FloatTopupEvent($this->paymentData->payment->destinationProvider));
+            event(new FloatTopUpEvent($this->paymentData->payment->destinationProvider));
         }
 
         return $this->paymentData->payment;

@@ -37,7 +37,7 @@ class SidoohAccounts extends SidoohService
 
         $url = config('services.sidooh.services.accounts.url')."/accounts/$id?with_user=true";
 
-        $acc = Cache::remember($id, (60 * 60 * 24), fn () => parent::fetch($url));
+        $acc = Cache::remember("account_$id", (60 * 60 * 24), fn () => parent::fetch($url));
 
         if (! $acc) {
             throw new Exception("Account doesn't exist!");
@@ -55,7 +55,7 @@ class SidoohAccounts extends SidoohService
 
         $url = config('services.sidooh.services.accounts.url')."/accounts/phone/$phone";
 
-        $acc = parent::fetch($url)/*Cache::remember($phone, (60 * 60 * 24), fn() => parent::fetch($url))*/;
+        $acc = Cache::remember("account_$phone", (60 * 60 * 24), fn () => parent::fetch($url));
 
         if (! $acc) {
             throw new Exception("Account doesn't exist!");
