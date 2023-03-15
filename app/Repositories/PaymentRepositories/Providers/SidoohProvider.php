@@ -37,7 +37,7 @@ class SidoohProvider implements PaymentContract
             throw new Exception('Unsupported payment type');
         }
 
-        $amount = $this->paymentDTO->fee();
+        $amount = $this->paymentDTO->totalAmount();
 
         // TODO: Add float option as well
         return match ($this->paymentDTO->subtype) {

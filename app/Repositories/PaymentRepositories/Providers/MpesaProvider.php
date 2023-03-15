@@ -35,7 +35,7 @@ class MpesaProvider implements PaymentContract
 
         // TODO: Add float option as well
         return match ($this->paymentDTO->subtype) {
-            PaymentSubtype::STK => mpesa_request($this->paymentDTO->source, $this->paymentDTO->fee(), $this->paymentDTO->reference)->id,
+            PaymentSubtype::STK => mpesa_request($this->paymentDTO->source, $this->paymentDTO->totalAmount(), $this->paymentDTO->reference)->id,
             default             => throw new Exception('Unsupported payment subtype')
         };
     }

@@ -59,7 +59,7 @@ class PaymentDTO
         }
     }
 
-    public function fee(): int
+    public function totalAmount(): int
     {
         return $this->amount + $this->charge;
     }
