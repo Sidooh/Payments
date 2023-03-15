@@ -2,13 +2,13 @@
 
 namespace App\Listeners;
 
-use App\Events\FloatTopupEvent;
+use App\Events\FloatTopUpEvent;
 use App\Repositories\EventRepositories\SidoohEventRepository;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class FloatTopupSuccess
+class FloatTopUpSuccess
 {
     /**
      * Create the event listener.
@@ -22,12 +22,9 @@ class FloatTopupSuccess
     /**
      * Handle the event.
      *
-     * @param  FloatTopupEvent  $event
-     * @return void
-     *
      * @throws Throwable
      */
-    public function handle(FloatTopupEvent $event): void
+    public function handle(FloatTopUpEvent $event): void
     {
         Log::info('...[EVENT]: Float topped up...');
 

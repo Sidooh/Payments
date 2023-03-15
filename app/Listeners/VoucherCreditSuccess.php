@@ -22,14 +22,12 @@ class VoucherCreditSuccess
     /**
      * Handle the event.
      *
-     * @param  VoucherCreditEvent  $event
-     * @return void
      *
      * @throws Throwable
      */
     public function handle(VoucherCreditEvent $event): void
     {
-        Log::info('...[EVENT]: Voucher credited...');
+        Log::info('...[EVENT]: Voucher Credited...');
 
         // TODO: Handle async?
         try {

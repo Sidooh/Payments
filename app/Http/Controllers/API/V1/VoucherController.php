@@ -108,7 +108,6 @@ class VoucherController extends Controller
 
         $voucher = $voucher->refresh();
 
-        $account = SidoohAccounts::find($data['account_id']);
         $amount = 'Ksh'.number_format($payment->amount, 2);
         $balance = 'Ksh'.number_format($voucher->balance, 2);
         $date = $payment->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
