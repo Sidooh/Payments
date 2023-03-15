@@ -4,9 +4,10 @@ namespace App\Listeners;
 
 use App\Repositories\EventRepositories\TendePayEventRepository;
 use DrH\TendePay\Events\TendePayRequestSuccessEvent;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
-class TendePayRequestSuccessListener
+class TendePayRequestSuccessListener implements ShouldQueue
 {
     /**
      * Create the event listener.
@@ -15,17 +16,13 @@ class TendePayRequestSuccessListener
      */
     public function __construct()
     {
-        //
     }
 
     /**
      * Handle the event.
-     *
-     * @return void
      */
-    public function handle(TendePayRequestSuccessEvent $event)
+    public function handle(TendePayRequestSuccessEvent $event): void
     {
-        //
         Log::info('...[EVENT]: B2B Payment Completed...');
 
         TendePayEventRepository::b2bPaymentSent($event->callback);

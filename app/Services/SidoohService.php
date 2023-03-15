@@ -94,19 +94,17 @@ class SidoohService
 
         $options = strtoupper($method) === 'POST' ? ['json' => $data] : [];
 
-        dispatch(function() use ($options, $url, $method) {
-            $t = microtime(true);
+        $t = microtime(true);
 
-            try {
-                $response = Http::send($method, $url, $options);
-                $latency = round((microtime(true) - $t) * 1000, 2);
+        try {
+            $response = Http::send($method, $url, $options);
+            $latency = round((microtime(true) - $t) * 1000, 2);
 
-                Log::info('...[SRV - SIDOOH]: RES... '.$latency.'ms', [$response]);
-            } catch (Exception $err) {
-                $latency = round((microtime(true) - $t) * 1000, 2);
+            Log::info('...[SRV - SIDOOH]: RES... '.$latency.'ms', [$response]);
+        } catch (Exception $err) {
+            $latency = round((microtime(true) - $t) * 1000, 2);
 
-                Log::error('...[SRV - SIDOOH]: ERR... '.$latency.'ms', [$err]);
-            }
-        })->afterResponse();
+            Log::error('...[SRV - SIDOOH]: ERR... '.$latency.'ms', [$err]);
+        }
     }
 }
