@@ -3,6 +3,7 @@
 namespace App\Repositories\SidoohRepositories;
 
 use App\Enums\TransactionType;
+use App\Exceptions\BalanceException;
 use App\Models\FloatAccount;
 use App\Models\FloatAccountTransaction;
 use Exception;
@@ -47,7 +48,7 @@ class FloatAccountRepository
 
         // TODO: Return proper response/ create specific error type, rather than throwing error
         if ($account->balance < $amount) {
-            throw new Exception('Insufficient float balance.', 422);
+            throw new BalanceException('Insufficient float balance.');
         }
 
         return DB::transaction(function() use ($charge, $description, $amount, $account) {
