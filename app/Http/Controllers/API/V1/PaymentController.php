@@ -9,6 +9,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Enums\Status;
+use App\Exceptions\PaymentException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MerchantPaymentRequest;
 use App\Http\Requests\PaymentRequest;
@@ -19,7 +20,6 @@ use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohService;
-use DrH\Mpesa\Exceptions\MpesaException;
 use Error;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -66,8 +66,7 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
-            // TODO: Change to PaymentException - create one and use internally
-        } catch (MpesaException $e) {
+        } catch (PaymentException $e) {
             Log::critical($e);
         } catch (HttpException $err) {
             Log::error($err);
@@ -190,7 +189,7 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Reversal Requested.');
-        } catch (MpesaException $e) {
+        } catch (PaymentException $e) {
             Log::critical($e);
         } catch (HttpException $err) {
             Log::error($err);
@@ -245,15 +244,15 @@ class PaymentController extends Controller
                     false,
                     $type2,
                     $subtype2,
-                    $destination
+                    $destination,
+                    paybill_charge($request->amount)
                 ), $request->ipn
             );
 
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
-            // TODO: Change to PaymentException - create one and use internally
-        } catch (MpesaException $e) {
+        } catch (PaymentException $e) {
             Log::critical($e);
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
@@ -301,8 +300,7 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Withdrawal Requested.');
-            // TODO: Change to PaymentException - create one and use internally
-        } catch (MpesaException $e) {
+        } catch (PaymentException $e) {
             Log::critical($e);
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
