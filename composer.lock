@@ -848,16 +848,16 @@
         },
         {
             "name": "drh/mpesa",
-            "version": "v2.5.4",
+            "version": "v2.5.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/mpesa.git",
-                "reference": "6cc5d4efd1e489ad232966839872ffcc03e12e14"
+                "reference": "ca6f3ddaf96261d5a284bbd62f56bc32da4d41cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/6cc5d4efd1e489ad232966839872ffcc03e12e14",
-                "reference": "6cc5d4efd1e489ad232966839872ffcc03e12e14",
+                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/ca6f3ddaf96261d5a284bbd62f56bc32da4d41cb",
+                "reference": "ca6f3ddaf96261d5a284bbd62f56bc32da4d41cb",
                 "shasum": ""
             },
             "require": {
@@ -916,9 +916,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/mpesa/issues",
-                "source": "https://github.com/DrH97/mpesa/tree/v2.5.4"
+                "source": "https://github.com/DrH97/mpesa/tree/v2.5.5"
             },
-            "time": "2023-03-14T15:55:04+00:00"
+            "time": "2023-03-15T17:50:04+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -4642,16 +4642,16 @@
         },
         {
             "name": "spatie/laravel-package-tools",
-            "version": "1.14.1",
+            "version": "1.14.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-package-tools.git",
-                "reference": "b477dd2f89d0751f0e51ffb3a70181f0bc7ab8df"
+                "reference": "bab62023a4745a61170ad5424184533685e73c2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/b477dd2f89d0751f0e51ffb3a70181f0bc7ab8df",
-                "reference": "b477dd2f89d0751f0e51ffb3a70181f0bc7ab8df",
+                "url": "https://api.github.com/repos/spatie/laravel-package-tools/zipball/bab62023a4745a61170ad5424184533685e73c2d",
+                "reference": "bab62023a4745a61170ad5424184533685e73c2d",
                 "shasum": ""
             },
             "require": {
@@ -4690,7 +4690,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-package-tools/issues",
-                "source": "https://github.com/spatie/laravel-package-tools/tree/1.14.1"
+                "source": "https://github.com/spatie/laravel-package-tools/tree/1.14.2"
             },
             "funding": [
                 {
@@ -4698,7 +4698,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-01-27T15:33:45+00:00"
+            "time": "2023-03-14T16:41:21+00:00"
         },
         {
             "name": "symfony/console",
