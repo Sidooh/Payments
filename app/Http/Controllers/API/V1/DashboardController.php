@@ -49,7 +49,7 @@ class DashboardController extends Controller
             );
         });
 
-        $orgBalance = Cache::remember('org_balance', 60 * 60 * 24, fn () => MpesaC2bCallback::latest('id')->first()->value('org_account_balance'));
+        $orgBalance = Cache::remember('org_balance', 60 * 60 * 12, fn () => MpesaC2bCallback::latest('id')->first()->value('org_account_balance'));
 
         return $this->successResponse([
             'total_payments'       => $totalPayments,
