@@ -9,7 +9,6 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Enums\Status;
-use App\Exceptions\PaymentException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MerchantPaymentRequest;
 use App\Http\Requests\PaymentRequest;
@@ -66,8 +65,6 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
-        } catch (PaymentException $e) {
-            Log::critical($e);
         } catch (HttpException $err) {
             Log::error($err);
 
@@ -189,8 +186,6 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Reversal Requested.');
-        } catch (PaymentException $e) {
-            Log::critical($e);
         } catch (HttpException $err) {
             Log::error($err);
 
@@ -252,8 +247,6 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
-        } catch (PaymentException $e) {
-            Log::critical($e);
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
@@ -300,8 +293,6 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Withdrawal Requested.');
-        } catch (PaymentException $e) {
-            Log::critical($e);
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
@@ -390,8 +381,11 @@ class PaymentController extends Controller
 
     public function getB2BPayments(): JsonResponse
     {
-        $payments = Payment::whereDestinationType(PaymentType::TENDE)->whereDestinationSubtype(PaymentSubtype::B2B)
-                           ->latest()->limit(100)->get();
+        $payments = Payment::whereDestinationType(PaymentType::TENDE)
+                           ->whereDestinationSubtype(PaymentSubtype::B2B)
+                           ->latest()
+                           ->limit(100)
+                           ->get();
 
         return $this->successResponse($payments);
     }
