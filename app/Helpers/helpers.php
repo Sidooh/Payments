@@ -50,7 +50,7 @@ if (! function_exists('withdrawal_charge')) {
     {
         $charges = config('services.sidooh.charges.withdrawal');
 
-        $charge = Arr::first($charges, fn ($ch) => $ch['max'] > $amount && $ch['min'] <= $amount);
+        $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
 
         if (! $charge) {
             throw new Exception('Withdrawal charge not found!');
@@ -68,7 +68,7 @@ if (! function_exists('paybill_charge')) {
     {
         $charges = config('services.sidooh.charges.paybill');
 
-        $charge = Arr::first($charges, fn ($ch) => $ch['max'] > $amount && $ch['min'] <= $amount);
+        $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
 
         if (! $charge) {
             throw new Exception('Paybill charge not found!');
