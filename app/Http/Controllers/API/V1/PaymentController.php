@@ -221,11 +221,13 @@ class PaymentController extends Controller
             $merchantType = MerchantType::from($request->merchant_type);
             [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
 
-            $destination = $merchantType === MerchantType::MPESA_PAY_BILL ? $request->only(
-                'merchant_type',
-                'paybill_number',
-                'account_number'
-            ) : $request->only('merchant_type', 'till_number', 'account_number');
+            if ($merchantType === MerchantType::MPESA_PAY_BILL) {
+                $charge = paybill_charge($request->integer('amount'));
+                $destination = $request->only('merchant_type', 'paybill_number', 'account_number');
+            } else {
+                $charge = 0;
+                $destination = $request->only('merchant_type', 'till_number', 'account_number');
+            }
 
             $repo = new PaymentRepository(
                 new PaymentDTO(
@@ -240,7 +242,7 @@ class PaymentController extends Controller
                     $type2,
                     $subtype2,
                     $destination,
-                    paybill_charge($request->amount)
+                    $charge
                 ), $request->ipn
             );
 
@@ -265,7 +267,9 @@ class PaymentController extends Controller
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
             [$type2, $subtype2] = PaymentMethod::from($request->destination)->getWithdrawalTypeAndSubtype();
-            $subtype2 = $type2 === PaymentType::MPESA ? PaymentSubtype::B2C : $subtype2;
+            $subtype2 = $type2 === PaymentType::MPESA
+                ? PaymentSubtype::B2C
+                : $subtype2;
 
             $destination = match ($subtype2) {
                 PaymentSubtype::VOUCHER => 'voucher_id',
