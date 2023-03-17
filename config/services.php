@@ -62,8 +62,8 @@ return [
         ],
         'charges'      => [
             'withdrawal' => [
-                ['min' => 50, 'max' => 1000, 'charge' => 50],
-                ['min' => 1000, 'max' => 10000, 'charge' => 100],
+                ['min' => 50, 'max' => 1000, 'charge' => 15],
+                //                ['min' => 1000, 'max' => 10000, 'charge' => 100],
             ],
             'paybill'    => [
                 ['min' => 1, 'max' => 100, 'charge' => 0],
