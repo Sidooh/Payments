@@ -68,7 +68,7 @@ return [
             'paybill'    => [
                 ['min' => 1, 'max' => 100, 'charge' => 0],
                 ['min' => 101, 'max' => 500, 'charge' => 4],
-                ['min' => 501, 'max' => 500, 'charge' => 9],
+                ['min' => 501, 'max' => 1000, 'charge' => 9],
                 ['min' => 1001, 'max' => 1500, 'charge' => 14],
                 ['min' => 1501, 'max' => 2500, 'charge' => 19],
                 ['min' => 2501, 'max' => 3500, 'charge' => 24],
@@ -88,13 +88,13 @@ return [
         'payment_providers' => [
             'mpesa' => [
                 'paybill_switch_amount' => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
-                'paybill' => [
-                    'key' => env('SIDOOH_PAYBILL_KEY'),
-                    'secret' => env('SIDOOH_PAYBILL_SECRET'),
-                    'passkey' => env('SIDOOH_PAYBILL_PASS_KEY'),
+                'paybill'               => [
+                    'key'       => env('SIDOOH_PAYBILL_KEY'),
+                    'secret'    => env('SIDOOH_PAYBILL_SECRET'),
+                    'passkey'   => env('SIDOOH_PAYBILL_PASS_KEY'),
                     'shortcode' => env('SIDOOH_PAYBILL_SHORTCODE'),
                 ],
-            ]
-        ]
+            ],
+        ],
     ],
 ];

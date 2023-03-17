@@ -4,10 +4,9 @@ namespace App\Listeners;
 
 use App\Repositories\EventRepositories\TendePayEventRepository;
 use DrH\TendePay\Events\TendePayRequestSuccessEvent;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
-class TendePayRequestSuccessListener implements ShouldQueue
+class TendePayRequestSuccessListener
 {
     /**
      * Create the event listener.

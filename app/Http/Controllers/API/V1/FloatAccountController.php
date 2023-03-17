@@ -7,7 +7,6 @@ use App\Enums\Initiator;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
-use App\Exceptions\PaymentException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FloatAccountRequest;
 use App\Http\Requests\FloatAccountTopupRequest;
@@ -108,8 +107,6 @@ class FloatAccountController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment->refresh()), 'Payment Requested.');
-        } catch (PaymentException $e) {
-            Log::critical($e);
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
