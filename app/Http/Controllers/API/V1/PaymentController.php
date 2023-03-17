@@ -19,7 +19,6 @@ use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohService;
-use DrH\Mpesa\Exceptions\MpesaException;
 use Error;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -66,9 +65,6 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
-            // TODO: Change to PaymentException - create one and use internally
-        } catch (MpesaException $e) {
-            Log::critical($e);
         } catch (HttpException $err) {
             Log::error($err);
 
@@ -190,8 +186,6 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Reversal Requested.');
-        } catch (MpesaException $e) {
-            Log::critical($e);
         } catch (HttpException $err) {
             Log::error($err);
 
@@ -227,11 +221,13 @@ class PaymentController extends Controller
             $merchantType = MerchantType::from($request->merchant_type);
             [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
 
-            $destination = $merchantType === MerchantType::MPESA_PAY_BILL ? $request->only(
-                'merchant_type',
-                'paybill_number',
-                'account_number'
-            ) : $request->only('merchant_type', 'till_number', 'account_number');
+            if ($merchantType === MerchantType::MPESA_PAY_BILL) {
+                $charge = paybill_charge($request->integer('amount'));
+                $destination = $request->only('merchant_type', 'paybill_number', 'account_number');
+            } else {
+                $charge = 0;
+                $destination = $request->only('merchant_type', 'till_number', 'account_number');
+            }
 
             $repo = new PaymentRepository(
                 new PaymentDTO(
@@ -245,16 +241,14 @@ class PaymentController extends Controller
                     false,
                     $type2,
                     $subtype2,
-                    $destination
+                    $destination,
+                    $charge
                 ), $request->ipn
             );
 
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
-            // TODO: Change to PaymentException - create one and use internally
-        } catch (MpesaException $e) {
-            Log::critical($e);
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
@@ -301,9 +295,6 @@ class PaymentController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment), 'Withdrawal Requested.');
-            // TODO: Change to PaymentException - create one and use internally
-        } catch (MpesaException $e) {
-            Log::critical($e);
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
@@ -392,8 +383,11 @@ class PaymentController extends Controller
 
     public function getB2BPayments(): JsonResponse
     {
-        $payments = Payment::whereDestinationType(PaymentType::TENDE)->whereDestinationSubtype(PaymentSubtype::B2B)
-                           ->latest()->limit(100)->get();
+        $payments = Payment::whereDestinationType(PaymentType::TENDE)
+                           ->whereDestinationSubtype(PaymentSubtype::B2B)
+                           ->latest()
+                           ->limit(100)
+                           ->get();
 
         return $this->successResponse($payments);
     }

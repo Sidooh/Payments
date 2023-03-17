@@ -4,6 +4,7 @@ namespace App\Repositories\SidoohRepositories;
 
 use App\Enums\Status;
 use App\Enums\TransactionType;
+use App\Exceptions\BalanceException;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use Exception;
@@ -67,7 +68,7 @@ class VoucherRepository
 
         // TODO: Return proper response/ create specific error type, rather than throwing error
         if ($voucher->balance < $amount) {
-            throw new Exception('Insufficient voucher balance.', 422);
+            throw new BalanceException('Insufficient voucher balance.');
         }
 
         return DB::transaction(function() use ($description, $amount, $voucher) {

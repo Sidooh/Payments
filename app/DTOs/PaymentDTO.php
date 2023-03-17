@@ -59,6 +59,11 @@ class PaymentDTO
         }
     }
 
+    public function totalAmount(): int
+    {
+        return $this->amount + $this->charge;
+    }
+
     /**
      * @throws Exception
      */
@@ -75,7 +80,8 @@ class PaymentDTO
             true,
             $payment->destination_type,
             $payment->destination_subtype,
-            $payment->destination_data
+            $payment->destination_data,
+            $payment->charge
         );
         $dto->payment = $payment;
 

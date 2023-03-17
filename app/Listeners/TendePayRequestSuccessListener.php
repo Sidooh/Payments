@@ -15,17 +15,13 @@ class TendePayRequestSuccessListener
      */
     public function __construct()
     {
-        //
     }
 
     /**
      * Handle the event.
-     *
-     * @return void
      */
-    public function handle(TendePayRequestSuccessEvent $event)
+    public function handle(TendePayRequestSuccessEvent $event): void
     {
-        //
         Log::info('...[EVENT]: B2B Payment Completed...');
 
         TendePayEventRepository::b2bPaymentSent($event->callback);
