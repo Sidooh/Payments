@@ -11,6 +11,7 @@ use App\Helpers\ChartAid;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use Carbon\Carbon;
+use DrH\Mpesa\Entities\MpesaC2bCallback;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -19,9 +20,6 @@ class DashboardController extends Controller
 {
     /**
      * Handle the incoming request.
-     *
-     * @param  Request  $request
-     * @return JsonResponse
      */
     public function __invoke(Request $request): JsonResponse
     {
@@ -51,12 +49,16 @@ class DashboardController extends Controller
             );
         });
 
+        $orgBalance = Cache::remember('org_balance', 60 * 60 * 12, fn () => MpesaC2bCallback::latest('id')->first()->value('org_account_balance'));
+
         return $this->successResponse([
             'total_payments'       => $totalPayments,
             'total_payments_today' => $totalPaymentsToday,
 
             'total_revenue'        => $totalRevenue,
             'total_revenue_today'  => $totalRevenueToday,
+
+            'org_balance' => $orgBalance,
         ]);
     }
 

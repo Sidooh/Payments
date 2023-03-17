@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-use App\Repositories\EventRepositories\MpesaEventRepository;
 use DrH\Mpesa\Entities\MpesaStkCallback;
 use DrH\Mpesa\Events\C2bConfirmationEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,7 +34,8 @@ class C2bPaymentConfirmation implements ShouldQueue
         ]);
 
         if ($request->doesntExist()) {
-            MpesaEventRepository::c2bPaymentConfirmed($c2b);
+            Log::warning('C2B Listener: request does not exist!');
+//            MpesaEventRepository::c2bPaymentConfirmed($c2b);
         }
     }
 }
