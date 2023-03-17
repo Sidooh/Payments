@@ -43,7 +43,6 @@ class MpesaProvider implements PaymentContract
                 config('services.sidooh.payment_providers.mpesa.paybill.secret'),
                 config('services.sidooh.payment_providers.mpesa.paybill.passkey')
             );
-
         } else {
             $mpesaAcc = null;
         }
