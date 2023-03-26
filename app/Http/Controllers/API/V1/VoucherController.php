@@ -26,7 +26,7 @@ class VoucherController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         $vouchers = Voucher::latest();
 
@@ -52,7 +52,7 @@ class VoucherController extends Controller
      */
     public function show(Voucher $voucher, Request $request): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         if (in_array('transactions', $relations)) {
             $voucher->load('transactions:id,voucher_id,type,amount,description,created_at')->limit(100);
