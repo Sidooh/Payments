@@ -95,7 +95,7 @@ return [
     'logging'           => [
         'enabled'  => env('TENDEPAY_ENABLE_LOGGING', false),
         'channels' => [
-            'single', 'stderr',
+            'gcp'
         ],
     ],
 ];
