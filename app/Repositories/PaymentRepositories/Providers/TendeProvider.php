@@ -8,6 +8,7 @@ use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Repositories\SidoohRepositories\FloatAccountRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
+use App\Services\SidoohAccounts;
 use DrH\TendePay\Exceptions\TendePayException;
 use DrH\TendePay\Facades\TendePay;
 use DrH\TendePay\Requests\BuyGoodsRequest;
@@ -73,6 +74,7 @@ class TendeProvider implements PaymentContract
         $amount = $this->paymentDTO->amount;
         $tillOrPaybill = $this->paymentDTO->destinationData['paybill_number'] ?? $this->paymentDTO->destinationData['till_number'];
         $accountNumber = $this->paymentDTO->destinationData['account_number'] ?? $this->paymentDTO->destinationData['till_number'];
+        $msisdn = SidoohAccounts::find($this->paymentDTO->accountId)['phone'];
 
         $merchantType = MerchantType::tryFrom($this->paymentDTO->destinationData['merchant_type']);
         $b2bRequest = match ($merchantType) {
@@ -81,7 +83,7 @@ class TendeProvider implements PaymentContract
             default                       => throw new Exception('Unsupported merchant type')
         };
 
-        $tendePayRequest = TendePay::b2bRequest($b2bRequest);
+        $tendePayRequest = TendePay::b2bRequest($b2bRequest, msisdn: $msisdn);
 
         return $tendePayRequest->id;
     }
