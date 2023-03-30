@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
             Model::handleLazyLoadingViolationUsing(function($model, $relation) {
                 $class = get_class($model);
 
-                info("Attempted to lazy load [$relation] on model [$class].");
+                Log::warning("Attempted to lazy load [$relation] on model [$class].");
             });
         }
 

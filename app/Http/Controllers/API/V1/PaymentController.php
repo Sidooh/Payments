@@ -229,6 +229,7 @@ class PaymentController extends Controller
                 $destination = $request->only('merchant_type', 'till_number', 'account_number');
             }
 
+
             $repo = new PaymentRepository(
                 new PaymentDTO(
                     $request->account_id,
