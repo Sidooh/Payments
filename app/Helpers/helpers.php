@@ -77,3 +77,21 @@ if (! function_exists('paybill_charge')) {
         return $charge['charge'];
     }
 }
+
+if (! function_exists('till_charge')) {
+    /**
+     * @throws \Exception
+     */
+    function till_charge(int $amount): int
+    {
+        $charges = config('services.sidooh.charges.till');
+
+        $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
+
+        if (! $charge) {
+            throw new Exception('Till charge not found!');
+        }
+
+        return $charge['charge'];
+    }
+}

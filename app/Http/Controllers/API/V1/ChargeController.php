@@ -10,9 +10,7 @@ class ChargeController extends Controller
 {
     public function getWithdrawalCharges(): JsonResponse
     {
-        $charges = config('services.sidooh.charges.withdrawal');
-
-        return $this->successResponse($charges);
+        return $this->successResponse(config('services.sidooh.charges.withdrawal'));
     }
 
     /**
@@ -21,9 +19,7 @@ class ChargeController extends Controller
     public function getWithdrawalCharge(int $amount): JsonResponse
     {
         try {
-            $charge = withdrawal_charge($amount);
-
-            return $this->successResponse($charge);
+            return $this->successResponse(withdrawal_charge($amount));
         } catch (Exception) {
             return $this->errorResponse('Invalid amount.', 422);
         }
@@ -31,9 +27,7 @@ class ChargeController extends Controller
 
     public function getPaybillCharges(): JsonResponse
     {
-        $charges = config('services.sidooh.charges.paybill');
-
-        return $this->successResponse($charges);
+        return $this->successResponse(config('services.sidooh.charges.paybill'));
     }
 
     /**
@@ -42,9 +36,24 @@ class ChargeController extends Controller
     public function getPaybillCharge(int $amount): JsonResponse
     {
         try {
-            $charge = paybill_charge($amount);
+            return $this->successResponse(paybill_charge($amount));
+        } catch (Exception) {
+            return $this->errorResponse('Invalid amount.', 422);
+        }
+    }
 
-            return $this->successResponse($charge);
+    public function getTillCharges(): JsonResponse
+    {
+        return $this->successResponse(config('services.sidooh.charges.till'));
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function getTillCharge(int $amount): JsonResponse
+    {
+        try {
+            return $this->successResponse(till_charge($amount));
         } catch (Exception) {
             return $this->errorResponse('Invalid amount.', 422);
         }
