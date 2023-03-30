@@ -22,7 +22,7 @@ use Illuminate\Http\Request;
 class VoucherController extends Controller
 {
     /**
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @throws \Exception
      */
     public function index(Request $request): JsonResponse
     {

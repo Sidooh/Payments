@@ -65,8 +65,29 @@ return [
                 ['min' => 50, 'max' => 1000, 'charge' => 15],
                 //                ['min' => 1000, 'max' => 10000, 'charge' => 100],
             ],
-            'paybill'    => [
-                ['min' => 1, 'max' => 100, 'charge' => 0],
+            'buy_goods'    => [
+                ['min' => 1, 'max' => 49, 'charge' => 2],
+                ['min' => 50, 'max' => 100, 'charge' => 3],
+                ['min' => 101, 'max' => 500, 'charge' => 4],
+                ['min' => 501, 'max' => 1000, 'charge' => 9],
+                ['min' => 1001, 'max' => 1500, 'charge' => 14],
+                ['min' => 1501, 'max' => 2500, 'charge' => 19],
+                ['min' => 2501, 'max' => 3500, 'charge' => 24],
+                ['min' => 3501, 'max' => 5000, 'charge' => 33],
+                ['min' => 5001, 'max' => 7500, 'charge' => 40],
+                ['min' => 7501, 'max' => 10000, 'charge' => 46],
+                ['min' => 10001, 'max' => 15000, 'charge' => 55],
+                ['min' => 15001, 'max' => 20000, 'charge' => 60],
+                ['min' => 20001, 'max' => 25000, 'charge' => 65],
+                ['min' => 25001, 'max' => 30000, 'charge' => 70],
+                ['min' => 30001, 'max' => 35000, 'charge' => 80],
+                ['min' => 35001, 'max' => 40000, 'charge' => 96],
+                ['min' => 40001, 'max' => 45000, 'charge' => 100],
+                ['min' => 45001, 'max' => 150000, 'charge' => 105],
+            ],
+            'pay_bill'    => [
+                ['min' => 1, 'max' => 49, 'charge' => 2],
+                ['min' => 50, 'max' => 100, 'charge' => 3],
                 ['min' => 101, 'max' => 500, 'charge' => 4],
                 ['min' => 501, 'max' => 1000, 'charge' => 9],
                 ['min' => 1001, 'max' => 1500, 'charge' => 14],
@@ -87,8 +108,8 @@ return [
         ],
         'payment_providers' => [
             'mpesa' => [
-                'paybill_switch_amount' => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
-                'paybill'               => [
+                'pay_bill_switch_amount'  => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
+                'pay_bill'                => [
                     'key'       => env('SIDOOH_PAYBILL_KEY'),
                     'secret'    => env('SIDOOH_PAYBILL_SECRET'),
                     'passkey'   => env('SIDOOH_PAYBILL_PASS_KEY'),

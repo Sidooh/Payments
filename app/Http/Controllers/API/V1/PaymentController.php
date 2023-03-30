@@ -222,12 +222,12 @@ class PaymentController extends Controller
             [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
 
             if ($merchantType === MerchantType::MPESA_PAY_BILL) {
-                $charge = paybill_charge($request->integer('amount'));
-                $destination = $request->only('merchant_type', 'paybill_number', 'account_number');
+                $charge = pay_bill_charge($request->integer('amount'));
             } else {
-                $charge = 0;
-                $destination = $request->only('merchant_type', 'till_number', 'account_number');
+                $charge = buy_goods_charge($request->integer('amount'));
             }
+
+            $destination = $request->only('merchant_type', 'paybill_number', 'account_number');
 
             $repo = new PaymentRepository(
                 new PaymentDTO(
