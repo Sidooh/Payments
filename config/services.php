@@ -85,7 +85,7 @@ return [
                 ['min' => 40001, 'max' => 45000, 'charge' => 100],
                 ['min' => 45001, 'max' => 150000, 'charge' => 105],
             ],
-            'paybill'    => [
+            'pay_bill'    => [
                 ['min' => 1, 'max' => 49, 'charge' => 2],
                 ['min' => 50, 'max' => 100, 'charge' => 3],
                 ['min' => 101, 'max' => 500, 'charge' => 4],

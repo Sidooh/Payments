@@ -25,7 +25,7 @@ class ChargeController extends Controller
         }
     }
 
-    public function getPaybillCharges(): JsonResponse
+    public function getPayBillCharges(): JsonResponse
     {
         return $this->successResponse(config('services.sidooh.charges.paybill'));
     }
@@ -33,10 +33,10 @@ class ChargeController extends Controller
     /**
      * @throws \Exception
      */
-    public function getPaybillCharge(int $amount): JsonResponse
+    public function getPayBillCharge(int $amount): JsonResponse
     {
         try {
-            return $this->successResponse(paybill_charge($amount));
+            return $this->successResponse(pay_bill_charge($amount));
         } catch (Exception) {
             return $this->errorResponse('Invalid amount.', 422);
         }

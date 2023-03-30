@@ -222,7 +222,7 @@ class PaymentController extends Controller
             [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
 
             if ($merchantType === MerchantType::MPESA_PAY_BILL) {
-                $charge = paybill_charge($request->integer('amount'));
+                $charge = pay_bill_charge($request->integer('amount'));
             } elseif ($merchantType === MerchantType::MPESA_BUY_GOODS) {
                 $charge = buy_goods_charge($request->integer('amount'));
             } else {

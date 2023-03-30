@@ -60,18 +60,18 @@ if (! function_exists('withdrawal_charge')) {
     }
 }
 
-if (! function_exists('paybill_charge')) {
+if (! function_exists('pay_bill_charge')) {
     /**
      * @throws \Exception
      */
-    function paybill_charge(int $amount): int
+    function pay_bill_charge(int $amount): int
     {
-        $charges = config('services.sidooh.charges.paybill');
+        $charges = config('services.sidooh.charges.pay_bill');
 
         $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
 
         if (! $charge) {
-            throw new Exception('Paybill charge not found!');
+            throw new Exception('PayBill charge not found!');
         }
 
         return $charge['charge'];
@@ -89,7 +89,7 @@ if (! function_exists('buy_goods_charge')) {
         $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
 
         if (! $charge) {
-            throw new Exception('Till charge not found!');
+            throw new Exception('Buy Goods charge not found!');
         }
 
         return $charge['charge'];

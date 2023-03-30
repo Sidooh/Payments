@@ -97,8 +97,8 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/withdrawal', [ChargeController::class, 'getWithdrawalCharges']);
         Route::get('/withdrawal/{amount}', [ChargeController::class, 'getWithdrawalCharge']);
 
-        Route::get('/paybill', [ChargeController::class, 'getPaybillCharges']);
-        Route::get('/paybill/{amount}', [ChargeController::class, 'getPaybillCharge']);
+        Route::get('/pay-bill', [ChargeController::class, 'getPayBillCharges']);
+        Route::get('/pay-bill/{amount}', [ChargeController::class, 'getPayBillCharge']);
 
         Route::get('/buy-goods', [ChargeController::class, 'getBuyGoodsCharges']);
         Route::get('/buy-goods/{amount}', [ChargeController::class, 'getBuyGoodsCharge']);
