@@ -100,7 +100,7 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/paybill', [ChargeController::class, 'getPaybillCharges']);
         Route::get('/paybill/{amount}', [ChargeController::class, 'getPaybillCharge']);
 
-        Route::get('/till', [ChargeController::class, 'getTillCharges']);
-        Route::get('/till/{amount}', [ChargeController::class, 'getTillCharge']);
+        Route::get('/buy-goods', [ChargeController::class, 'getBuyGoodsCharges']);
+        Route::get('/buy-goods/{amount}', [ChargeController::class, 'getBuyGoodsCharge']);
     });
 });

@@ -224,7 +224,7 @@ class PaymentController extends Controller
             if ($merchantType === MerchantType::MPESA_PAY_BILL) {
                 $charge = paybill_charge($request->integer('amount'));
             } elseif ($merchantType === MerchantType::MPESA_BUY_GOODS) {
-                $charge = till_charge($request->integer('amount'));
+                $charge = buy_goods_charge($request->integer('amount'));
             } else {
                 $charge = 0;
             }

@@ -78,13 +78,13 @@ if (! function_exists('paybill_charge')) {
     }
 }
 
-if (! function_exists('till_charge')) {
+if (! function_exists('buy_goods_charge')) {
     /**
      * @throws \Exception
      */
-    function till_charge(int $amount): int
+    function buy_goods_charge(int $amount): int
     {
-        $charges = config('services.sidooh.charges.till');
+        $charges = config('services.sidooh.charges.buy_goods');
 
         $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
 
