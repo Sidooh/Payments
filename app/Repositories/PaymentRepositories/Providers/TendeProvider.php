@@ -72,8 +72,8 @@ class TendeProvider implements PaymentContract
     private function tendePay(): int
     {
         $amount = $this->paymentDTO->amount;
-        $tillOrPaybill = $this->paymentDTO->destinationData['paybill_number'] ?? $this->paymentDTO->destinationData['till_number'];
-        $accountNumber = $this->paymentDTO->destinationData['account_number'] ?? $this->paymentDTO->destinationData['till_number'];
+        $tillOrPaybill = $this->paymentDTO->destinationData['paybill_number'] ?? $this->paymentDTO->destinationData['buy_goods_number'];
+        $accountNumber = $this->paymentDTO->destinationData['account_number'] ?? $this->paymentDTO->destinationData['buy_goods_number'];
         $msisdn = SidoohAccounts::find($this->paymentDTO->accountId)['phone'];
 
         $merchantType = MerchantType::tryFrom($this->paymentDTO->destinationData['merchant_type']);

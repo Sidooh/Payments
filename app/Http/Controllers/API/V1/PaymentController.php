@@ -214,7 +214,7 @@ class PaymentController extends Controller
 
     public function merchant(MerchantPaymentRequest $request): JsonResponse
     {
-        Log::info('...[CTRL - PAYMENT]: Merchant...', $request->all());
+        Log::info('...[CTRL - PAYMENT]: Merchant...', [$request->all()]);
 
         try {
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
@@ -226,9 +226,8 @@ class PaymentController extends Controller
                 $destination = $request->only('merchant_type', 'paybill_number', 'account_number');
             } else {
                 $charge = buy_goods_charge($request->integer('amount'));
-                $destination = $request->only('merchant_type', 'till_number', 'account_number');
+                $destination = $request->only('merchant_type', 'buy_goods_number', 'account_number');
             }
-
 
             $repo = new PaymentRepository(
                 new PaymentDTO(
