@@ -108,8 +108,8 @@ return [
         ],
         'payment_providers' => [
             'mpesa' => [
-                'paybill_switch_amount' => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
-                'paybill'               => [
+                'pay_bill_switch_amount'  => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
+                'pay_bill'                => [
                     'key'       => env('SIDOOH_PAYBILL_KEY'),
                     'secret'    => env('SIDOOH_PAYBILL_SECRET'),
                     'passkey'   => env('SIDOOH_PAYBILL_PASS_KEY'),

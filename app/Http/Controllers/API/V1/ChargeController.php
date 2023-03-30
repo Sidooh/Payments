@@ -27,7 +27,7 @@ class ChargeController extends Controller
 
     public function getPayBillCharges(): JsonResponse
     {
-        return $this->successResponse(config('services.sidooh.charges.paybill'));
+        return $this->successResponse(config('services.sidooh.charges.pay_bill'));
     }
 
     /**
