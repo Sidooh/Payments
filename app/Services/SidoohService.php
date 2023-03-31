@@ -80,7 +80,7 @@ class SidoohService
         }
     }
 
-    public static function sendCallback(?string $url, string $method = 'GET', JsonResource $data = null): void
+    public static function sendCallback(?string $url, string $method = 'GET', JsonResource|array $data = null): void
     {
         if (! $url) {
             return;

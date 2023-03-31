@@ -31,6 +31,10 @@ class PaymentResource extends JsonResource
             $base['error_message'] = $this->error_message;
         }
 
+        if (isset($this->mpesa_code)) {
+            $base['mpesa_code'] = $this->mpesa_code;
+        }
+
         return $base;
     }
 }
