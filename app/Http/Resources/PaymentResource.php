@@ -11,15 +11,13 @@ class PaymentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  Request  $request
-     * @return array|Arrayable|\JsonSerializable
      */
-    public function toArray($request): array|JsonSerializable|Arrayable
+    public function toArray(Request $request): array|JsonSerializable|Arrayable
     {
         $base = [
             'id'          => $this->id,
             'amount'      => $this->amount,
+            'charge'      => $this->charge,
             'status'      => $this->status,
             'type'        => $this->type,
             'subtype'     => $this->subtype,
@@ -31,6 +29,10 @@ class PaymentResource extends JsonResource
         if (isset($this->error_code)) {
             $base['error_code'] = $this->error_code;
             $base['error_message'] = $this->error_message;
+        }
+
+        if (isset($this->mpesa_code)) {
+            $base['mpesa_code'] = $this->mpesa_code;
         }
 
         return $base;

@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'mailgun'  => [
+    'mailgun' => [
         'domain'   => env('MAILGUN_DOMAIN'),
         'secret'   => env('MAILGUN_SECRET'),
         'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
@@ -24,16 +24,16 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
-    'ses'      => [
+    'ses' => [
         'key'    => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'sidooh'   => [
-        'jwt_key'                            => env('JWT_KEY'),
-        'tagline'                            => 'Sidooh, Makes You Money with Every Purchase.',
-        'mpesa'                              => [
+    'sidooh' => [
+        'jwt_key'           => env('JWT_KEY'),
+        'tagline'           => 'Sidooh, Makes You Money with Every Purchase.',
+        'mpesa'             => [
             'env' => 'local',
             'b2c' => [
                 'phone'      => '254708374149',
@@ -41,8 +41,8 @@ return [
                 'max_amount' => '70000',
             ],
         ],
-        'country_code'                       => env('COUNTRY_CODE', 'KE'),
-        'services'                           => [
+        'country_code'      => env('COUNTRY_CODE', 'KE'),
+        'services'          => [
             'notify'   => [
                 'enabled' => true,
                 'url'     => env('SIDOOH_NOTIFY_API_URL'),
@@ -60,30 +60,63 @@ return [
                 'url'     => env('SIDOOH_SAVINGS_API_URL'),
             ],
         ],
-        'charges'                            => [
+        'charges'           => [
             'withdrawal' => [
-                [
-                    'min'    => 50,
-                    'max'    => 1000,
-                    'charge' => 50,
-                ],
-                [
-                    'min'    => 1000,
-                    'max'    => 10000,
-                    'charge' => 100,
-                ],
+                ['min' => 1, 'max' => 100, 'charge' => 5],
+                ['min' => 101, 'max' => 20000, 'charge' => 15],
+                ['min' => 20001, 'max' => 150000, 'charge' => 30],
+            ],
+            'buy_goods'  => [
+                ['min' => 1, 'max' => 49, 'charge' => 2],
+                ['min' => 50, 'max' => 100, 'charge' => 3],
+                ['min' => 101, 'max' => 500, 'charge' => 4],
+                ['min' => 501, 'max' => 1000, 'charge' => 9],
+                ['min' => 1001, 'max' => 1500, 'charge' => 14],
+                ['min' => 1501, 'max' => 2500, 'charge' => 19],
+                ['min' => 2501, 'max' => 3500, 'charge' => 24],
+                ['min' => 3501, 'max' => 5000, 'charge' => 33],
+                ['min' => 5001, 'max' => 7500, 'charge' => 40],
+                ['min' => 7501, 'max' => 10000, 'charge' => 46],
+                ['min' => 10001, 'max' => 15000, 'charge' => 55],
+                ['min' => 15001, 'max' => 20000, 'charge' => 60],
+                ['min' => 20001, 'max' => 25000, 'charge' => 65],
+                ['min' => 25001, 'max' => 30000, 'charge' => 70],
+                ['min' => 30001, 'max' => 35000, 'charge' => 80],
+                ['min' => 35001, 'max' => 40000, 'charge' => 96],
+                ['min' => 40001, 'max' => 45000, 'charge' => 100],
+                ['min' => 45001, 'max' => 150000, 'charge' => 105],
+            ],
+            'pay_bill'   => [
+                ['min' => 1, 'max' => 49, 'charge' => 2],
+                ['min' => 50, 'max' => 100, 'charge' => 3],
+                ['min' => 101, 'max' => 500, 'charge' => 4],
+                ['min' => 501, 'max' => 1000, 'charge' => 9],
+                ['min' => 1001, 'max' => 1500, 'charge' => 14],
+                ['min' => 1501, 'max' => 2500, 'charge' => 19],
+                ['min' => 2501, 'max' => 3500, 'charge' => 24],
+                ['min' => 3501, 'max' => 5000, 'charge' => 33],
+                ['min' => 5001, 'max' => 7500, 'charge' => 40],
+                ['min' => 7501, 'max' => 10000, 'charge' => 46],
+                ['min' => 10001, 'max' => 15000, 'charge' => 55],
+                ['min' => 15001, 'max' => 20000, 'charge' => 60],
+                ['min' => 20001, 'max' => 25000, 'charge' => 65],
+                ['min' => 25001, 'max' => 30000, 'charge' => 70],
+                ['min' => 30001, 'max' => 35000, 'charge' => 80],
+                ['min' => 35001, 'max' => 40000, 'charge' => 96],
+                ['min' => 40001, 'max' => 45000, 'charge' => 100],
+                ['min' => 45001, 'max' => 150000, 'charge' => 105],
             ],
         ],
         'payment_providers' => [
             'mpesa' => [
-                'paybill_switch_amount' => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
-                'paybill' => [
-                    'key' => env('SIDOOH_PAYBILL_KEY'),
-                    'secret' => env('SIDOOH_PAYBILL_SECRET'),
-                    'passkey' => env('SIDOOH_PAYBILL_PASS_KEY'),
+                'pay_bill_switch_amount' => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
+                'pay_bill'               => [
+                    'key'       => env('SIDOOH_PAYBILL_KEY'),
+                    'secret'    => env('SIDOOH_PAYBILL_SECRET'),
+                    'passkey'   => env('SIDOOH_PAYBILL_PASS_KEY'),
                     'shortcode' => env('SIDOOH_PAYBILL_SHORTCODE'),
                 ],
-            ]
-        ]
+            ],
+        ],
     ],
 ];

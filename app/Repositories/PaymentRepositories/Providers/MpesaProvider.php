@@ -34,14 +34,14 @@ class MpesaProvider implements PaymentContract
             throw new Exception('Unsupported payment type');
         }
 
-        $paybillSwitch = config('services.sidooh.payment_providers.mpesa.paybill_switch_amount');
-        if ($paybillSwitch > 0 && $this->paymentDTO->amount > $paybillSwitch) {
+        $payBillSwitch = config('services.sidooh.payment_providers.mpesa.pay_bill_switch_amount');
+        if ($payBillSwitch > 0 && $this->paymentDTO->amount > $payBillSwitch) {
 //            if TILL add partyB and type to MpesaAccount::TILL
             $mpesaAcc = new MpesaAccount(
-                config('services.sidooh.payment_providers.mpesa.paybill.shortcode'),
-                config('services.sidooh.payment_providers.mpesa.paybill.key'),
-                config('services.sidooh.payment_providers.mpesa.paybill.secret'),
-                config('services.sidooh.payment_providers.mpesa.paybill.passkey')
+                config('services.sidooh.payment_providers.mpesa.pay_bill.shortcode'),
+                config('services.sidooh.payment_providers.mpesa.pay_bill.key'),
+                config('services.sidooh.payment_providers.mpesa.pay_bill.secret'),
+                config('services.sidooh.payment_providers.mpesa.pay_bill.passkey')
             );
         } else {
             $mpesaAcc = null;

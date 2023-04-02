@@ -9,8 +9,6 @@ class MerchantPaymentRequest extends PaymentRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -19,8 +17,6 @@ class MerchantPaymentRequest extends PaymentRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -38,8 +34,8 @@ class MerchantPaymentRequest extends PaymentRequest
                 'account_number' => ['required', 'string'],
             ],
             MerchantType::MPESA_BUY_GOODS => [
-                'till_number'    => ['required', 'integer'],
-                'account_number' => ['nullable', 'string'],
+                'buy_goods_number'    => ['required', 'integer'],
+                'account_number'      => ['nullable', 'string'],
             ],
             default => []
         };

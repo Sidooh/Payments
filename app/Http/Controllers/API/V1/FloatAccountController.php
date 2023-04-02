@@ -14,7 +14,6 @@ use App\Http\Resources\PaymentResource;
 use App\Models\FloatAccount;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Services\SidoohAccounts;
-use DrH\Mpesa\Exceptions\MpesaException;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -80,9 +79,6 @@ class FloatAccountController extends Controller
 
     /**
      * Handle the incoming request.
-     *
-     * @param  FloatAccountTopupRequest  $request
-     * @return JsonResponse
      */
     public function credit(FloatAccountTopupRequest $request): JsonResponse
     {
@@ -111,9 +107,6 @@ class FloatAccountController extends Controller
             $payment = $repo->processPayment();
 
             return $this->successResponse(PaymentResource::make($payment->refresh()), 'Payment Requested.');
-            // TODO: Change to PaymentException - create one and use internally
-        } catch (MpesaException $e) {
-            Log::critical($e);
         } catch (Exception $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());

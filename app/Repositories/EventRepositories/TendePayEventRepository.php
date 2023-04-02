@@ -33,7 +33,7 @@ class TendePayEventRepository
         DB::transaction(function() use ($payment) {
             VoucherRepository::creditDefaultVoucherForAccount($payment->account_id, $payment->amount, Description::VOUCHER_REFUND->value);
 
-            $payment->update(['status' => Status::FAILED->name]);
+            $payment->update(['status' => Status::FAILED]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
         });
@@ -49,7 +49,9 @@ class TendePayEventRepository
             return;
         }
 
-        $payment->update(['status' => Status::COMPLETED->name]);
+        $payment->update(['status' => Status::COMPLETED]);
+
+        $payment['mpesa_code'] = $callback->confirmation_code;
 
         SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
     }

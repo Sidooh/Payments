@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentRepository
 {
-    /**
-     * @throws Exception
-     */
     public function __construct(private readonly PaymentDTO $paymentData, private readonly ?string $ipn = null)
     {
         Log::info('PaymentDTO', [$this->paymentData]);

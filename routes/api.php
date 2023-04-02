@@ -93,6 +93,14 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
     });
 
     //  UTILITIES
-    Route::get('/charges/withdrawal', [ChargeController::class, 'getWithdrawalCharges']);
-    Route::get('/charges/withdrawal/{amount}', [ChargeController::class, 'getWithdrawalCharge']);
+    Route::prefix('/charges')->group(function() {
+        Route::get('/withdrawal', [ChargeController::class, 'getWithdrawalCharges']);
+        Route::get('/withdrawal/{amount}', [ChargeController::class, 'getWithdrawalCharge']);
+
+        Route::get('/pay-bill', [ChargeController::class, 'getPayBillCharges']);
+        Route::get('/pay-bill/{amount}', [ChargeController::class, 'getPayBillCharge']);
+
+        Route::get('/buy-goods', [ChargeController::class, 'getBuyGoodsCharges']);
+        Route::get('/buy-goods/{amount}', [ChargeController::class, 'getBuyGoodsCharge']);
+    });
 });
