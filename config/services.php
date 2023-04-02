@@ -31,9 +31,9 @@ return [
     ],
 
     'sidooh' => [
-        'jwt_key'      => env('JWT_KEY'),
-        'tagline'      => 'Sidooh, Makes You Money with Every Purchase.',
-        'mpesa'        => [
+        'jwt_key'           => env('JWT_KEY'),
+        'tagline'           => 'Sidooh, Makes You Money with Every Purchase.',
+        'mpesa'             => [
             'env' => 'local',
             'b2c' => [
                 'phone'      => '254708374149',
@@ -41,8 +41,8 @@ return [
                 'max_amount' => '70000',
             ],
         ],
-        'country_code' => env('COUNTRY_CODE', 'KE'),
-        'services'     => [
+        'country_code'      => env('COUNTRY_CODE', 'KE'),
+        'services'          => [
             'notify'   => [
                 'enabled' => true,
                 'url'     => env('SIDOOH_NOTIFY_API_URL'),
@@ -60,12 +60,13 @@ return [
                 'url'     => env('SIDOOH_SAVINGS_API_URL'),
             ],
         ],
-        'charges'      => [
+        'charges'           => [
             'withdrawal' => [
-                ['min' => 50, 'max' => 1000, 'charge' => 15],
-                //                ['min' => 1000, 'max' => 10000, 'charge' => 100],
+                ['min' => 1, 'max' => 100, 'charge' => 5],
+                ['min' => 101, 'max' => 20000, 'charge' => 15],
+                ['min' => 20001, 'max' => 150000, 'charge' => 30],
             ],
-            'buy_goods'    => [
+            'buy_goods'  => [
                 ['min' => 1, 'max' => 49, 'charge' => 2],
                 ['min' => 50, 'max' => 100, 'charge' => 3],
                 ['min' => 101, 'max' => 500, 'charge' => 4],
@@ -85,7 +86,7 @@ return [
                 ['min' => 40001, 'max' => 45000, 'charge' => 100],
                 ['min' => 45001, 'max' => 150000, 'charge' => 105],
             ],
-            'pay_bill'    => [
+            'pay_bill'   => [
                 ['min' => 1, 'max' => 49, 'charge' => 2],
                 ['min' => 50, 'max' => 100, 'charge' => 3],
                 ['min' => 101, 'max' => 500, 'charge' => 4],
@@ -108,8 +109,8 @@ return [
         ],
         'payment_providers' => [
             'mpesa' => [
-                'pay_bill_switch_amount'  => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
-                'pay_bill'                => [
+                'pay_bill_switch_amount' => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
+                'pay_bill'               => [
                     'key'       => env('SIDOOH_PAYBILL_KEY'),
                     'secret'    => env('SIDOOH_PAYBILL_SECRET'),
                     'passkey'   => env('SIDOOH_PAYBILL_PASS_KEY'),
