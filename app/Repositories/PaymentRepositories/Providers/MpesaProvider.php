@@ -34,8 +34,7 @@ class MpesaProvider implements PaymentContract
             throw new Exception('Unsupported payment type');
         }
 
-
-        $amount = $this->paymentDTO->totalAmount();
+        $amount = $this->paymentDTO->totalAmount();
         $payBillSwitch = config('services.sidooh.payment_providers.mpesa.pay_bill_switch_amount');
         if ($payBillSwitch > 0 && $amount > $payBillSwitch) {
 //            if TILL add partyB and type to MpesaAccount::TILL
