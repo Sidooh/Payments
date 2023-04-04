@@ -54,7 +54,8 @@ class TendePayEventRepository
         $payment->update(['status' => Status::COMPLETED]);
 
         try {
-            FloatAccountRepository::debit(3, $payment->amount+$payment->charge, "$payment->id");
+            $cost = $payment->amount > 100 ? $payment->amount+$payment->charge : $payment->amount;
+            FloatAccountRepository::debit(3, $cost, "$payment->id");
         } catch (Exception|Throwable $e) {
             Log::error($e);
         }
