@@ -52,6 +52,7 @@ class TendePayEventRepository
         $payment->update(['status' => Status::COMPLETED]);
 
         $payment['mpesa_code'] = $callback->confirmation_code;
+        $payment['mpesa_merchant'] = $callback->receiver_party_name;
 
         SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
     }

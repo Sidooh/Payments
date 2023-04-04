@@ -33,6 +33,7 @@ class PaymentResource extends JsonResource
 
         if (isset($this->mpesa_code)) {
             $base['mpesa_code'] = $this->mpesa_code;
+            $base['mpesa_merchant'] = $this->mpesa_merchant;
         }
 
         return $base;
