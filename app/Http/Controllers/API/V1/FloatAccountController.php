@@ -35,7 +35,7 @@ class FloatAccountController extends Controller
                 ->limit(10);
         }
 
-        $floatAccounts = $floatAccounts->limit(1000)->get();
+        $floatAccounts = $floatAccounts->limit(100)->get();
 
         if (in_array('account', $relations)) {
             $floatAccounts = withRelation('account', $floatAccounts, 'account_id', 'id');
