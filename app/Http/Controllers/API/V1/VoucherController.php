@@ -38,7 +38,7 @@ class VoucherController extends Controller
             $vouchers->with('transactions:id,voucher_id,type,amount,description,created_at')->latest()->limit(10);
         }
 
-        $vouchers = $vouchers->limit(1000)->get();
+        $vouchers = $vouchers->limit(100)->get();
 
         if (in_array('account', $relations)) {
             $vouchers = withRelation('account', $vouchers, 'account_id', 'id');

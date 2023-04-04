@@ -34,8 +34,9 @@ class MpesaProvider implements PaymentContract
             throw new Exception('Unsupported payment type');
         }
 
+        $amount = $this->paymentDTO->totalAmount();
         $payBillSwitch = config('services.sidooh.payment_providers.mpesa.pay_bill_switch_amount');
-        if ($payBillSwitch > 0 && $this->paymentDTO->amount > $payBillSwitch) {
+        if ($payBillSwitch > 0 && $amount > $payBillSwitch) {
 //            if TILL add partyB and type to MpesaAccount::TILL
             $mpesaAcc = new MpesaAccount(
                 config('services.sidooh.payment_providers.mpesa.pay_bill.shortcode'),
@@ -49,7 +50,7 @@ class MpesaProvider implements PaymentContract
 
         // TODO: Add float option as well
         return match ($this->paymentDTO->subtype) {
-            PaymentSubtype::STK => mpesa_request($this->paymentDTO->source, $this->paymentDTO->amount, null, null, $mpesaAcc)->id,
+            PaymentSubtype::STK => mpesa_request($this->paymentDTO->source, $amount, null, null, $mpesaAcc)->id,
             default             => throw new Exception('Unsupported payment subtype')
         };
     }
