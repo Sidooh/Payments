@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers\API\V1;
 
-use App\Enums\Frequency;
 use App\Enums\PaymentSubtype;
-use App\Enums\Period;
 use App\Enums\Status;
-use App\Facades\LocalCarbon;
-use App\Helpers\ChartAid;
 use App\Http\Controllers\Controller;
+use App\Models\FloatAccount;
 use App\Models\Payment;
 use Carbon\Carbon;
 use DrH\Mpesa\Entities\MpesaC2bCallback;
@@ -49,56 +46,34 @@ class DashboardController extends Controller
             );
         });
 
-        $orgBalance = Cache::remember('org_balance', 60 * 60 * 12, fn () => MpesaC2bCallback::latest('id')->value('org_account_balance'));
-
         return $this->successResponse([
             'total_payments'       => $totalPayments,
             'total_payments_today' => $totalPaymentsToday,
 
             'total_revenue'        => $totalRevenue,
             'total_revenue_today'  => $totalRevenueToday,
-
-            'org_balance' => $orgBalance,
         ]);
     }
 
     public function revenueChart(Request $request): JsonResponse
     {
-        $frequency = Frequency::tryFrom((string) $request->input('frequency')) ?? Frequency::HOURLY;
+        $transactions = Payment::selectRaw("status, DATE_FORMAT(created_at, '%Y%m%d%H') as date, SUM(amount) as amount")
+                                   ->whereDate('created_at', Carbon::today())
+                                   ->groupBy('date', 'status')
+                                   ->orderByDesc('date')
+                                   ->get();
 
-        $chartAid = new ChartAid(Period::TODAY, $frequency, 'sum', 'amount');
-        $chartAid->setShowFuture(true);
+        return $this->successResponse($transactions);
+    }
 
-        $fetch = function(array $whereBetween, int $freqCount = null) use ($chartAid) {
-            $transactions = Cache::remember(
-                'payments_'.implode('_', $whereBetween),
-                60 * 60,
-                fn () => Payment::select(['status', 'created_at', 'amount'])->whereBetween('created_at', $whereBetween)
-                    ->get()
-            );
-
-            $transform = function($transactions, $key) use ($freqCount, $chartAid) {
-                $models = $transactions->groupBy(fn ($item) => $chartAid->chartDateFormat($item['created_at']));
-
-                return [$key => $chartAid->chartDataSet($models, $freqCount)];
-            };
-
-            return collect($transactions->toArray())->groupBy('status')->toBase()->mapWithKeys($transform)->merge(
-                $transform($transactions, 'ALL')
-            );
-        };
-
-        $todayHrs = LocalCarbon::now()->diffInHours(LocalCarbon::now()->startOfDay());
+    public function getProviderBalances(): JsonResponse
+    {
+        $orgBalance = Cache::remember('org_balance', 60 * 60 * 12, fn () => MpesaC2bCallback::latest('id')->value('org_account_balance'));
+        $b2bBalance = Cache::remember('b2b_balance', 60 * 60, fn () => FloatAccount::whereDescription('SIDOOH - MERCHANT')->value('balance'));
 
         return $this->successResponse([
-            'today'     => $fetch([
-                LocalCarbon::today()->startOfDay()->utc(),
-                LocalCarbon::today()->endOfDay()->utc(),
-            ], $todayHrs + 1),
-            'yesterday' => $fetch([
-                LocalCarbon::yesterday()->startOfDay()->utc(),
-                LocalCarbon::yesterday()->endOfDay()->utc(),
-            ]),
+            'org_balance' => $orgBalance,
+            'b2b_balance' => $b2bBalance,
         ]);
     }
 }
