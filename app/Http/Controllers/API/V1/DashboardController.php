@@ -55,15 +55,15 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function revenueChart(Request $request): JsonResponse
+    public function chart(Request $request): JsonResponse
     {
-        $transactions = Payment::selectRaw("status, DATE_FORMAT(created_at, '%Y%m%d%H') as date, SUM(amount) as amount")
+        $chart = Payment::selectRaw("status, DATE_FORMAT(created_at, '%Y%m%d%H') as date, SUM(amount) as amount, COUNT(*) as count")
                                    ->whereDate('created_at', Carbon::today())
                                    ->groupBy('date', 'status')
                                    ->orderByDesc('date')
                                    ->get();
 
-        return $this->successResponse($transactions);
+        return $this->successResponse($chart);
     }
 
     public function getProviderBalances(): JsonResponse
