@@ -16,7 +16,7 @@ class VoucherTransactionController extends Controller
 
         $transactions = VoucherTransaction::select(['id', 'type', 'amount', 'description', 'voucher_id', 'created_at'])
             ->latest()
-            ->limit($request->integer('limit', 1000));
+            ->limit($request->integer('limit', 100));
 
         if (in_array('voucher', $relations)) {
             $transactions->with('voucher:id,account_id,voucher_type_id,balance');

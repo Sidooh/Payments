@@ -90,7 +90,8 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
     //  DASHBOARD ROUTES
     Route::prefix('/dashboard')->group(function() {
         Route::get('/', DashboardController::class);
-        Route::get('/revenue-chart', [DashboardController::class, 'revenueChart']);
+        Route::get('/chart', [DashboardController::class, 'chart']);
+        Route::get('/providers/balances', [DashboardController::class, 'getProviderBalances']);
     });
 
     //  UTILITIES
