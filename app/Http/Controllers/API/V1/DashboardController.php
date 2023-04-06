@@ -69,7 +69,7 @@ class DashboardController extends Controller
     public function getProviderBalances(): JsonResponse
     {
         $orgBalance = Cache::remember('org_balance', 60 * 60 * 12, fn () => MpesaC2bCallback::latest('id')->value('org_account_balance'));
-        $b2bBalance = Cache::remember('b2b_balance', 60 * 60 * 3, fn () => FloatAccount::find(3)->value('balance'));
+        $b2bBalance = Cache::remember('b2b_balance', 60 * 60 * 3, fn () => FloatAccount::find(3)->balance);
 
         return $this->successResponse([
             'org_balance' => $orgBalance,
