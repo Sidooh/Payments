@@ -6,6 +6,7 @@ use App\Http\Controllers\API\V1\DashboardController;
 use App\Http\Controllers\API\V1\FloatAccountController;
 use App\Http\Controllers\API\V1\FloatAccountTransactionController;
 use App\Http\Controllers\API\V1\PaymentController;
+use App\Http\Controllers\API\V1\TendePayMerchantController;
 use App\Http\Controllers\API\V1\VoucherController;
 use App\Http\Controllers\API\V1\VoucherTransactionController;
 use App\Http\Controllers\API\V1\VoucherTypeController;
@@ -104,4 +105,6 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/buy-goods', [ChargeController::class, 'getBuyGoodsCharges']);
         Route::get('/buy-goods/{amount}', [ChargeController::class, 'getBuyGoodsCharge']);
     });
+
+    Route::get('/merchants/search/{code}', [TendePayMerchantController::class, 'searchMerchant']);
 });
