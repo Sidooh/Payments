@@ -224,9 +224,17 @@ class PaymentController extends Controller
             if ($merchantType === MerchantType::MPESA_PAY_BILL) {
                 $charge = pay_bill_charge($request->integer('amount'));
                 $destination = $request->only('merchant_type', 'paybill_number', 'account_number');
+
+                if (is_blacklisted_merchant($request->paybill_number)) {
+                    throw new Exception('invalid merchant', 422);
+                }
             } else {
                 $charge = buy_goods_charge($request->integer('amount'));
                 $destination = $request->only('merchant_type', 'buy_goods_number', 'account_number');
+
+                if (is_blacklisted_merchant($request->buy_goods_number)) {
+                    throw new Exception('invalid merchant', 422);
+                }
             }
 
             $repo = new PaymentRepository(
