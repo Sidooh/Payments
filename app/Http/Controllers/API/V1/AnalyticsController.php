@@ -38,7 +38,7 @@ class AnalyticsController extends Controller
                                           ->fromRaw("(SELECT CASE WHEN status = 'Paid' THEN 1 END status FROM mpesa_stk_requests WHERE created_at > ?) mpesa_stk_requests",
                                               now()->subYear())
                                           ->value('slo'),
-            'mpesa_b2c' => MpesaBulkPaymentResponse::selectRaw('ROUND(COUNT(status)/COUNT(*) * 100) slo')
+            'mpesa_b2c' => MpesaBulkPaymentResponse::selectRaw('ROUND(COUNT(result_code)/COUNT(*) * 100) slo')
                                                    ->fromRaw("(SELECT CASE WHEN result_code = '0' THEN 1 END result_code FROM mpesa_bulk_payment_responses WHERE created_at > ?) mpesa_bulk_payment_responses",
                                                        now()->subYear())
                                                    ->value('slo'),
