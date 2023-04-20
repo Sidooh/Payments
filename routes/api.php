@@ -101,7 +101,6 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
             Route::get('/vendors', [AnalyticsController::class, 'getVendorsSLOs']);
         });
         Route::get('/payments', [AnalyticsController::class, 'payments']);
-        Route::get('/revenue', [AnalyticsController::class, 'revenue']);
     });
 
     //  UTILITIES
