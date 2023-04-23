@@ -47,12 +47,12 @@ class FloatAccountRepository
         $account = FloatAccount::findOrFail($id);
 
         // TODO: Return proper response/ create specific error type, rather than throwing error
-        if ($account->balance < $amount) {
+        if ($account->balance <  ($amount + $charge)) {
             throw new BalanceException('Insufficient float balance.');
         }
 
-        return DB::transaction(function() use ($charge, $description, $amount, $account) {
-            $account->balance -= $amount + $charge;
+        return DB::transaction(function() use ($amount, $charge, $description, $account) {
+            $account->balance -= ($amount + $charge);
             $account->save();
 
             $transaction = [

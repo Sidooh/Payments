@@ -35,7 +35,7 @@ class MpesaProvider implements PaymentContract
         }
 
         $amount = $this->paymentDTO->totalAmount();
-        $payBillSwitch = config('services.sidooh.payment_providers.mpesa.pay_bill_switch_amount');
+        $payBillSwitch = config('services.sidooh.providers.mpesa.pay_bill_switch_amount');
         if ($payBillSwitch > 0 && $amount > $payBillSwitch) {
 //            if TILL add partyB and type to MpesaAccount::TILL
             $mpesaAcc = new MpesaAccount(

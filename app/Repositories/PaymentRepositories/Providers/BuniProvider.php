@@ -36,8 +36,6 @@ readonly class BuniProvider implements PaymentContract
 
         $amount = $this->paymentDTO->totalAmount();
 
-        \Config::set('buni.urls.stk_callback', config('app.url'));
-
         return match ($this->paymentDTO->subtype) {
             PaymentSubtype::STK => BuniStk::push($amount, $this->paymentDTO->source, 'SIDOOH', 'test')->id,
             default => throw new Exception('Unsupported payment subtype')

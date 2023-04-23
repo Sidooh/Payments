@@ -12,9 +12,9 @@ enum PaymentMethod: string
 
     public function getTypeAndSubtype(): array
     {
+        $mpesaType = PaymentType::tryFrom(config('services.sidooh.providers.mpesa.stk')) ?? PaymentType::MPESA;
         return match ($this) {
-//            self::MPESA   => [PaymentType::MPESA, PaymentSubtype::STK],
-            self::MPESA   => [PaymentType::BUNI, PaymentSubtype::STK],
+            self::MPESA   => [$mpesaType, PaymentSubtype::STK],
             self::VOUCHER => [PaymentType::SIDOOH, PaymentSubtype::VOUCHER],
             self::FLOAT   => [PaymentType::SIDOOH, PaymentSubtype::FLOAT],
         };

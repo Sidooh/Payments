@@ -8,7 +8,4 @@ enum PaymentType: string
     case SIDOOH = 'SIDOOH';
     case TENDE = 'TENDE';
     case BUNI = 'BUNI';
-//    case BANK = 'BANK';
-//    case PAYPAL = 'PAYPAL';
-//    case OTHER = 'OTHER';
 }

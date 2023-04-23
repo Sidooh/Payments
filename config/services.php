@@ -107,7 +107,7 @@ return [
                 ['min' => 45001, 'max' => 150000, 'charge' => 105],
             ],
         ],
-        'payment_providers' => [
+        'providers' => [
             'mpesa' => [
                 'pay_bill_switch_amount' => env('SIDOOH_PAYBILL_SWITCH_AMOUNT'),
                 'pay_bill'               => [
@@ -116,6 +116,7 @@ return [
                     'passkey'   => env('SIDOOH_PAYBILL_PASS_KEY'),
                     'shortcode' => env('SIDOOH_PAYBILL_SHORTCODE'),
                 ],
+                'stk'   => env('SIDOOH_STK_PROVIDER', 'MPESA'),
             ],
         ],
         'merchants' => [
