@@ -13,7 +13,8 @@ enum PaymentMethod: string
     public function getTypeAndSubtype(): array
     {
         return match ($this) {
-            self::MPESA   => [PaymentType::MPESA, PaymentSubtype::STK],
+//            self::MPESA   => [PaymentType::MPESA, PaymentSubtype::STK],
+            self::MPESA   => [PaymentType::BUNI, PaymentSubtype::STK],
             self::VOUCHER => [PaymentType::SIDOOH, PaymentSubtype::VOUCHER],
             self::FLOAT   => [PaymentType::SIDOOH, PaymentSubtype::FLOAT],
         };

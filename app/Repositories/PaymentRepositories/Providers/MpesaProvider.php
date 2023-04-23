@@ -48,7 +48,6 @@ class MpesaProvider implements PaymentContract
             $mpesaAcc = null;
         }
 
-        // TODO: Add float option as well
         return match ($this->paymentDTO->subtype) {
             PaymentSubtype::STK => mpesa_request($this->paymentDTO->source, $amount, null, null, $mpesaAcc)->id,
             default             => throw new Exception('Unsupported payment subtype')

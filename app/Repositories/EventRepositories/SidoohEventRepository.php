@@ -3,6 +3,7 @@
 namespace App\Repositories\EventRepositories;
 
 use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Http\Resources\PaymentResource;
 use App\Models\FloatAccountTransaction;
@@ -19,7 +20,7 @@ class SidoohEventRepository
      */
     public static function voucherCredited(VoucherTransaction $transaction): void
     {
-        $payment = Payment::whereDestinationProvider(PaymentSubtype::VOUCHER, $transaction->id)->firstOrFail();
+        $payment = Payment::whereDestinationProvider(PaymentType::SIDOOH, PaymentSubtype::VOUCHER, $transaction->id)->firstOrFail();
 
         self::processEvent($transaction, $payment);
     }
@@ -29,7 +30,7 @@ class SidoohEventRepository
      */
     public static function floatTopUp(FloatAccountTransaction $transaction): void
     {
-        $payment = Payment::whereDestinationProvider(PaymentSubtype::FLOAT, $transaction->id)->firstOrFail();
+        $payment = Payment::whereDestinationProvider(PaymentType::SIDOOH, PaymentSubtype::FLOAT, $transaction->id)->firstOrFail();
 
         self::processEvent($transaction, $payment);
     }
