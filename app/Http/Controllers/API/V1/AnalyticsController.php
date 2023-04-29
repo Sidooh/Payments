@@ -10,11 +10,12 @@ use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkRequest;
 use DrH\TendePay\Models\TendePayRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class AnalyticsController extends Controller
 {
-    public function getPaymentsSLOs(): JsonResponse
+    public function getPaymentsSLO(): JsonResponse
     {
         $slo = Cache::remember('payments_slo', (3600 * 24 * 7), function() {
             return Payment::selectRaw('YEAR(created_at) as year, status, count(*) as count')
@@ -27,7 +28,7 @@ class AnalyticsController extends Controller
         return $this->successResponse($slo);
     }
 
-    public function getVendorsSLOs(): JsonResponse
+    public function getVendorsSLO(Request $request): JsonResponse
     {
         $SLOs = Cache::remember('vendors_slo', (3600 * 24 * 7), fn () => [
             'tende'     => TendePayRequest::selectRaw('ROUND(COUNT(status)/COUNT(*) * 100) slo')
