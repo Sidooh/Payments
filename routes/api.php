@@ -96,9 +96,9 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
     });
 
     Route::prefix('/analytics')->group(function() {
-        Route::prefix('/slos')->group(function() {
-            Route::get('/payments', [AnalyticsController::class, 'getPaymentsSLOs']);
-            Route::get('/vendors', [AnalyticsController::class, 'getVendorsSLOs']);
+        Route::prefix('/slo')->group(function() {
+            Route::get('/payments', [AnalyticsController::class, 'getPaymentsSLO']);
+            Route::get('/vendors', [AnalyticsController::class, 'getVendorsSLO']);
         });
         Route::get('/payments', [AnalyticsController::class, 'payments']);
     });
