@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\V1\AdminController;
+use App\Http\Controllers\API\V1\AnalyticsController;
 use App\Http\Controllers\API\V1\ChargeController;
 use App\Http\Controllers\API\V1\DashboardController;
 use App\Http\Controllers\API\V1\FloatAccountController;
@@ -92,6 +93,14 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/', DashboardController::class);
         Route::get('/chart', [DashboardController::class, 'chart']);
         Route::get('/providers/balances', [DashboardController::class, 'getProviderBalances']);
+    });
+
+    Route::prefix('/analytics')->group(function() {
+        Route::prefix('/slo')->group(function() {
+            Route::get('/payments', [AnalyticsController::class, 'getPaymentsSLO']);
+            Route::get('/vendors', [AnalyticsController::class, 'getVendorsSLO']);
+        });
+        Route::get('/payments', [AnalyticsController::class, 'payments']);
     });
 
     //  UTILITIES

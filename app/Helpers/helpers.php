@@ -95,3 +95,12 @@ if (! function_exists('buy_goods_charge')) {
         return $charge['charge'];
     }
 }
+
+if (! function_exists('is_blacklisted_merchant')) {
+    function is_blacklisted_merchant(int $code): bool
+    {
+        $blacklist = config('services.sidooh.merchants.blacklist') ?? [];
+
+        return in_array($code, $blacklist);
+    }
+}
