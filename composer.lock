@@ -772,16 +772,16 @@
         },
         {
             "name": "drh/laravel-buni",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/laravel-buni.git",
-                "reference": "833571e5eb5c6cf8b1a14df68bb68b06dc4bb6a4"
+                "reference": "d545a1a4c7082aa247342f875aa4b78c26d92672"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/laravel-buni/zipball/833571e5eb5c6cf8b1a14df68bb68b06dc4bb6a4",
-                "reference": "833571e5eb5c6cf8b1a14df68bb68b06dc4bb6a4",
+                "url": "https://api.github.com/repos/DrH97/laravel-buni/zipball/d545a1a4c7082aa247342f875aa4b78c26d92672",
+                "reference": "d545a1a4c7082aa247342f875aa4b78c26d92672",
                 "shasum": ""
             },
             "require": {
@@ -830,9 +830,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/laravel-buni/issues",
-                "source": "https://github.com/DrH97/laravel-buni/tree/v1.0.3"
+                "source": "https://github.com/DrH97/laravel-buni/tree/v1.0.4"
             },
-            "time": "2023-05-10T09:39:44+00:00"
+            "time": "2023-05-10T10:13:07+00:00"
         },
         {
             "name": "drh/laravel-tendepay",
