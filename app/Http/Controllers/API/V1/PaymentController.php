@@ -111,8 +111,8 @@ class PaymentController extends Controller
         if ($payment->subtype === PaymentSubtype::STK) {
             $payment->type === PaymentType::BUNI ?
                 $payment->load([
-                    'provider:id,status,invoice_number,description,merchant_checkout_id,amount,phone_number,created_at',
-                    'provider.callback:id,merchant_checkout_id,mpesa_receipt_number,phone_number,result_desc,created_at',
+                    'provider:id,status,invoice_number,description,merchant_request_id,amount,phone_number,created_at',
+                    'provider.callback:id,merchant_request_id,mpesa_receipt_number,phone_number,result_desc,created_at',
                 ])
                 :
                 $payment->load([
