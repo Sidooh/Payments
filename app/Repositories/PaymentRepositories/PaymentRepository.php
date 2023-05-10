@@ -12,7 +12,7 @@ use App\Models\Payment;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-readonly class PaymentRepository
+class PaymentRepository
 {
     public function __construct(private PaymentDTO $paymentData, private ?string $ipn = null)
     {

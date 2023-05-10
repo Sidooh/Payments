@@ -8,7 +8,7 @@ use App\Enums\PaymentType;
 use DrH\Buni\Facades\BuniStk;
 use Exception;
 
-readonly class BuniProvider implements PaymentContract
+class BuniProvider implements PaymentContract
 {
     public function __construct(private PaymentDTO $paymentDTO)
     {
