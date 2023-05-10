@@ -21,9 +21,9 @@ return new class extends Migration {
             $table->string('transaction_date')->nullable();
 
             $table->timestamps();
-            $table->foreign('checkout_request_id')
-                ->references('checkout_request_id')
-                ->on('buni_stk_requests')->onDelete('cascade')->onUpdate('cascade');
+//            $table->foreign('checkout_request_id')
+//                ->references('checkout_request_id')
+//                ->on('buni_stk_requests')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('merchant_request_id')
                 ->references('merchant_request_id')
                 ->on('buni_stk_requests')->onDelete('cascade')->onUpdate('cascade');

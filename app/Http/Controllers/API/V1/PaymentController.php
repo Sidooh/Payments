@@ -109,10 +109,16 @@ class PaymentController extends Controller
     {
         // TODO: Add auth check functionality for this
         if ($payment->subtype === PaymentSubtype::STK) {
-            $payment->load([
-                'provider:id,status,reference,description,checkout_request_id,amount,phone,created_at',
-                'provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at',
-            ]);
+            $payment->type === PaymentType::BUNI ?
+                $payment->load([
+                    'provider:id,status,invoice_number,description,merchant_checkout_id,amount,phone_number,created_at',
+                    'provider.callback:id,merchant_checkout_id,mpesa_receipt_number,phone_number,result_desc,created_at',
+                ])
+                :
+                $payment->load([
+                    'provider:id,status,reference,description,checkout_request_id,amount,phone,created_at',
+                    'provider.response:id,checkout_request_id,mpesa_receipt_number,phone,result_desc,created_at',
+                ]);
         }
 
         if (in_array($payment->subtype, [PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT])) {
