@@ -4,6 +4,7 @@ namespace App\Repositories\EventRepositories;
 
 use App\Enums\Description;
 use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
@@ -23,7 +24,7 @@ class TendePayEventRepository
      */
     public static function b2bPaymentFailed(TendePayCallback $callback): void
     {
-        $payment = Payment::whereDestinationProvider(PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
+        $payment = Payment::whereDestinationProvider(PaymentType::TENDE, PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING) {
             Log::error('Payment is not pending...', [$payment, $callback->request]);
@@ -43,7 +44,7 @@ class TendePayEventRepository
 
     public static function b2bPaymentSent(TendePayCallback $callback): void
     {
-        $payment = Payment::whereDestinationProvider(PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
+        $payment = Payment::whereDestinationProvider(PaymentType::TENDE, PaymentSubtype::B2B, $callback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING) {
             Log::error('Payment is not pending...', [$payment, $callback->request]);
