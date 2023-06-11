@@ -36,8 +36,10 @@ class BuniProvider implements PaymentContract
 
         $amount = $this->paymentDTO->totalAmount();
 
+        $reference = config('services.sidooh.providers.buni.till') . '#' . $this->paymentDTO->reference;
+
         return match ($this->paymentDTO->subtype) {
-            PaymentSubtype::STK => BuniStk::push($amount, $this->paymentDTO->source, $this->paymentDTO->reference, $this->paymentDTO->description)->id,
+            PaymentSubtype::STK => BuniStk::push($amount, $this->paymentDTO->source, $reference, $this->paymentDTO->description)->id,
             default => throw new Exception('Unsupported payment subtype')
         };
     }

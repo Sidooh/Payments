@@ -118,6 +118,9 @@ return [
                 ],
                 'stk'   => env('SIDOOH_STK_PROVIDER', 'MPESA'),
             ],
+            'buni' => [
+                'till' => env('BUNI_TILL_NUMBER')
+            ],
         ],
         'merchants' => [
             'blacklist' => [888888, 888880]
