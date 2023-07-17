@@ -58,6 +58,8 @@ class BuniEventRepository
         if (! $payment->destination_type) {
             $payment->update(['status' => Status::COMPLETED]);
 
+            if ($payment->type === PaymentType::BUNI) $payment->type = PaymentType::MPESA;
+
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
 
             return;
