@@ -45,12 +45,12 @@ class Payment extends Model
 
     public function provider(): MorphTo
     {
-        return $this->morphTo(__FUNCTION__, 'subtype', 'provider_id');
+        return $this->morphTo(__FUNCTION__, 'provider', 'provider_id');
     }
 
     public function destinationProvider(): MorphTo
     {
-        return $this->morphTo(__FUNCTION__, 'destination_subtype', 'destination_provider_id');
+        return $this->morphTo(__FUNCTION__, 'destination_provider', 'destination_provider_id');
     }
 
     /**
@@ -61,9 +61,9 @@ class Payment extends Model
      * @param  int  $providerId
      * @return Builder
      */
-    public function scopeWhereProvider(Builder $query, PaymentSubtype $subtype, int $providerId): Builder
+    public function scopeWhereProvider(Builder $query, PaymentType $type, PaymentSubtype $subtype, int $providerId): Builder
     {
-        return $query->whereSubtype($subtype->name)->whereProviderId($providerId);
+        return $query->whereType($type->name)->whereSubtype($subtype->name)->whereProviderId($providerId);
     }
 
     /**
@@ -74,8 +74,8 @@ class Payment extends Model
      * @param  int  $providerId
      * @return Builder
      */
-    public function scopeWhereDestinationProvider(Builder $query, PaymentSubtype $subtype, int $providerId): Builder
+    public function scopeWhereDestinationProvider(Builder $query, PaymentType $type, PaymentSubtype $subtype, int $providerId): Builder
     {
-        return $query->whereDestinationSubtype($subtype->name)->whereDestinationProviderId($providerId);
+        return $query->whereDestinationType($type->name)->whereDestinationSubtype($subtype->name)->whereDestinationProviderId($providerId);
     }
 }

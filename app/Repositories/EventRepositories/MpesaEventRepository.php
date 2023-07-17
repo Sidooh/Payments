@@ -6,6 +6,7 @@ use App\DTOs\PaymentDTO;
 use App\Enums\Description;
 use App\Enums\PaymentCodes;
 use App\Enums\PaymentSubtype;
+use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
@@ -23,7 +24,7 @@ class MpesaEventRepository
 {
     public static function stkPaymentFailed(MpesaStkCallback $stkCallback): void
     {
-        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
+        $payment = Payment::whereProvider(PaymentType::MPESA, PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING) {
             Log::critical('Payment is not pending...', [$payment, $stkCallback->request]);
@@ -50,7 +51,7 @@ class MpesaEventRepository
      */
     public static function stkPaymentReceived(MpesaStkCallback $stkCallback): void
     {
-        $payment = Payment::whereProvider(PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
+        $payment = Payment::whereProvider(PaymentType::MPESA, PaymentSubtype::STK, $stkCallback->request->id)->firstOrFail();
 
         if ($payment->status !== Status::PENDING) {
             Log::critical('Payment is not pending...', [$payment, $stkCallback->request]);
@@ -76,7 +77,7 @@ class MpesaEventRepository
     public static function b2cPaymentSent(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
-            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
+            $payment = Payment::whereDestinationProvider(PaymentType::MPESA, PaymentSubtype::B2C, $paymentResponse->request->id)
                               ->firstOrFail();
             if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");
@@ -96,7 +97,7 @@ class MpesaEventRepository
     public static function b2cPaymentFailed(MpesaBulkPaymentResponse $paymentResponse): void
     {
         try {
-            $payment = Payment::whereDestinationProvider(PaymentSubtype::B2C, $paymentResponse->request->id)
+            $payment = Payment::whereDestinationProvider(PaymentType::MPESA, PaymentSubtype::B2C, $paymentResponse->request->id)
                               ->firstOrFail();
 
             if ($payment->status !== Status::PENDING) {

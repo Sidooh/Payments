@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentRepository
 {
-    public function __construct(private readonly PaymentDTO $paymentData, private readonly ?string $ipn = null)
+    public function __construct(private PaymentDTO $paymentData, private ?string $ipn = null)
     {
         Log::info('PaymentDTO', [$this->paymentData]);
     }
@@ -24,9 +24,10 @@ class PaymentRepository
         $matchType = $this->paymentData->isWithdrawal ? $this->paymentData->destinationType : $this->paymentData->type;
 
         return match ($matchType) {
-            PaymentType::MPESA  => new MpesaRepository($this->paymentData),
+            PaymentType::MPESA => new MpesaRepository($this->paymentData),
             PaymentType::SIDOOH => new SidoohRepository($this->paymentData),
-            PaymentType::TENDE  => new TendeRepository($this->paymentData),
+            PaymentType::TENDE => new TendeRepository($this->paymentData),
+            PaymentType::BUNI => new BuniRepository($this->paymentData),
         };
     }
 
@@ -37,7 +38,7 @@ class PaymentRepository
     {
         $providerId = $this->getPaymentRepository()->process();
 
-        if (! $this->paymentData->isWithdrawal) {
+        if (!$this->paymentData->isWithdrawal) {
             $payment = $this->createPayment($providerId);
 
             // TODO: Should we fire event on voucher debit then consume?
@@ -54,7 +55,7 @@ class PaymentRepository
                     $repo->processPayment();
                 }
 
-                if (! $this->paymentData->destinationSubtype) {
+                if (!$this->paymentData->destinationSubtype) {
                     $payment->update(['status' => Status::COMPLETED]);
                 }
             }
@@ -62,7 +63,7 @@ class PaymentRepository
             $payment = $this->updatePayment($providerId);
         }
 
-        return $payment;
+        return $payment->refresh();
     }
 
     private function updatePayment(int $providerId): Payment
