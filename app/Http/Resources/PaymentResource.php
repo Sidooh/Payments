@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\PaymentType;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -19,7 +20,7 @@ class PaymentResource extends JsonResource
             'amount'      => $this->amount,
             'charge'      => $this->charge,
             'status'      => $this->status,
-            'type'        => $this->type,
+            'type'        => $this->type === PaymentType::BUNI ? PaymentType::MPESA : $this->type,
             'subtype'     => $this->subtype,
             'description' => $this->description,
             'reference'   => $this->reference,
