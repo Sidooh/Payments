@@ -63,7 +63,7 @@ class PaymentRepository
             $payment = $this->updatePayment($providerId);
         }
 
-        return $payment;
+        return $payment->refresh();
     }
 
     private function updatePayment(int $providerId): Payment
