@@ -36,7 +36,7 @@ class BuniProvider implements PaymentContract
 
         $amount = $this->paymentDTO->totalAmount();
 
-        $reference = config('services.sidooh.providers.buni.till') . '#' . $this->paymentDTO->reference;
+        $reference = config('services.sidooh.providers.buni.till') . '#SIDOOH';
 
         return match ($this->paymentDTO->subtype) {
             PaymentSubtype::STK => BuniStk::push($amount, $this->paymentDTO->source, $reference, $this->paymentDTO->description)->id,
