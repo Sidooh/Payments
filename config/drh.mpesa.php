@@ -151,6 +151,49 @@ return [
     ],
 
     /*
+     |--------------------------------------------------------------------------
+     | B2B array
+     |--------------------------------------------------------------------------
+     |
+     | If you are sending payments to b2b
+     |
+     */
+    'b2b' => [
+        /*
+         * Sending app consumer key
+         */
+        'consumer_key' => env('MPESA_B2B_KEY'),
+        /*
+         * Sending app consumer secret
+         */
+        'consumer_secret' => env('MPESA_B2B_SECRET'),
+        /*
+         * Shortcode sending funds
+         */
+        'short_code' => env('MPESA_B2B_SHORTCODE', '600982'),
+        /*
+        * This is the user initiating the transaction, usually from the Mpesa organization portal
+        * Make sure this was the user who was used to 'GO LIVE'
+        * https://org.ke.m-pesa.com/
+        */
+        'initiator' => env('MPESA_B2B_INITIATOR', 'testapi'),
+        /*
+         * The user security credential.
+         * Go to https://developer.safaricom.co.ke/test_credentials and paste your initiator password to generate
+         * security credential
+         */
+        'security_credential' => 'C+4UVvb7bERHCHxs6j8F/CgSjxINcZc2Uvtv5/aw7DQxFzMeCjZYLxUnU9C5paekZOhRIpsJ3QOKZphIEOjd0tkN/Em8OBTEPGHgccab/K6eT9vZwkBO7EcgU6p9z7madUDXR+SxcuC3axaTcPsxP8AWonHp/U8fu8XttlCdOHWqPY9lyvyn0zPabBoF1GdPMmrgW/udSfiFE+kB0PTBfbKcrITBv+GIWUM751iCRCIcTHJSQ0aKYLPBPqDruh3xb368HVBrhabsNAtBCHXrqe5vnJXr2Nxl6vBIByaAxbS7AVrU+9TFZ0mgYZa5C1e7VoEDoGVHoiRYmj+rs8GTgg==',
+        /*
+         * Notification URL for timeout
+         */
+        'timeout_url' => env('APP_URL') . '/payments/callbacks/timeout/',
+        /**
+         * Result URL
+         */
+        'result_url' => env('APP_URL') . '/payments/callbacks/result/',
+    ],
+
+    /*
      |------------------------------------------------------
      | Set sandbox amount
      | ------------------------------------------------------

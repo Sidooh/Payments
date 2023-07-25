@@ -117,6 +117,7 @@ return [
                     'shortcode' => env('SIDOOH_PAYBILL_SHORTCODE'),
                 ],
                 'stk'   => env('SIDOOH_STK_PROVIDER', 'MPESA'),
+                'b2b'   => env('SIDOOH_B2B_PROVIDER', 'MPESA'),
             ],
             'buni' => [
                 'till' => env('BUNI_TILL_NUMBER')

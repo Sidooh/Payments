@@ -9,6 +9,7 @@ enum MerchantType: string
 
     public function getTypeAndSubtype(): array
     {
-        return [PaymentType::TENDE, PaymentSubtype::B2B];
+        $type = PaymentType::tryFrom(config('services.sidooh.providers.mpesa.b2b')) ?? PaymentType::MPESA;
+        return [$type, PaymentSubtype::B2B];
     }
 }
