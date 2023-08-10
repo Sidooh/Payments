@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Exception;
 use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
@@ -23,7 +24,12 @@ class SidoohProducts extends SidoohService
     {
         Log::info('...[SRV - PRODUCTS]: Payment Callback...', $data);
 
-        return parent::http()->post(self::baseUrl().'/payments/callback', $data)->throw();
+        return parent::http()
+            ->connectTimeout(5)
+            ->retry(3, 100, function ($exception, $request) {
+                return $exception instanceof ConnectionException;
+            })
+            ->post(self::baseUrl() . '/payments/callback', $data)->throw();
     }
 
     /**
@@ -33,11 +39,11 @@ class SidoohProducts extends SidoohService
     {
         Log::info('...[SRV - PRODUCTS]: Find Enterprise...', ['id' => $id]);
 
-        $url = self::baseUrl()."/enterprises/$id?with=enterprise_accounts";
+        $url = self::baseUrl() . "/enterprises/$id?with=enterprise_accounts";
 
-        $response = Cache::remember($id, (60 * 60 * 24), fn () => parent::fetch($url));
+        $response = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));
 
-        if (! $response) {
+        if (!$response) {
             throw new Exception("Enterprise doesn't exist!");
         }
 
