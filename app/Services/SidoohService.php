@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Error;
 use Exception;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -98,7 +99,11 @@ class SidoohService
             $t = microtime(true);
 
             try {
-                $response = Http::send($method, $url, $options);
+                $response = Http::connectTimeout(5)
+                    ->retry(3, 100, function ($exception, $request) {
+                        return $exception instanceof ConnectionException;
+                    })
+                    ->send($method, $url, $options);
                 $latency = round((microtime(true) - $t) * 1000, 2);
 
                 Log::info('...[SRV - SIDOOH]: RES... '.$latency.'ms', [$response]);

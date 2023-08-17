@@ -18,21 +18,6 @@ class SidoohProducts extends SidoohService
     }
 
     /**
-     * @throws RequestException
-     */
-    public static function paymentCallback(array $data): PromiseInterface|Response
-    {
-        Log::info('...[SRV - PRODUCTS]: Payment Callback...', $data);
-
-        return parent::http()
-            ->connectTimeout(5)
-            ->retry(3, 100, function ($exception, $request) {
-                return $exception instanceof ConnectionException;
-            })
-            ->post(self::baseUrl() . '/payments/callback', $data)->throw();
-    }
-
-    /**
      * @throws \Exception
      */
     public static function findEnterprise($id)
