@@ -100,7 +100,7 @@ class SidoohService
 
             try {
                 $response = Http::connectTimeout(5)
-                    ->retry(3, 100, function ($exception, $request) {
+                    ->retry(3, 300, function ($exception, $request) {
                         return $exception instanceof ConnectionException;
                     })
                     ->send($method, $url, $options);

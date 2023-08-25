@@ -5,13 +5,13 @@ COPY . /app
 # TODO: Return --no-dev for production (removed for us to use clockwork in playdooh)
 RUN composer install --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-reqs --no-progress --no-dev
 
-FROM trafex/php-nginx:3.0.0 as production
+FROM trafex/php-nginx:3.3.0 as production
 
 USER root
 RUN apk add --no-cache \
-  php81-pdo \
-  php81-pdo_mysql \
-  php81-tokenizer
+  php82-pdo \
+  php82-pdo_mysql \
+  php82-tokenizer
 USER nobody
 
 # Configure nginx
