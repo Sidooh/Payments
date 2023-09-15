@@ -104,3 +104,21 @@ if (! function_exists('is_blacklisted_merchant')) {
         return in_array($code, $blacklist);
     }
 }
+
+if (! function_exists('mpesa_float_charge')) {
+    /**
+     * @throws \Exception
+     */
+    function mpesa_float_charge(int $amount): int
+    {
+        $charges = config('services.sidooh.charges.mpesa_float');
+
+        $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
+
+        if (! $charge) {
+            throw new Exception('Mpesa Float charge not found!');
+        }
+
+        return $charge['charge'];
+    }
+}

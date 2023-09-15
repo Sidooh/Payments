@@ -84,10 +84,16 @@ class MpesaProvider implements PaymentContract
         $merchantType = MerchantType::tryFrom($this->paymentDTO->destinationData['merchant_type']);
 
         $amount = $this->paymentDTO->amount;
-        $tillOrPaybill = $this->paymentDTO->destinationData['paybill_number'] ?? $this->paymentDTO->destinationData['buy_goods_number'];
-        $reference = $this->paymentDTO->destinationData['account_number'] ?? $this->paymentDTO->destinationData['buy_goods_number'];
+        $tillOrPaybill = $this->paymentDTO->destinationData['paybill_number'] ?? $this->paymentDTO->destinationData['buy_goods_number'] ?? $this->paymentDTO->destinationData['store'] ;
+        $reference = $this->paymentDTO->destinationData['account_number'] ?? $this->paymentDTO->destinationData['buy_goods_number'] ?? '';
         $msisdn = SidoohAccounts::find($this->paymentDTO->accountId)['phone'];
 
-        return mpesa_b2b($merchantType === MerchantType::MPESA_BUY_GOODS ? B2BPayment::TILL : B2BPayment::PAYBILL, $tillOrPaybill, $amount, $reference, $msisdn)->id;
+        $merchantType = match ($merchantType) {
+            MerchantType::MPESA_BUY_GOODS => B2BPayment::TILL,
+            MerchantType::MPESA_PAY_BILL => B2BPayment::PAYBILL,
+            MerchantType::MPESA_STORE => B2BPayment::STORE,
+        };
+
+        return mpesa_b2b($merchantType, $tillOrPaybill, $amount, $reference, $msisdn)->id;
     }
 }

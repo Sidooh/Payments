@@ -61,6 +61,9 @@ return [
             ],
         ],
         'charges'           => [
+            'mpesa_float' => [
+                ['min' => 1, 'max' => 100000, 'charge' => 30],
+            ],
             'withdrawal' => [
                 ['min' => 1, 'max' => 100, 'charge' => 5],
                 ['min' => 101, 'max' => 20000, 'charge' => 15],
