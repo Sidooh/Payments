@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('payments', function (Blueprint $table) {
             //
-            $table->string('provider', 30)->storedAs('CONCAT(type, subtype)');
-            $table->string('destination_provider', 30)
+            $table->string('provider_text', 30)->storedAs('CONCAT(type, subtype)');
+            $table->string('destination_provider_text', 30)
                 ->storedAs('CONCAT(destination_type, destination_subtype)');
         });
     }
@@ -26,7 +26,7 @@ return new class extends Migration
     {
         Schema::table('payments', function (Blueprint $table) {
             //
-            $table->dropColumn(['provider', 'destination_provider']);
+            $table->dropColumn(['provider_text', 'destination_provider_text']);
         });
     }
 };

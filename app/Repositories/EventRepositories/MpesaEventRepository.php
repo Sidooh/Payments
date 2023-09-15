@@ -13,6 +13,7 @@ use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\FloatAccountRepository;
 use App\Services\SidoohService;
+use DrH\Mpesa\Entities\MpesaB2bCallback;
 use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkCallback;
 use Error;
@@ -110,6 +111,57 @@ class MpesaEventRepository
                 $account->id,
                 $payment->amount,
                 Description::ACCOUNT_WITHDRAWAL_REFUND->value,
+                $payment->charge
+            );
+
+            $payment->update(['status' => Status::FAILED]);
+
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        } catch (Exception $e) {
+            Log::error($e);
+        }
+    }
+
+
+    public static function b2bPaymentSent(MpesaB2bCallback $paymentCallback): void
+    {
+        try {
+            $payment = Payment::whereDestinationProvider(PaymentType::MPESA, PaymentSubtype::B2B, $paymentCallback->request->id)
+                ->firstOrFail();
+            if ($payment->status !== Status::PENDING) {
+                throw new Error("Payment is not pending... - $payment->id");
+            }
+
+            $payment->update(['status' => Status::COMPLETED]);
+
+            SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+        } catch (Exception $e) {
+            Log::error($e);
+        }
+    }
+
+
+    /**
+     * @throws \Throwable
+     */
+    public static function b2bPaymentFailed(MpesaB2bCallback $paymentCallback): void
+    {
+        try {
+            $payment = Payment::whereDestinationProvider(PaymentType::MPESA, PaymentSubtype::B2B, $paymentCallback->request->id)
+                ->firstOrFail();
+
+            Log::error($payment);
+
+            if ($payment->status !== Status::PENDING) {
+                throw new Error("Payment is not pending... - $payment->id");
+            }
+
+            $account = $payment->provider->floatAccount;
+
+            FloatAccountRepository::credit(
+                $account->id,
+                $payment->amount,
+                Description::PAYMENT_REVERSAL->value,
                 $payment->charge
             );
 

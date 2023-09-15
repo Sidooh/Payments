@@ -116,7 +116,7 @@ if (! function_exists('mpesa_float_charge')) {
         $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
 
         if (! $charge) {
-            throw new Exception('Mpesa Float charge not found!');
+            throw new Exception('Mpesa float charge not found!');
         }
 
         return $charge['charge'];

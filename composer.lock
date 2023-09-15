@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0845ba06653c19a21431c70310636684",
+    "content-hash": "119a1012557d015b406fa6a6ea337fa9",
     "packages": [
         {
             "name": "brick/math",
@@ -916,16 +916,16 @@
         },
         {
             "name": "drh/mpesa",
-            "version": "v3.1.0",
+            "version": "v3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/mpesa.git",
-                "reference": "7bed9d58108ba7c71c3862100f272efa37e5723b"
+                "reference": "8d352079f3abc11132149c3c96f9fd0583509d87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/7bed9d58108ba7c71c3862100f272efa37e5723b",
-                "reference": "7bed9d58108ba7c71c3862100f272efa37e5723b",
+                "url": "https://api.github.com/repos/DrH97/mpesa/zipball/8d352079f3abc11132149c3c96f9fd0583509d87",
+                "reference": "8d352079f3abc11132149c3c96f9fd0583509d87",
                 "shasum": ""
             },
             "require": {
@@ -984,9 +984,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/mpesa/issues",
-                "source": "https://github.com/DrH97/mpesa/tree/v3.1.0"
+                "source": "https://github.com/DrH97/mpesa/tree/v3.2.1"
             },
-            "time": "2023-09-08T08:54:52+00:00"
+            "time": "2023-09-15T17:39:16+00:00"
         },
         {
             "name": "egulias/email-validator",
