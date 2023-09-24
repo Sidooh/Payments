@@ -127,6 +127,7 @@ class MpesaEventRepository
     {
         try {
             $payment = Payment::whereDestinationProvider(PaymentType::MPESA, PaymentSubtype::B2B, $paymentCallback->request->id)
+                ->with('destinationProvider.response')
                 ->firstOrFail();
             if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");

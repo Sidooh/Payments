@@ -50,7 +50,7 @@ class Payment extends Model
 
     public function destinationProvider(): MorphTo
     {
-        return $this->morphTo(__FUNCTION__, 'destination_provider_type', 'destination_provider_id');
+        return $this->morphTo(__FUNCTION__, 'destination_provider_text', 'destination_provider_id');
     }
 
     /**
