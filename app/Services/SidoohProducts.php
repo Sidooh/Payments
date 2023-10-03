@@ -3,9 +3,6 @@
 namespace App\Services;
 
 use Exception;
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\RequestException;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -14,16 +11,6 @@ class SidoohProducts extends SidoohService
     public static function baseUrl()
     {
         return config('services.sidooh.services.products.url');
-    }
-
-    /**
-     * @throws RequestException
-     */
-    public static function paymentCallback(array $data): PromiseInterface|Response
-    {
-        Log::info('...[SRV - PRODUCTS]: Payment Callback...', $data);
-
-        return parent::http()->post(self::baseUrl().'/payments/callback', $data)->throw();
     }
 
     /**
