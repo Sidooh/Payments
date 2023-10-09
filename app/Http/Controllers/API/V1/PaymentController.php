@@ -335,6 +335,7 @@ class PaymentController extends Controller
             $destination = match ($subtype2) {
                 PaymentSubtype::VOUCHER => 'voucher_id',
                 PaymentSubtype::B2C     => 'phone',
+                PaymentSubtype::FLOAT => 'float_account_id',
                 default                 => throw new Exception('Unexpected payment subtype'),
             };
 
