@@ -352,7 +352,7 @@ class PaymentController extends Controller
                     $type2,
                     $subtype2,
                     [$destination => $request->destination_account],
-                    withdrawal_charge($request->amount)
+                    $type2 === PaymentType::SIDOOH ? 0 : withdrawal_charge($request->amount)
                 ), $request->ipn
             );
 
