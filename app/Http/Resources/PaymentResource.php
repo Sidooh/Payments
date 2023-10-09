@@ -38,7 +38,7 @@ class PaymentResource extends JsonResource
             $base['mpesa_account'] = $this->mpesa_account;
         }
 
-        if (isset($this->destinationProvider->response)) {
+        if (isset($this->destinationProvider->response) && $this->status == "COMPLETE") {
             $base['store'] = $this->destinationProvider->response->credit_party_public_name;
         }
 
