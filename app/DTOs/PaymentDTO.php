@@ -43,7 +43,7 @@ class PaymentDTO
 
         $validPaymentCombinations = match ($this->subtype) {
             PaymentSubtype::STK, PaymentSubtype::VOUCHER => [null, PaymentSubtype::VOUCHER, PaymentSubtype::FLOAT, PaymentSubtype::B2B],
-            PaymentSubtype::FLOAT => [PaymentSubtype::VOUCHER, PaymentSubtype::B2C, PaymentSubtype::B2B],
+            PaymentSubtype::FLOAT => [PaymentSubtype::VOUCHER, PaymentSubtype::B2C, PaymentSubtype::B2B, PaymentSubtype::FLOAT],
             default               => throw new HttpException(422, 'Unsupported payment source')
         };
 
