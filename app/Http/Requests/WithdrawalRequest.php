@@ -46,7 +46,7 @@ class WithdrawalRequest extends PaymentRequest
     /**
      * @throws Exception
      */
-    public function destinationAccountRule(): SidoohVoucherExists|string
+    public function destinationAccountRule(): SidoohVoucherExists|SidoohFloatAccountExists|string
     {
         $countryCode = config('services.sidooh.country_code');
 
