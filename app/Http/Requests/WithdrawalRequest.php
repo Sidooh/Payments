@@ -53,6 +53,7 @@ class WithdrawalRequest extends PaymentRequest
         return match (PaymentMethod::tryFrom($this->input('destination'))) {
             PaymentMethod::MPESA   => "phone:$countryCode",
             PaymentMethod::VOUCHER => new SidoohVoucherExists,
+            PaymentMethod::FLOAT => new SidoohFloatAccountExists,
             default                => abort(422, 'Unsupported destination')
         /*throw new Exception('Unsupported destination', 422)*/
         };
