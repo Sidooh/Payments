@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\PaymentType;
+use App\Enums\Status;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -38,7 +39,7 @@ class PaymentResource extends JsonResource
             $base['mpesa_account'] = $this->mpesa_account;
         }
 
-        if (isset($this->destinationProvider->response) && $this->status == "COMPLETE") {
+        if (isset($this->destinationProvider->response) && $this->status == Status::COMPLETED) {
             $base['store'] = $this->destinationProvider->response->credit_party_public_name;
         }
 
