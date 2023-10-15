@@ -28,7 +28,7 @@ enum PaymentMethod: string
         return match ($this) {
             self::MPESA   => [PaymentType::MPESA, PaymentSubtype::B2C],
             self::VOUCHER => [PaymentType::SIDOOH, PaymentSubtype::VOUCHER],
-            self::FLOAT   => throw new Exception('Unsupported payment method')
+            self::FLOAT   => [PaymentType::SIDOOH, PaymentSubtype::FLOAT]
         };
     }
 }

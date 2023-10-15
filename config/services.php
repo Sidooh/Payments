@@ -61,6 +61,9 @@ return [
             ],
         ],
         'charges'           => [
+            'mpesa_float' => [
+                ['min' => 1, 'max' => 100000, 'charge' => 30],
+            ],
             'withdrawal' => [
                 ['min' => 1, 'max' => 100, 'charge' => 5],
                 ['min' => 101, 'max' => 20000, 'charge' => 15],
@@ -117,6 +120,7 @@ return [
                     'shortcode' => env('SIDOOH_PAYBILL_SHORTCODE'),
                 ],
                 'stk'   => env('SIDOOH_STK_PROVIDER', 'MPESA'),
+                'b2b'   => env('SIDOOH_B2B_PROVIDER', 'MPESA'),
             ],
             'buni' => [
                 'till' => env('BUNI_TILL_NUMBER')

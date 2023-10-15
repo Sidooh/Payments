@@ -142,7 +142,7 @@ class PaymentController extends Controller
         }
 
         if ($payment->destination_subtype === PaymentSubtype::B2B) {
-            $payment->load('destinationProvider.callback');
+            $payment->load('destinationProvider.response');
         }
 
         if ($payment->account_id) {
@@ -274,6 +274,55 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
+    public function mpesaFloat(MerchantPaymentRequest $request): JsonResponse
+    {
+        Log::info('...[CTRL - PAYMENT]: Float...', [$request->all()]);
+
+        try {
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
+            $merchantType = MerchantType::from($request->merchant_type);
+            [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
+
+            if ($merchantType === MerchantType::MPESA_STORE) {
+                $charge = mpesa_float_charge($request->integer('amount'));
+                $destination = $request->only('merchant_type', 'store', 'agent');
+
+                if (is_blacklisted_merchant($request->store)) {
+                    throw new Exception('invalid store', 422);
+                }
+            }
+
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    $request->reference,
+                    $request->source_account,
+                    false,
+                    $type2,
+                    $subtype2,
+                    $destination,
+                    $charge
+                ), $request->ipn
+            );
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
+        } catch (Exception $err) {
+            if ($err->getCode() === 422) {
+                return $this->errorResponse($err->getMessage(), $err->getCode());
+            }
+
+            Log::error($err);
+        }
+
+        return $this->errorResponse('Failed to process payment request.');
+    }
+
     public function withdraw(WithdrawalRequest $request): JsonResponse
     {
         Log::info('...[CTRL - PAYMENT]: Withdraw...', $request->all());
@@ -286,6 +335,7 @@ class PaymentController extends Controller
             $destination = match ($subtype2) {
                 PaymentSubtype::VOUCHER => 'voucher_id',
                 PaymentSubtype::B2C     => 'phone',
+                PaymentSubtype::FLOAT => 'float_account_id',
                 default                 => throw new Exception('Unexpected payment subtype'),
             };
 
@@ -302,7 +352,7 @@ class PaymentController extends Controller
                     $type2,
                     $subtype2,
                     [$destination => $request->destination_account],
-                    withdrawal_charge($request->amount)
+                    $type2 === PaymentType::SIDOOH ? 0 : withdrawal_charge($request->amount)
                 ), $request->ipn
             );
 

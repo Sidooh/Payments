@@ -37,6 +37,11 @@ class MerchantPaymentRequest extends PaymentRequest
                 'buy_goods_number'    => ['required', 'integer'],
                 'account_number'      => ['nullable', 'string'],
             ],
+            MerchantType::MPESA_STORE => [
+                'store' => ['required', 'numeric'],
+                'agent' => ['required', 'numeric'],
+                'amount' => ['required', 'integer', 'max:5000'],
+            ],
             default => []
         };
     }

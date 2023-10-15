@@ -46,13 +46,14 @@ class WithdrawalRequest extends PaymentRequest
     /**
      * @throws Exception
      */
-    public function destinationAccountRule(): SidoohVoucherExists|string
+    public function destinationAccountRule(): SidoohVoucherExists|SidoohFloatAccountExists|string
     {
         $countryCode = config('services.sidooh.country_code');
 
         return match (PaymentMethod::tryFrom($this->input('destination'))) {
             PaymentMethod::MPESA   => "phone:$countryCode",
             PaymentMethod::VOUCHER => new SidoohVoucherExists,
+            PaymentMethod::FLOAT => new SidoohFloatAccountExists,
             default                => abort(422, 'Unsupported destination')
         /*throw new Exception('Unsupported destination', 422)*/
         };
