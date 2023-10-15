@@ -99,9 +99,11 @@ class SidoohService
             $t = microtime(true);
 
             try {
-                $response = Http::retry(3, 250, function (Exception $exception, PendingRequest $request) {
-                    return $exception instanceof ConnectionException;
-                })->send($method, $url, $options);
+                $response = Http::connectTimeout(5)
+                    ->retry(3, 300, function ($exception, $request) {
+                        return $exception instanceof ConnectionException;
+                    })
+                    ->send($method, $url, $options);
                 $latency = round((microtime(true) - $t) * 1000, 2);
 
                 Log::info('...[SRV - SIDOOH]: RES... '.$latency.'ms', [$response]);

@@ -20,11 +20,11 @@ class SidoohProducts extends SidoohService
     {
         Log::info('...[SRV - PRODUCTS]: Find Enterprise...', ['id' => $id]);
 
-        $url = self::baseUrl()."/enterprises/$id?with=enterprise_accounts";
+        $url = self::baseUrl() . "/enterprises/$id?with=enterprise_accounts";
 
-        $response = Cache::remember($id, (60 * 60 * 24), fn () => parent::fetch($url));
+        $response = Cache::remember($id, (60 * 60 * 24), fn() => parent::fetch($url));
 
-        if (! $response) {
+        if (!$response) {
             throw new Exception("Enterprise doesn't exist!");
         }
 
