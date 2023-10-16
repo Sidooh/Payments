@@ -65,9 +65,10 @@ return [
                 ['min' => 1, 'max' => 100000, 'charge' => 30],
             ],
             'withdrawal' => [
-                ['min' => 1, 'max' => 100, 'charge' => 5],
-                ['min' => 101, 'max' => 20000, 'charge' => 15],
-                ['min' => 20001, 'max' => 150000, 'charge' => 30],
+                ['min' => 1, 'max' => 100, 'charge' => 3],
+                ['min' => 101, 'max' => 1500, 'charge' => 15],
+                ['min' => 1501, 'max' => 5000, 'charge' => 20],
+                ['min' => 5001, 'max' => 250000, 'charge' => 50],
             ],
             'buy_goods'  => [
                 ['min' => 1, 'max' => 49, 'charge' => 2],
