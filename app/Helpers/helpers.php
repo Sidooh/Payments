@@ -122,3 +122,10 @@ if (! function_exists('mpesa_float_charge')) {
         return $charge['charge'];
     }
 }
+
+if (! function_exists('admin_contacts')) {
+    function admin_contacts(): array
+    {
+        return explode(',', config('services.sidooh.admin_contacts'));
+    }
+}

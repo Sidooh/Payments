@@ -122,6 +122,7 @@ return [
                 ],
                 'stk'   => env('SIDOOH_STK_PROVIDER', 'MPESA'),
                 'b2b'   => env('SIDOOH_B2B_PROVIDER', 'MPESA'),
+                'b2b_balance_threshold' => 100000,
             ],
             'buni' => [
                 'till' => env('BUNI_TILL_NUMBER')
@@ -129,6 +130,7 @@ return [
         ],
         'merchants' => [
             'blacklist' => [888888, 888880]
-        ]
+        ],
+        'admin_contacts'     => env('ADMIN_CONTACTS', '254110039317,254714611696'),
     ],
 ];

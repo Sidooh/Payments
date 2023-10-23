@@ -4,6 +4,7 @@ namespace App\Repositories\EventRepositories;
 
 use App\DTOs\PaymentDTO;
 use App\Enums\Description;
+use App\Enums\EventType;
 use App\Enums\PaymentCodes;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
@@ -12,6 +13,7 @@ use App\Http\Resources\PaymentResource;
 use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\FloatAccountRepository;
+use App\Services\SidoohNotify;
 use App\Services\SidoohService;
 use DrH\Mpesa\Entities\MpesaB2bCallback;
 use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
@@ -136,6 +138,17 @@ class MpesaEventRepository
             $payment->update(['status' => Status::COMPLETED]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+
+            dispatch(function () use ($paymentCallback) {
+                $threshold = config('services.sidooh.providers.mpesa.b2b_balance_threshold', 10000);
+
+                $balance = (int)explode('|', $paymentCallback->debit_account_balance)[2];
+
+                if ($balance <= $threshold) {
+                    SidoohNotify::notify(admin_contacts(), "B2B Alert!\n\n$balance", EventType::ERROR_ALERT);
+                }
+
+            })->afterResponse();
         } catch (Exception $e) {
             Log::error($e);
         }
