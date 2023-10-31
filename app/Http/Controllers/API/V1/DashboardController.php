@@ -5,9 +5,9 @@ namespace App\Http\Controllers\API\V1;
 use App\Enums\PaymentSubtype;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
-use App\Models\FloatAccount;
 use App\Models\Payment;
 use Carbon\Carbon;
+use DrH\Mpesa\Entities\MpesaB2bCallback;
 use DrH\Mpesa\Entities\MpesaC2bCallback;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -69,7 +69,9 @@ class DashboardController extends Controller
     public function getProviderBalances(): JsonResponse
     {
         $orgBalance = Cache::remember('org_balance', 60 * 60 * 12, fn () => MpesaC2bCallback::latest('id')->value('org_account_balance'));
-        $b2bBalance = Cache::remember('b2b_balance', 60 * 60 * 3, fn () => FloatAccount::find(3)->balance);
+        $b2bBalance = Cache::remember('b2b_balance',
+            60 * 60 * 3,
+            fn () => explode('|', MpesaB2bCallback::latest('id')->value('debit_account_balance'))[2]);
 
         return $this->successResponse([
             'org_balance' => $orgBalance,
