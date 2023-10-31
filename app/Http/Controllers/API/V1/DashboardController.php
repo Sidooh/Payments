@@ -70,7 +70,7 @@ class DashboardController extends Controller
     {
         $orgBalance = Cache::remember('org_balance', 60 * 60 * 12, fn () => MpesaC2bCallback::latest('id')->value('org_account_balance'));
         $b2bBalance = Cache::remember('b2b_balance',
-            60 * 60 * 3,
+            60 * 10,
             fn () => explode('|', MpesaB2bCallback::latest('id')->value('debit_account_balance'))[2]);
 
         return $this->successResponse([
