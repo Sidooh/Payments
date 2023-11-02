@@ -15,11 +15,11 @@ class FloatAccountRepository
     /**
      * @throws Exception|Throwable
      */
-    public static function credit(int $id, int $amount, string $description, int $charge = 0): FloatAccountTransaction
+    public static function credit(int $id, int $amount, string $description, int $charge = 0, array $extra = null): FloatAccountTransaction
     {
         $account = FloatAccount::findOrFail($id);
 
-        return DB::transaction(function() use ($charge, $description, $amount, $account) {
+        return DB::transaction(function() use ($extra, $charge, $description, $amount, $account) {
             $account->balance += $amount + $charge;
             $account->save();
 
@@ -35,6 +35,7 @@ class FloatAccountRepository
                 'amount'      => $amount + $charge,
                 'type'        => TransactionType::CREDIT,
                 'description' => $description,
+                'extra' => $extra,
             ]);
         }, 2);
     }

@@ -3,14 +3,20 @@
 namespace App\Repositories\EventRepositories;
 
 use App\DTOs\PaymentDTO;
+use App\Enums\EventType;
 use App\Enums\PaymentCodes;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Http\Resources\PaymentResource;
+use App\Models\FloatAccount;
 use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
+use App\Repositories\SidoohRepositories\FloatAccountRepository;
+use App\Services\SidoohAccounts;
+use App\Services\SidoohNotify;
 use App\Services\SidoohService;
+use DrH\Buni\Models\BuniIpn;
 use DrH\Buni\Models\BuniStkCallback;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -67,5 +73,54 @@ class BuniEventRepository
         $repo = new PaymentRepository(PaymentDTO::fromPayment($payment), $payment->ipn);
 
         $repo->processPayment();
+    }
+
+
+    /**
+     * @throws Throwable
+     */
+    public static function ipnReceived(BuniIpn $ipn): void
+    {
+        $reference = $ipn->customer_reference;
+        if ($ipn->status === 'COMPLETED') {
+            Log::error('ipn already completed', $ipn->id);
+            return;
+        }
+
+        if ($ipn->narration === 'Ag Dpst') {
+            $values = explode(" ", $ipn->customer_reference);
+            foreach ($values as $value) {
+                if (is_numeric($value)) {
+                    $reference = $value;
+                    break;
+                }
+            }
+
+            if (!is_numeric($reference)) {
+                Log::error('reference retrieved is invalid', $values);
+                return;
+            }
+
+            $amount = $ipn->transaction_amount;
+
+            // find float account with reference
+            $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($reference)->first();
+            FloatAccountRepository::credit($float->id, $amount, "Account credit", 0, ["buni_ipn_id" => $ipn->id]);
+            $float->refresh();
+
+            $ipn->status = 'COMPLETED';
+            $ipn->save();
+
+
+            $amount = 'Ksh'.number_format($amount, 2);
+            $balance = 'Ksh'.number_format($float->balance, 2);
+
+            $message = "Your merchant voucher has been credited with $amount.\n";
+            $message .= "New balance is $balance.";
+
+            $account = SidoohAccounts::find($float->account_id);
+            SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
+
+        }
     }
 }

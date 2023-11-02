@@ -1,11 +1,11 @@
-FROM composer:2.2 as build
+FROM composer:2.6 as build
 
 COPY . /app
 
 # TODO: Return --no-dev for production (removed for us to use clockwork in playdooh)
 RUN composer install --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-reqs --no-progress --no-dev
 
-FROM trafex/php-nginx:3.3.0 as production
+FROM trafex/php-nginx:3.4.0 as production
 
 USER root
 RUN apk add --no-cache \
