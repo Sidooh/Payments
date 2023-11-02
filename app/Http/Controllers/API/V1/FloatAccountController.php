@@ -53,6 +53,7 @@ class FloatAccountController extends Controller
             'account_id'     => $request->account_id,
         ], [
             'floatable_id' => $request->reference,
+            'description' => $request->description,
         ]);
 
         return $this->successResponse($account);

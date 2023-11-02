@@ -17,6 +17,7 @@ class FloatAccount extends Model
         'floatable_id',
         'floatable_type',
         'account_id',
+        'description',
     ];
 
     protected $casts = [
