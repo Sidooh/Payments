@@ -148,7 +148,7 @@ class MpesaEventRepository
                     SidoohNotify::notify(admin_contacts(), "B2B Alert!\n\n$balance", EventType::ERROR_ALERT);
                 }
 
-            })->afterResponse();
+            })->delay(now()->addSeconds(5));
         } catch (Exception $e) {
             Log::error($e);
         }
