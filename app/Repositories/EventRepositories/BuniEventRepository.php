@@ -87,6 +87,15 @@ class BuniEventRepository
             return;
         }
 
+        if ($ipn->narration === 'ATM Cash KCB') {
+            $values = explode(" ", $ipn->customer_reference);
+            $reference = substr_replace($values[1], '', 0, 7);
+
+            self::creditAccount($ipn, $reference, $values) ;
+
+            return;
+        }
+
         if ($ipn->narration === 'Ag Dpst') {
             $values = explode(" ", $ipn->customer_reference);
             foreach ($values as $value) {
@@ -96,31 +105,36 @@ class BuniEventRepository
                 }
             }
 
-            if (!is_numeric($reference)) {
-                Log::error('reference retrieved is invalid', $values);
-                return;
-            }
-
-            $amount = $ipn->transaction_amount;
-
-            // find float account with reference
-            $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($reference)->first();
-            FloatAccountRepository::credit($float->id, $amount, "Account credit", 0, ["buni_ipn_id" => $ipn->id]);
-            $float->refresh();
-
-            $ipn->status = 'COMPLETED';
-            $ipn->save();
-
-
-            $amount = 'Ksh'.number_format($amount, 2);
-            $balance = 'Ksh'.number_format($float->balance, 2);
-
-            $message = "Your merchant voucher has been credited with $amount.\n";
-            $message .= "New balance is $balance.";
-
-            $account = SidoohAccounts::find($float->account_id);
-            SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
+            self::creditAccount($ipn, $reference, $values) ;
 
         }
+    }
+
+    private static function creditAccount(BuniIpn $ipn, string $reference, $values): void
+    {
+        if (!is_numeric($reference)) {
+            Log::error('reference retrieved is invalid', $values);
+            return;
+        }
+
+        $amount = $ipn->transaction_amount;
+
+        // find float account with reference
+        $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($reference)->first();
+        FloatAccountRepository::credit($float->id, $amount, "Account credit", 0, ["buni_ipn_id" => $ipn->id]);
+        $float->refresh();
+
+        $ipn->status = 'COMPLETED';
+        $ipn->save();
+
+
+        $amount = 'Ksh'.number_format($amount, 2);
+        $balance = 'Ksh'.number_format($float->balance, 2);
+
+        $message = "Your merchant voucher has been credited with $amount.\n";
+        $message .= "New balance is $balance.";
+
+        $account = SidoohAccounts::find($float->account_id);
+        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
     }
 }
