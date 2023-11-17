@@ -3,12 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Enums\PaymentMethod;
-use App\Rules\SidoohFloatAccountExists;
-use App\Rules\SidoohVoucherExists;
+use App\Rules\SidoohMerchantFloatAccountExists;
 use Exception;
 use Illuminate\Validation\Rules\Enum;
 
-class WithdrawalRequest extends PaymentRequest
+class MpesaWithdrawalRequest extends PaymentRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -35,10 +34,12 @@ class WithdrawalRequest extends PaymentRequest
     /**
      * @throws Exception
      */
-    public function sourceAccountRule(): SidoohFloatAccountExists|string
+    public function sourceAccountRule(): string
     {
+        $countryCode = config('services.sidooh.country_code');
+
         return match (PaymentMethod::tryFrom($this->input('source'))) {
-            PaymentMethod::FLOAT => new SidoohFloatAccountExists,
+            PaymentMethod::MPESA   => "phone:$countryCode",
             default              => abort(422, 'Unsupported source')
         };
     }
@@ -46,14 +47,10 @@ class WithdrawalRequest extends PaymentRequest
     /**
      * @throws Exception
      */
-    public function destinationAccountRule(): SidoohVoucherExists|SidoohFloatAccountExists|string
+    public function destinationAccountRule(): SidoohMerchantFloatAccountExists
     {
-        $countryCode = config('services.sidooh.country_code');
-
         return match (PaymentMethod::tryFrom($this->input('destination'))) {
-            PaymentMethod::MPESA   => "phone:$countryCode",
-            PaymentMethod::VOUCHER => new SidoohVoucherExists,
-            PaymentMethod::FLOAT => new SidoohFloatAccountExists,
+            PaymentMethod::FLOAT => new SidoohMerchantFloatAccountExists,
             default                => abort(422, 'Unsupported destination')
         };
     }

@@ -39,6 +39,7 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::post('/', PaymentController::class);
         Route::post('/merchant', [PaymentController::class, 'merchant']);
         Route::post('/mpesa-float', [PaymentController::class, 'mpesaFloat']);
+        Route::post('/mpesa-withdraw', [PaymentController::class, 'mpesaWithdraw']);
         Route::post('/withdraw', [PaymentController::class, 'withdraw']);
 
         Route::get('/providers/{type}/{subtype}', [PaymentController::class, 'typeAndSubtype']);
@@ -114,6 +115,9 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
 
         Route::get('/buy-goods', [ChargeController::class, 'getBuyGoodsCharges']);
         Route::get('/buy-goods/{amount}', [ChargeController::class, 'getBuyGoodsCharge']);
+
+        Route::get('/mpesa-withdrawal', [ChargeController::class, 'getMpesaWithdrawalCharges']);
+        Route::get('/mpesa-withdrawal/{amount}', [ChargeController::class, 'getMpesaWithdrawalCharge']);
     });
 
     Route::get('/merchants/search/{code}', [TendePayMerchantController::class, 'searchMerchant']);

@@ -123,6 +123,24 @@ if (! function_exists('mpesa_float_charge')) {
     }
 }
 
+if (! function_exists('mpesa_withdraw_charge')) {
+    /**
+     * @throws \Exception
+     */
+    function mpesa_withdraw_charge(int $amount): int
+    {
+        $charges = config('services.sidooh.charges.mpesa_withdrawal');
+
+        $charge = Arr::first($charges, fn ($ch) => $ch['max'] >= $amount && $ch['min'] <= $amount);
+
+        if (! $charge) {
+            throw new Exception('Mpesa withdraw charge not found!');
+        }
+
+        return $charge['charge'];
+    }
+}
+
 if (! function_exists('admin_contacts')) {
     function admin_contacts(): array
     {

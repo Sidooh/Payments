@@ -37,22 +37,26 @@ class MpesaProvider implements PaymentContract
             throw new Exception('Unsupported payment type');
         }
 
+        $reference = null;
+
         $amount = $this->paymentDTO->totalAmount();
         $payBillSwitch = config('services.sidooh.providers.mpesa.pay_bill_switch_amount');
         if ($payBillSwitch > 0 && $amount > $payBillSwitch) {
 //            if TILL add partyB and type to MpesaAccount::TILL
             $mpesaAcc = new MpesaAccount(
-                config('services.sidooh.payment_providers.mpesa.pay_bill.shortcode'),
-                config('services.sidooh.payment_providers.mpesa.pay_bill.key'),
-                config('services.sidooh.payment_providers.mpesa.pay_bill.secret'),
-                config('services.sidooh.payment_providers.mpesa.pay_bill.passkey')
+                config('services.sidooh.providers.mpesa.pay_bill.shortcode'),
+                config('services.sidooh.providers.mpesa.pay_bill.key'),
+                config('services.sidooh.providers.mpesa.pay_bill.secret'),
+                config('services.sidooh.providers.mpesa.pay_bill.passkey')
             );
+
+            $reference = $this->paymentDTO->reference;
         } else {
             $mpesaAcc = null;
         }
 
         return match ($this->paymentDTO->subtype) {
-            PaymentSubtype::STK => mpesa_request($this->paymentDTO->source, $amount, null, null, $mpesaAcc)->id,
+            PaymentSubtype::STK => mpesa_request($this->paymentDTO->source, $amount, $reference, null, $mpesaAcc)->id,
             default => throw new Exception('Unsupported payment subtype')
         };
     }
