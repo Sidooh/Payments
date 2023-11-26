@@ -60,18 +60,18 @@ class ChargeController extends Controller
     }
 
 
-    public function getMpesaWithdrawalCharges(): JsonResponse
+    public function getMpesaCollectionCharges(): JsonResponse
     {
-        return $this->successResponse(config('services.sidooh.charges.mpesa_withdrawal'));
+        return $this->successResponse(config('services.sidooh.charges.mpesa_collection'));
     }
 
     /**
      * @throws \Exception
      */
-    public function getMpesaWithdrawalCharge(int $amount): JsonResponse
+    public function getMpesaCollectionCharge(int $amount): JsonResponse
     {
         try {
-            return $this->successResponse(mpesa_withdraw_charge($amount));
+            return $this->successResponse(mpesa_collection_charge($amount));
         } catch (Exception) {
             return $this->errorResponse('Invalid amount.', 422);
         }

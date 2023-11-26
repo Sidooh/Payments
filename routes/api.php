@@ -38,6 +38,7 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/', [PaymentController::class, 'index']);
         Route::post('/', PaymentController::class);
         Route::post('/merchant', [PaymentController::class, 'merchant']);
+        Route::post('/merchant-float', [PaymentController::class, 'merchantFloatTopUp']);
         Route::post('/mpesa-float', [PaymentController::class, 'mpesaFloat']);
         Route::post('/mpesa-withdraw', [PaymentController::class, 'mpesaWithdraw']);
         Route::post('/withdraw', [PaymentController::class, 'withdraw']);
@@ -116,8 +117,8 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/buy-goods', [ChargeController::class, 'getBuyGoodsCharges']);
         Route::get('/buy-goods/{amount}', [ChargeController::class, 'getBuyGoodsCharge']);
 
-        Route::get('/mpesa-withdrawal', [ChargeController::class, 'getMpesaWithdrawalCharges']);
-        Route::get('/mpesa-withdrawal/{amount}', [ChargeController::class, 'getMpesaWithdrawalCharge']);
+        Route::get('/mpesa-collection', [ChargeController::class, 'getMpesaCollectionCharges']);
+        Route::get('/mpesa-collection/{amount}', [ChargeController::class, 'getMpesaCollectionCharge']);
     });
 
     Route::get('/merchants/search/{code}', [TendePayMerchantController::class, 'searchMerchant']);

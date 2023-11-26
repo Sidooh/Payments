@@ -324,7 +324,6 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
-
     public function mpesaWithdraw(MpesaWithdrawalRequest $request): JsonResponse
     {
         Log::info('...[CTRL - PAYMENT]: Mpesa Withdraw...', $request->all());
@@ -353,7 +352,58 @@ class PaymentController extends Controller
                     $destinationType,
                     $destinationSubtype,
                     [$destinationData => $request->destination_account],
-                    mpesa_withdraw_charge($request->integer('amount')),
+                    mpesa_collection_charge($request->integer('amount')),
+                ), $request->ipn
+            );
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
+        } catch (HttpException $err) {
+            Log::error($err);
+
+            return $this->errorResponse($err->getMessage(), $err->getStatusCode());
+        } catch (Exception|Throwable|Error $err) {
+            if ($err->getCode() === 422 || $err->getCode() === 400) {
+                return $this->errorResponse($err->getMessage(), $err->getCode());
+            }
+
+            Log::error($err);
+        }
+
+        return $this->errorResponse('Failed to process payment request.');
+    }
+
+
+    public function merchantFloatTopUp(MpesaWithdrawalRequest $request): JsonResponse
+    {
+        Log::info('...[CTRL - PAYMENT]: Merchant Float...', $request->all());
+
+        try {
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
+            [$destinationType, $destinationSubtype] = PaymentMethod::from($request->destination)->getTypeAndSubtype();
+
+            $destinationData = match ($destinationSubtype) {
+                PaymentSubtype::FLOAT   => 'float_account_id',
+                default                 => throw new HttpException(
+                    422, 'Only float account is supported for destination.'
+                )
+            };
+
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    "Withdrawal",
+                    $request->source_account,
+                    false,
+                    $destinationType,
+                    $destinationSubtype,
+                    [$destinationData => $request->destination_account],
+                    mpesa_collection_charge($request->integer('amount')),
                 ), $request->ipn
             );
 

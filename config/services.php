@@ -65,7 +65,7 @@ return [
                 ['min' => 1, 'max' => 100000, 'charge' => 30],
                 ['min' => 100001, 'max' => 400000, 'charge' => 30],
             ],
-            'mpesa_withdrawal' => [
+            'mpesa_collection' => [
                 ['min' => 50, 'max' => 100, 'charge' => 11],
                 ['min' => 101, 'max' => 2500, 'charge' => 29],
                 ['min' => 2501, 'max' => 3500, 'charge' => 52],
