@@ -397,13 +397,13 @@ class PaymentController extends Controller
                     $type,
                     $subtype,
                     $request->description,
-                    "Withdrawal",
+                    "Voucher",
                     $request->source_account,
                     false,
                     $destinationType,
                     $destinationSubtype,
                     [$destinationData => $request->destination_account],
-                    mpesa_collection_charge($request->integer('amount')),
+                    mpesa_withdrawal_charge($request->integer('amount')),
                 ), $request->ipn
             );
 
