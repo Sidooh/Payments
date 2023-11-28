@@ -122,8 +122,7 @@ return [
             'pay_bill'   => [
                 ['min' => 1, 'max' => 49, 'charge' => 0],
                 ['min' => 50, 'max' => 100, 'charge' => 0],
-                ['min' => 101, 'max' => 200, 'charge' => 0],
-                ['min' => 201, 'max' => 500, 'charge' => 5],
+                ['min' => 101, 'max' => 500, 'charge' => 5],
                 ['min' => 501, 'max' => 1000, 'charge' => 10],
                 ['min' => 1001, 'max' => 1500, 'charge' => 15],
                 ['min' => 1501, 'max' => 2500, 'charge' => 20],
