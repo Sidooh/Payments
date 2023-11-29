@@ -14,7 +14,7 @@ class ChargeController extends Controller
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getWithdrawalCharge(int $amount): JsonResponse
     {
@@ -31,7 +31,7 @@ class ChargeController extends Controller
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getPayBillCharge(int $amount): JsonResponse
     {
@@ -48,7 +48,7 @@ class ChargeController extends Controller
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getBuyGoodsCharge(int $amount): JsonResponse
     {
@@ -60,18 +60,47 @@ class ChargeController extends Controller
     }
 
 
+    public function getMpesaFloatCharges(): JsonResponse
+    {
+        return $this->successResponse(config('services.sidooh.charges.mpesa_float'));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getMpesaFloatCharge(int $amount): JsonResponse
+    {
+        try {
+            return $this->successResponse(mpesa_float_charge($amount));
+        } catch (Exception) {
+            return $this->errorResponse('Invalid amount.', 422);
+        }
+    }
+
     public function getMpesaWithdrawalCharges(): JsonResponse
     {
         return $this->successResponse(config('services.sidooh.charges.mpesa_withdrawal'));
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getMpesaWithdrawalCharge(int $amount): JsonResponse
     {
         try {
             return $this->successResponse(mpesa_withdrawal_charge($amount));
+        } catch (Exception) {
+            return $this->errorResponse('Invalid amount.', 422);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getMpesaCollectionCharge(int $amount): JsonResponse
+    {
+        try {
+            return $this->successResponse(mpesa_collection_charge($amount));
         } catch (Exception) {
             return $this->errorResponse('Invalid amount.', 422);
         }

@@ -117,8 +117,13 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::get('/buy-goods', [ChargeController::class, 'getBuyGoodsCharges']);
         Route::get('/buy-goods/{amount}', [ChargeController::class, 'getBuyGoodsCharge']);
 
+        Route::get('/mpesa-float', [ChargeController::class, 'getMpesaFloatCharges']);
+        Route::get('/mpesa-float/{amount}', [ChargeController::class, 'getMpesaFloatCharge']);
+
         Route::get('/mpesa-withdrawal', [ChargeController::class, 'getMpesaWithdrawalCharges']);
         Route::get('/mpesa-withdrawal/{amount}', [ChargeController::class, 'getMpesaWithdrawalCharge']);
+
+        Route::get('/mpesa-collection/{amount}', [ChargeController::class, 'getMpesaCollectionCharge']);
     });
 
     Route::get('/merchants/search/{code}', [TendePayMerchantController::class, 'searchMerchant']);

@@ -23,7 +23,7 @@ if (! function_exists('base_64_url_encode')) {
 
 if (! function_exists('withRelation')) {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     function withRelation($relation, $parentRecords, $parentKey, $childKey)
     {
@@ -44,7 +44,7 @@ if (! function_exists('withRelation')) {
 
 if (! function_exists('withdrawal_charge')) {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     function withdrawal_charge(int $amount): int
     {
@@ -62,7 +62,7 @@ if (! function_exists('withdrawal_charge')) {
 
 if (! function_exists('pay_bill_charge')) {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     function pay_bill_charge(int $amount): int
     {
@@ -80,7 +80,7 @@ if (! function_exists('pay_bill_charge')) {
 
 if (! function_exists('buy_goods_charge')) {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     function buy_goods_charge(int $amount): int
     {
@@ -107,7 +107,7 @@ if (! function_exists('is_blacklisted_merchant')) {
 
 if (! function_exists('mpesa_float_charge')) {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     function mpesa_float_charge(int $amount): int
     {
@@ -125,7 +125,7 @@ if (! function_exists('mpesa_float_charge')) {
 
 if (! function_exists('mpesa_withdrawal_charge')) {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     function mpesa_withdrawal_charge(int $amount): int
     {
@@ -138,6 +138,21 @@ if (! function_exists('mpesa_withdrawal_charge')) {
         }
 
         return $charge['charge'];
+    }
+}
+
+if (! function_exists('mpesa_collection_charge')) {
+    /**
+     * @throws Exception
+     */
+    function mpesa_collection_charge(int $amount): int
+    {
+        $paybillSwitchAmount = config('services.sidooh.providers.mpesa.pay_bill_switch_amount');
+        if ($paybillSwitchAmount > 0 && $amount > $paybillSwitchAmount) {
+            return pay_bill_charge($amount);
+        }
+
+        return buy_goods_charge($amount);
     }
 }
 

@@ -283,20 +283,25 @@ class PaymentController extends Controller
             [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
             $merchantType = MerchantType::from($request->merchant_type);
             [$type2, $subtype2] = $merchantType->getTypeAndSubtype();
+            $amount = $request->integer('amount');
 
             if ($merchantType === MerchantType::MPESA_STORE) {
-                $charge = mpesa_float_charge($request->integer('amount'));
-                $destination = $request->only('merchant_type', 'store', 'agent');
-
                 if (is_blacklisted_merchant($request->store)) {
                     throw new Exception('invalid store', 422);
+                }
+
+                $charge = mpesa_float_charge($amount);
+                $destination = $request->only('merchant_type', 'store', 'agent');
+
+                if ($subtype === PaymentSubtype::STK) {
+                    $charge += mpesa_collection_charge($amount);
                 }
             }
 
             $repo = new PaymentRepository(
                 new PaymentDTO(
                     $request->account_id,
-                    $request->amount,
+                    $amount,
                     $type,
                     $subtype,
                     $request->description,
