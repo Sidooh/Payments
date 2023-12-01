@@ -39,6 +39,7 @@ Route::middleware('auth.jwt')->prefix('/v1')->group(function() {
         Route::post('/', PaymentController::class);
         Route::post('/merchant', [PaymentController::class, 'merchant']);
         Route::post('/merchant-float', [PaymentController::class, 'merchantFloatTopUp']);
+        Route::post('/merchant-float-transfer', [PaymentController::class, 'merchantFloatTransfer']);
         Route::post('/mpesa-float', [PaymentController::class, 'mpesaFloat']);
         Route::post('/mpesa-withdraw', [PaymentController::class, 'mpesaWithdraw']);
         Route::post('/withdraw', [PaymentController::class, 'withdraw']);

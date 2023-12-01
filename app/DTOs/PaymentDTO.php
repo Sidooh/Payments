@@ -56,6 +56,11 @@ class PaymentDTO
             if (! $exists) {
                 throw new HttpException(422, 'Invalid float account');
             }
+
+            $isSameAsSource = $this->subtype === PaymentSubtype::FLOAT && $this->source == $this->destinationData['float_account_id'];
+            if ($isSameAsSource) {
+                throw new HttpException(422, 'Invalid float account');
+            }
         }
     }
 
