@@ -22,3 +22,5 @@ cloud_sql_proxy
 Dockerfile*
 /.git
 .github
+
+cloud-sql-proxy
