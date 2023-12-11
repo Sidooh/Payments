@@ -151,7 +151,7 @@ return [
                 ],
                 'stk'   => env('SIDOOH_STK_PROVIDER', 'MPESA'),
                 'b2b'   => env('SIDOOH_B2B_PROVIDER', 'MPESA'),
-                'b2b_balance_threshold' => 100000,
+                'b2b_balance_threshold' => env('B2B_BALANCE_THRESHOLD', 100000),
             ],
             'buni' => [
                 'till' => env('BUNI_TILL_NUMBER')
