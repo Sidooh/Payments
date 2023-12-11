@@ -12,6 +12,7 @@ use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MerchantFloatSendRequest;
+use App\Http\Requests\MerchantFloatWithdrawRequest;
 use App\Http\Requests\MerchantPaymentRequest;
 use App\Http\Requests\MpesaWithdrawalRequest;
 use App\Http\Requests\PaymentRequest;
@@ -460,6 +461,56 @@ class PaymentController extends Controller
                     $destinationType,
                     $destinationSubtype,
                     ['float_account_id' => $request->destination_account],
+                ), $request->ipn
+            );
+
+            $payment = $repo->processPayment();
+
+            return $this->successResponse(PaymentResource::make($payment), 'Payment Requested.');
+        } catch (HttpException $err) {
+            Log::error($err);
+
+            return $this->errorResponse($err->getMessage(), $err->getStatusCode());
+        } catch (Exception|Throwable|Error $err) {
+            if ($err->getCode() === 422 || $err->getCode() === 400) {
+                return $this->errorResponse($err->getMessage(), $err->getCode());
+            }
+
+            Log::error($err);
+        }
+
+        return $this->errorResponse('Failed to process payment request.');
+    }
+
+
+    public function merchantFloatWithdraw(MerchantFloatWithdrawRequest $request): JsonResponse
+    {
+        Log::info('...[CTRL - PAYMENT]: Merchant Float Withdraw...', $request->all());
+
+        try {
+            [$type, $subtype] = PaymentMethod::from($request->source)->getTypeAndSubtype();
+            [$destinationType, $destinationSubtype] = PaymentMethod::from($request->destination)->getWithdrawalTypeAndSubtype();
+
+            // TODO: Check float account belongs to account making request
+            FloatAccount::whereId($request->source_account)
+                ->whereAccountId($request->account_id)
+                ->whereFloatableType(Initiator::MERCHANT->value)
+                ->firstOrFail();
+
+            $repo = new PaymentRepository(
+                new PaymentDTO(
+                    $request->account_id,
+                    $request->amount,
+                    $type,
+                    $subtype,
+                    $request->description,
+                    "Merchant Voucher Withdraw",
+                    $request->source_account,
+                    false,
+                    $destinationType,
+                    $destinationSubtype,
+                    ['phone' => $request->destination_account],
+                    mpesa_withdrawal_charge($request->integer('amount')),
                 ), $request->ipn
             );
 

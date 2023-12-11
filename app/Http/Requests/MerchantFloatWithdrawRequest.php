@@ -7,7 +7,7 @@ use App\Rules\SidoohMerchantFloatAccountExists;
 use Exception;
 use Illuminate\Validation\Rules\Enum;
 
-class MerchantFloatSendRequest extends PaymentRequest
+class MerchantFloatWithdrawRequest extends PaymentRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +26,8 @@ class MerchantFloatSendRequest extends PaymentRequest
     public function rules(): array
     {
         return parent::rules() + [
-            'destination'         => ['bail', 'required', new Enum(PaymentMethod::class)],
+                'amount'         => ['required', 'integer', 'max:10000'],
+                'destination'         => ['bail', 'required', new Enum(PaymentMethod::class)],
             'destination_account' => ['required', 'numeric', 'different:source_account', $this->destinationAccountRule()],
         ];
     }
@@ -45,11 +46,13 @@ class MerchantFloatSendRequest extends PaymentRequest
     /**
      * @throws Exception
      */
-    public function destinationAccountRule(): SidoohMerchantFloatAccountExists
+    public function destinationAccountRule(): string
     {
+        $countryCode = config('services.sidooh.country_code');
+
         return match (PaymentMethod::tryFrom($this->input('destination'))) {
-            PaymentMethod::FLOAT => new SidoohMerchantFloatAccountExists,
-            default                => abort(422, 'Unsupported destination')
+            PaymentMethod::MPESA   => "phone:$countryCode",
+            default              => abort(422, 'Unsupported destination')
         };
     }
 }

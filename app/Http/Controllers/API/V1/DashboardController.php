@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use Carbon\Carbon;
 use DrH\Mpesa\Entities\MpesaB2bCallback;
+use DrH\Mpesa\Entities\MpesaB2cResultParameter;
 use DrH\Mpesa\Entities\MpesaC2bCallback;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ class DashboardController extends Controller
                         PaymentSubtype::B2C->name,
                         PaymentSubtype::VOUCHER->name,
                     ]
-                )->sum('amount')
+                )->sum('charge')
             );
         });
         $totalRevenueToday = Cache::remember('total_revenue_today', 60 * 60, function() {
@@ -42,7 +43,7 @@ class DashboardController extends Controller
                         PaymentSubtype::B2C->name,
                         PaymentSubtype::VOUCHER->name,
                     ]
-                )->whereDate('created_at', Carbon::today())->sum('amount')
+                )->whereDate('created_at', Carbon::today())->sum('charge')
             );
         });
 
@@ -69,6 +70,7 @@ class DashboardController extends Controller
     public function getProviderBalances(): JsonResponse
     {
         $orgBalance = Cache::remember('org_balance', 60 * 60 * 12, fn () => MpesaC2bCallback::latest('id')->value('org_account_balance'));
+        $b2cBalance = Cache::remember('b2c_balance', 60 * 60 * 12, fn () => MpesaB2cResultParameter::latest('id')->value('b2c_utility_account_available_funds'));
         $b2bBalance = Cache::remember('b2b_balance',
             60 * 10,
             fn () => explode('|', MpesaB2bCallback::latest('id')->value('debit_account_balance'))[2]);
@@ -76,6 +78,7 @@ class DashboardController extends Controller
         return $this->successResponse([
             'org_balance' => $orgBalance,
             'b2b_balance' => $b2bBalance,
+            'b2c_balance' => $b2cBalance,
         ]);
     }
 }
