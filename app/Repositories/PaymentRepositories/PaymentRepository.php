@@ -24,10 +24,10 @@ class PaymentRepository
         $matchType = $this->paymentData->isWithdrawal ? $this->paymentData->destinationType : $this->paymentData->type;
 
         return match ($matchType) {
-            PaymentType::MPESA => new MpesaRepository($this->paymentData),
+            PaymentType::MPESA  => new MpesaRepository($this->paymentData),
             PaymentType::SIDOOH => new SidoohRepository($this->paymentData),
-            PaymentType::TENDE => new TendeRepository($this->paymentData),
-            PaymentType::BUNI => new BuniRepository($this->paymentData),
+            PaymentType::TENDE  => new TendeRepository($this->paymentData),
+            PaymentType::BUNI   => new BuniRepository($this->paymentData),
         };
     }
 

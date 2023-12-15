@@ -16,6 +16,7 @@ use App\Repositories\SidoohRepositories\FloatAccountRepository;
 use App\Services\SidoohNotify;
 use App\Services\SidoohService;
 use DrH\Mpesa\Entities\MpesaB2bCallback;
+use DrH\Mpesa\Entities\MpesaB2cResultParameter;
 use DrH\Mpesa\Entities\MpesaBulkPaymentResponse;
 use DrH\Mpesa\Entities\MpesaStkCallback;
 use Error;
@@ -81,7 +82,7 @@ class MpesaEventRepository
     {
         try {
             $payment = Payment::whereDestinationProvider(PaymentType::MPESA, PaymentSubtype::B2C, $paymentResponse->request->id)
-                              ->firstOrFail();
+                ->firstOrFail();
             if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
@@ -89,6 +90,16 @@ class MpesaEventRepository
             $payment->update(['status' => Status::COMPLETED]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
+
+            dispatch(function() {
+                $balance = MpesaB2cResultParameter::latest('id')->value('b2c_utility_account_available_funds');
+                $threshold = config('services.sidooh.providers.mpesa.b2c_balance_threshold', 5000);
+
+                if ($balance <= $threshold) {
+                    SidoohNotify::notify(admin_contacts(), "B2C Alert!\n\n$balance", EventType::ERROR_ALERT);
+                }
+
+            })->delay(now()->addSeconds(5));
         } catch (Exception $e) {
             Log::error($e);
         }
@@ -101,7 +112,7 @@ class MpesaEventRepository
     {
         try {
             $payment = Payment::whereDestinationProvider(PaymentType::MPESA, PaymentSubtype::B2C, $paymentResponse->request->id)
-                              ->firstOrFail();
+                ->firstOrFail();
 
             if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");
@@ -124,7 +135,6 @@ class MpesaEventRepository
         }
     }
 
-
     public static function b2bPaymentSent(MpesaB2bCallback $paymentCallback): void
     {
         try {
@@ -139,10 +149,10 @@ class MpesaEventRepository
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
 
-            dispatch(function () use ($paymentCallback) {
+            dispatch(function() use ($paymentCallback) {
                 $threshold = config('services.sidooh.providers.mpesa.b2b_balance_threshold', 10000);
 
-                $balance = (int)explode('|', $paymentCallback->debit_account_balance)[2];
+                $balance = (int) explode('|', $paymentCallback->debit_account_balance)[2];
 
                 if ($balance <= $threshold) {
                     SidoohNotify::notify(admin_contacts(), "B2B Alert!\n\n$balance", EventType::ERROR_ALERT);
@@ -153,7 +163,6 @@ class MpesaEventRepository
             Log::error($e);
         }
     }
-
 
     /**
      * @throws \Throwable
@@ -190,44 +199,44 @@ class MpesaEventRepository
     /**
      * @throws \Exception
      */
-//    public static function c2bPaymentConfirmed(MpesaC2bCallback $callback): void
-//    {
-//        $account = SidoohAccounts::findByPhone($callback->msisdn);
-//        $voucher = VoucherRepository::getDefaultVoucherForAccount($account['id']);
-//        $reason = 'Till payment made to Sidooh.';
-//
-//        $repo = new PaymentRepository(
-//            new PaymentDTO(
-//                $account['id'],
-//                $callback->trans_amount,
-//                PaymentType::SIDOOH,
-//                PaymentSubtype::FLOAT,
-//                Description::VOUCHER_CREDIT->value,
-//                $reason,
-//                1,
-//                false,
-//                PaymentType::SIDOOH,
-//                PaymentSubtype::VOUCHER,
-//                ['voucher_id' => $voucher->id]
-//            )
-//        );
-//
-//        $payment = $repo->processPayment();
-//
-//        $voucher = $voucher->refresh();
-//
-//        $amount = 'Ksh'.number_format($payment->amount, 2);
-//        $balance = 'Ksh'.number_format($voucher->balance, 2);
-//        $date = $payment->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
-//
-//        $message = "You have received $amount voucher ";
-//        $message .= "from Sidooh on $date.\n";
-//        $message .= "\n\tReason - {$reason}\n\n";
-//        $message .= "New voucher balance is $balance.\n\n";
-//        $message .= "Dial *384*99# NOW for FREE on your Safaricom line to BUY AIRTIME or PAY BILLS & PAY USING the voucher received.\n\n";
-//        $message .= config('services.sidooh.tagline');
-//
-//        $account = SidoohAccounts::find($voucher->account_id);
-//        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
-//    }
+    //    public static function c2bPaymentConfirmed(MpesaC2bCallback $callback): void
+    //    {
+    //        $account = SidoohAccounts::findByPhone($callback->msisdn);
+    //        $voucher = VoucherRepository::getDefaultVoucherForAccount($account['id']);
+    //        $reason = 'Till payment made to Sidooh.';
+    //
+    //        $repo = new PaymentRepository(
+    //            new PaymentDTO(
+    //                $account['id'],
+    //                $callback->trans_amount,
+    //                PaymentType::SIDOOH,
+    //                PaymentSubtype::FLOAT,
+    //                Description::VOUCHER_CREDIT->value,
+    //                $reason,
+    //                1,
+    //                false,
+    //                PaymentType::SIDOOH,
+    //                PaymentSubtype::VOUCHER,
+    //                ['voucher_id' => $voucher->id]
+    //            )
+    //        );
+    //
+    //        $payment = $repo->processPayment();
+    //
+    //        $voucher = $voucher->refresh();
+    //
+    //        $amount = 'Ksh'.number_format($payment->amount, 2);
+    //        $balance = 'Ksh'.number_format($voucher->balance, 2);
+    //        $date = $payment->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
+    //
+    //        $message = "You have received $amount voucher ";
+    //        $message .= "from Sidooh on $date.\n";
+    //        $message .= "\n\tReason - {$reason}\n\n";
+    //        $message .= "New voucher balance is $balance.\n\n";
+    //        $message .= "Dial *384*99# NOW for FREE on your Safaricom line to BUY AIRTIME or PAY BILLS & PAY USING the voucher received.\n\n";
+    //        $message .= config('services.sidooh.tagline');
+    //
+    //        $account = SidoohAccounts::find($voucher->account_id);
+    //        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
+    //    }
 }

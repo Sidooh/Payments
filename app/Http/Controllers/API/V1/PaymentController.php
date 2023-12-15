@@ -355,7 +355,7 @@ class PaymentController extends Controller
                     $type,
                     $subtype,
                     $request->description,
-                    "Withdrawal",
+                    'Withdrawal',
                     $request->source_account,
                     false,
                     $destinationType,
@@ -383,7 +383,6 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
-
     public function merchantFloatTopUp(MpesaWithdrawalRequest $request): JsonResponse
     {
         Log::info('...[CTRL - PAYMENT]: Merchant Float...', $request->all());
@@ -406,7 +405,7 @@ class PaymentController extends Controller
                     $type,
                     $subtype,
                     $request->description,
-                    "Voucher",
+                    'Voucher',
                     $request->source_account,
                     false,
                     $destinationType,
@@ -455,7 +454,7 @@ class PaymentController extends Controller
                     $type,
                     $subtype,
                     $request->description,
-                    "Merchant Voucher Transfer",
+                    'Merchant Voucher Transfer',
                     $request->source_account,
                     false,
                     $destinationType,
@@ -482,7 +481,6 @@ class PaymentController extends Controller
         return $this->errorResponse('Failed to process payment request.');
     }
 
-
     public function merchantFloatWithdraw(MerchantFloatWithdrawRequest $request): JsonResponse
     {
         Log::info('...[CTRL - PAYMENT]: Merchant Float Withdraw...', $request->all());
@@ -504,7 +502,7 @@ class PaymentController extends Controller
                     $type,
                     $subtype,
                     $request->description,
-                    "Merchant Voucher Withdraw",
+                    'Merchant Voucher Withdraw',
                     $request->source_account,
                     false,
                     $destinationType,
@@ -544,7 +542,7 @@ class PaymentController extends Controller
             $destination = match ($subtype2) {
                 PaymentSubtype::VOUCHER => 'voucher_id',
                 PaymentSubtype::B2C     => 'phone',
-                PaymentSubtype::FLOAT => 'float_account_id',
+                PaymentSubtype::FLOAT   => 'float_account_id',
                 default                 => throw new Exception('Unexpected payment subtype'),
             };
 
@@ -657,10 +655,10 @@ class PaymentController extends Controller
     public function getB2BPayments(): JsonResponse
     {
         $payments = Payment::whereDestinationType(PaymentType::TENDE)
-                           ->whereDestinationSubtype(PaymentSubtype::B2B)
-                           ->latest()
-                           ->limit(100)
-                           ->get();
+            ->whereDestinationSubtype(PaymentSubtype::B2B)
+            ->latest()
+            ->limit(100)
+            ->get();
 
         return $this->successResponse($payments);
     }
