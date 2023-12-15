@@ -83,7 +83,7 @@ class SidoohService
 
     public static function sendCallback(?string $url, string $method = 'GET', JsonResource $data = null): void
     {
-        if (! $url) {
+        if (!$url) {
             return;
         }
 

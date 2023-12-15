@@ -39,7 +39,7 @@ class SidoohAccounts extends SidoohService
 
         $acc = Cache::remember("account_$id", (60 * 60 * 24), fn () => parent::fetch($url));
 
-        if (! $acc) {
+        if (!$acc) {
             throw new Exception("Account doesn't exist!");
         }
 
@@ -57,7 +57,7 @@ class SidoohAccounts extends SidoohService
 
         $acc = Cache::remember("account_$phone", (60 * 60 * 24), fn () => parent::fetch($url));
 
-        if (! $acc) {
+        if (!$acc) {
             throw new Exception("Account doesn't exist!");
         }
 

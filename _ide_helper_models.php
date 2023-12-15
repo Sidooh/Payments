@@ -15,6 +15,7 @@ namespace App\Models{
  * App\Models\FloatAccount
  *
  * @property int $id
+ * @property string|null $description
  * @property int $balance
  * @property string $floatable_type
  * @property int $floatable_id
@@ -30,6 +31,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereFloatableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereFloatableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FloatAccount whereId($value)
@@ -91,6 +93,8 @@ namespace App\Models{
  * @property int|null $destination_provider_id
  * @property array|null $destination_data
  * @property string|null $ipn
+ * @property string|null $provider_text
+ * @property string|null $destination_provider_text
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $destinationProvider
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $provider
  * @method static \Database\Factories\PaymentFactory factory($count = null, $state = [])
@@ -103,14 +107,16 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationData($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationProvider(\App\Enums\PaymentSubtype $subtype, int $providerId)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationProvider(\App\Enums\PaymentType $type, \App\Enums\PaymentSubtype $subtype, int $providerId)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationProviderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationProviderText($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationSubtype($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereDestinationType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereIpn($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvider(\App\Enums\PaymentSubtype $subtype, int $providerId)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProvider(\App\Enums\PaymentType $type, \App\Enums\PaymentSubtype $subtype, int $providerId)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProviderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Payment whereProviderText($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereReference($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Payment whereSubtype($value)
@@ -119,6 +125,18 @@ namespace App\Models{
  * @mixin \Eloquent
  */
 	class IdeHelperPayment {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\TendePayMerchant
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|TendePayMerchant newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TendePayMerchant newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TendePayMerchant query()
+ * @mixin \Eloquent
+ */
+	class IdeHelperTendePayMerchant {}
 }
 
 namespace App\Models{

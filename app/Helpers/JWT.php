@@ -59,7 +59,7 @@ class JWT extends Guard
                 Log::debug('Token is invalid.');
             }
 
-            return ! $tokenExpired && $base64UrlSignature === $signatureProvided;
+            return !$tokenExpired && $base64UrlSignature === $signatureProvided;
         } catch (Exception $err) {
             Log::error('--- --- --- --- ---   ...[JWT]: Unable to verify auth token...   --- --- --- --- ---', [$err]);
 
