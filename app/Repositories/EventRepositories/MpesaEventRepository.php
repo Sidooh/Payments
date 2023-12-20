@@ -179,6 +179,8 @@ class MpesaEventRepository
                 throw new Error("Payment is not pending... - $payment->id");
             }
 
+            // TODO Handle failures from STK source
+
             $account = $payment->provider->floatAccount;
 
             FloatAccountRepository::credit(
