@@ -6,6 +6,7 @@
                 "=>": "align"
             }
         },
+        "cast_spaces": "none",
         "function_declaration": {
             "closure_function_spacing": "none"
         }

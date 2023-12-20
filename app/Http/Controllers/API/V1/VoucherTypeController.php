@@ -94,7 +94,7 @@ class VoucherTypeController extends Controller
                     ->whereAccountId($request->account_id)
                     ->first();
 
-                if (! $voucher) {
+                if (!$voucher) {
                     throw new Exception('invalid voucher selected', 422);
                 }
 

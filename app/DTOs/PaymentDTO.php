@@ -53,7 +53,7 @@ class PaymentDTO
 
         if ($this->destinationSubtype === PaymentSubtype::FLOAT) {
             $exists = FloatAccount::whereId($this->destinationData['float_account_id'])->exists();
-            if (! $exists) {
+            if (!$exists) {
                 throw new HttpException(422, 'Invalid float account');
             }
 

@@ -64,7 +64,7 @@ class MpesaEventRepository
         }
 
         // Complete payment
-        if (! $payment->destination_type) {
+        if (!$payment->destination_type) {
             $payment->update(['status' => Status::COMPLETED]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
@@ -152,7 +152,7 @@ class MpesaEventRepository
             dispatch(function() use ($paymentCallback) {
                 $threshold = config('services.sidooh.providers.mpesa.b2b_balance_threshold', 10000);
 
-                $balance = (int) explode('|', $paymentCallback->debit_account_balance)[2];
+                $balance = (int)explode('|', $paymentCallback->debit_account_balance)[2];
 
                 if ($balance <= $threshold) {
                     SidoohNotify::notify(admin_contacts(), "B2B Alert!\n\n$balance", EventType::ERROR_ALERT);

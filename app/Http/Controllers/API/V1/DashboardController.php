@@ -73,7 +73,7 @@ class DashboardController extends Controller
         $b2cBalance = Cache::remember('b2c_balance', 60 * 60 * 12, fn () => MpesaB2cResultParameter::latest('id')->value('b2c_utility_account_available_funds'));
         $b2bBalance = Cache::remember('b2b_balance',
             60 * 10,
-            fn () => explode('|', MpesaB2bCallback::latest('id')->value('debit_account_balance'))[2]);
+            fn () => explode('|', MpesaB2bCallback::whereResultCode('0')->latest('id')->value('debit_account_balance'))[2]);
 
         return $this->successResponse([
             'org_balance' => $orgBalance,

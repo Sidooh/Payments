@@ -61,7 +61,7 @@ class BuniEventRepository
         }
 
         // Complete payment
-        if (! $payment->destination_type) {
+        if (!$payment->destination_type) {
             $payment->update(['status' => Status::COMPLETED]);
 
             SidoohService::sendCallback($payment->ipn, 'POST', PaymentResource::make($payment));
