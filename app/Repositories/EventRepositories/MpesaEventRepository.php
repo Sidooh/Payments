@@ -5,11 +5,13 @@ namespace App\Repositories\EventRepositories;
 use App\DTOs\PaymentDTO;
 use App\Enums\Description;
 use App\Enums\EventType;
+use App\Enums\Initiator;
 use App\Enums\PaymentCodes;
 use App\Enums\PaymentSubtype;
 use App\Enums\PaymentType;
 use App\Enums\Status;
 use App\Http\Resources\PaymentResource;
+use App\Models\FloatAccount;
 use App\Models\Payment;
 use App\Repositories\PaymentRepositories\PaymentRepository;
 use App\Repositories\SidoohRepositories\FloatAccountRepository;
@@ -173,21 +175,28 @@ class MpesaEventRepository
             $payment = Payment::whereDestinationProvider(PaymentType::MPESA, PaymentSubtype::B2B, $paymentCallback->request->id)
                 ->firstOrFail();
 
-            Log::error($payment);
+//            Log::error($payment);
 
             if ($payment->status !== Status::PENDING) {
                 throw new Error("Payment is not pending... - $payment->id");
             }
 
-            // TODO Handle failures from STK source
+            if ($payment->subtype == PaymentSubtype::STK) {
+                $floatAccount = FloatAccount::whereAccountId($payment->account_id)->whereFloatableType(Initiator::MERCHANT)->first();
 
-            $account = $payment->provider->floatAccount;
+                $charge = mpesa_float_charge($payment->amount);
+            } else {
+                $floatAccount = $payment->provider->floatAccount;
+
+                $charge = $payment->charge;
+            }
+
 
             FloatAccountRepository::credit(
-                $account->id,
+                $floatAccount->id,
                 $payment->amount,
                 Description::PAYMENT_REVERSAL->value,
-                $payment->charge
+                $charge
             );
 
             $payment->update(['status' => Status::FAILED]);
