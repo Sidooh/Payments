@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ffe7f25a91d61ad5e0e067e5d0e72d1",
+    "content-hash": "4063855092164fbb10496b49139204cb",
     "packages": [
         {
             "name": "brick/math",
@@ -910,16 +910,16 @@
         },
         {
             "name": "drh/laravel-jenga",
-            "version": "v1.0.3",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DrH97/laravel-jenga.git",
-                "reference": "e2cbee99bbb1f02e23e7d51950c4f8d107764016"
+                "reference": "8f7bc36fb7de78b52ba2662b67095a2840cb5d26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DrH97/laravel-jenga/zipball/e2cbee99bbb1f02e23e7d51950c4f8d107764016",
-                "reference": "e2cbee99bbb1f02e23e7d51950c4f8d107764016",
+                "url": "https://api.github.com/repos/DrH97/laravel-jenga/zipball/8f7bc36fb7de78b52ba2662b67095a2840cb5d26",
+                "reference": "8f7bc36fb7de78b52ba2662b67095a2840cb5d26",
                 "shasum": ""
             },
             "require": {
@@ -968,9 +968,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DrH97/laravel-jenga/issues",
-                "source": "https://github.com/DrH97/laravel-jenga/tree/v1.0.3"
+                "source": "https://github.com/DrH97/laravel-jenga/tree/v1.1.0"
             },
-            "time": "2024-03-22T08:42:44+00:00"
+            "time": "2024-03-23T08:41:50+00:00"
         },
         {
             "name": "drh/laravel-tendepay",
@@ -9754,16 +9754,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "6.0.1",
+            "version": "6.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "43c751b41d74f96cbbd4e07b7aec9675651e2951"
+                "reference": "8074dbcd93529b357029f5cc5058fd3e43666984"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/43c751b41d74f96cbbd4e07b7aec9675651e2951",
-                "reference": "43c751b41d74f96cbbd4e07b7aec9675651e2951",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/8074dbcd93529b357029f5cc5058fd3e43666984",
+                "reference": "8074dbcd93529b357029f5cc5058fd3e43666984",
                 "shasum": ""
             },
             "require": {
@@ -9778,7 +9778,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "6.0-dev"
+                    "dev-main": "6.1-dev"
                 }
             },
             "autoload": {
@@ -9806,7 +9806,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/environment/issues",
                 "security": "https://github.com/sebastianbergmann/environment/security/policy",
-                "source": "https://github.com/sebastianbergmann/environment/tree/6.0.1"
+                "source": "https://github.com/sebastianbergmann/environment/tree/6.1.0"
             },
             "funding": [
                 {
@@ -9814,7 +9814,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-04-11T05:39:26+00:00"
+            "time": "2024-03-23T08:47:14+00:00"
         },
         {
             "name": "sebastian/exporter",
