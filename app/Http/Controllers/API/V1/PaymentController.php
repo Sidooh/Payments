@@ -90,7 +90,7 @@ class PaymentController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         $payments = Payment::latest();
 

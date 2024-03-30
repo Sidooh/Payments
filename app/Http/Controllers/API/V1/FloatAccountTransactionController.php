@@ -11,7 +11,7 @@ class FloatAccountTransactionController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         $transactions = FloatAccountTransaction::select([
             'id',
@@ -39,7 +39,7 @@ class FloatAccountTransactionController extends Controller
 
     public function show(FloatAccountTransaction $transaction, Request $request): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         if (in_array('float_account', $relations)) {
             $transaction->load('floatAccount:id,account_id,balance');
