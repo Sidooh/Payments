@@ -6,26 +6,26 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "drh/laravel-buni": "^2.0",
-        "drh/laravel-jenga": "^1.1",
-        "drh/laravel-tendepay": "^1.3",
-        "drh/mpesa": "^3.2",
+        "drh/laravel-buni": "v2.1",
+        "drh/laravel-jenga": "v2.0",
+        "drh/laravel-tendepay": "v2.0",
+        "drh/mpesa": "^3.3",
         "guzzlehttp/guzzle": "^7.8",
-        "laravel/framework": "^10.35",
-        "laravel/sanctum": "^3.3",
-        "laravel/tinker": "^2.8",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^2.9",
         "propaganistas/laravel-phone": "^5.0",
-        "sentry/sentry-laravel": "^3.8"
+        "sentry/sentry-laravel": "^4.0"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.13",
+        "barryvdh/laravel-ide-helper": "^3.0",
         "fakerphp/faker": "^1.23",
         "itsgoingd/clockwork": "^5.1",
         "laravel/pint": "^1.13",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^7.10",
-        "phpunit/phpunit": "^10.5",
-        "spatie/laravel-ignition": "^2.3"
+        "nunomaduro/collision": "^8.1",
+        "phpunit/phpunit": "^11.0",
+        "spatie/laravel-ignition": "^2.4"
     },
     "autoload": {
         "psr-4": {

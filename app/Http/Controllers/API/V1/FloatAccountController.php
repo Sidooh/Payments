@@ -26,7 +26,7 @@ class FloatAccountController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         $floatAccounts = FloatAccount::latest();
 
@@ -64,7 +64,7 @@ class FloatAccountController extends Controller
      */
     public function show(Request $request, FloatAccount $floatAccount): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         if (in_array('transactions', $relations)) {
             $floatAccount->load('transactions:id,float_account_id,type,amount,description,created_at')

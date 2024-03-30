@@ -21,7 +21,7 @@ class VoucherTypeController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         $types = VoucherType::latest();
 
@@ -66,7 +66,7 @@ class VoucherTypeController extends Controller
 
     public function show(VoucherType $voucherType, Request $request): JsonResponse
     {
-        $relations = explode(',', $request->query('with'));
+        $relations = explode(',', $request->query('with', ''));
 
         if (in_array('vouchers', $relations)) {
             $voucherType->load(['vouchers' => function($query) {
