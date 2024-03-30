@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Enums\PaymentSubtype;
-use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use DrH\Mpesa\Entities\MpesaB2bCallback;
@@ -22,9 +21,9 @@ class AnalyticsController extends Controller
             return Payment::selectRaw('YEAR(created_at) as year, status, count(*) as count')
                 ->groupByRaw('year, status')
                 ->get()
-                ->filter(fn($x) => in_array($x->status,
-                    [Status::COMPLETED, Status::FAILED]))
-                ->toArray();
+                /*->filter(fn($x) => in_array($x->status,
+                    [Status::COMPLETED, Status::FAILED]))*/ // TODO: Why not filter in the SQL? Where()...
+                /*->toArray()*/;
         });
 
         return $this->successResponse($slo);
