@@ -23,7 +23,8 @@ class AnalyticsController extends Controller
                 ->groupByRaw('year, status')
                 ->get()
                 ->filter(fn($x) => in_array($x->status,
-                    [Status::COMPLETED, Status::FAILED]));
+                    [Status::COMPLETED, Status::FAILED]))
+                ->toArray();
         });
 
         return $this->successResponse($slo);
