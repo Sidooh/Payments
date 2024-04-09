@@ -6,9 +6,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "drh/laravel-buni": "v2.1",
-        "drh/laravel-jenga": "v2.0",
-        "drh/laravel-tendepay": "v2.0",
+        "drh/laravel-buni": "^2.1",
+        "drh/laravel-jenga": "^2.0",
+        "drh/laravel-tendepay": "^2.0",
         "drh/mpesa": "^3.3",
         "guzzlehttp/guzzle": "^7.8",
         "laravel/framework": "^11.0",
