@@ -14,12 +14,13 @@ return new class extends Migration {
             $table->decimal('bill_amount');
             $table->string('customer_ref_number');
             $table->string('bankreference');
-            $table->string('tran_particular');
+            $table->string('tran_particular')->nullable();
             $table->string('payment_mode');
             $table->string('transaction_date');
-            $table->string('phonenumber');
+            $table->string('phonenumber')->nullable();
             $table->string('debitaccount');
-            $table->string('debitcustname');
+            $table->string('debitcustname')->nullable();
+            $table->string('currency')->nullable();
 
             $table->timestamps();
         });
