@@ -24,23 +24,17 @@ class JengaEventRepository
             return;
         }
 
-        if (!is_numeric($ipn->reference)) {
-            Log::error('reference retrieved is invalid', $ipn->reference);
+        if (!is_numeric($ipn->bill_number)) {
+            Log::error('reference retrieved is invalid', $ipn->bill_number);
             return;
         }
-
-        return;
 
         $amount = $ipn->bill_amount;
 
         // find float account with reference
-        $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($reference)->first();
+        $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($ipn->bill_number)->firstOrFail();
         FloatAccountRepository::credit($float->id, $amount, "Account Credit: Equity Bill - $ipn->bankreference", 0, ["jenga_bill_ipn_id" => $ipn->id]);
         $float->refresh();
-
-        $ipn->status = 'COMPLETED';
-        $ipn->save();
-
 
         $amount = 'Ksh'.number_format($amount, 2);
         $balance = 'Ksh'.number_format($float->balance, 2);
