@@ -17,6 +17,7 @@ class FloatAccountTransaction extends Model
 
     protected $fillable = [
         'amount',
+        'balance',
         'type',
         'description',
         'extra',
@@ -24,6 +25,7 @@ class FloatAccountTransaction extends Model
 
     protected $casts = [
         'amount' => 'int',
+        'balance' => 'int',
         'type'   => TransactionType::class,
         'extra'  => 'array',
     ];

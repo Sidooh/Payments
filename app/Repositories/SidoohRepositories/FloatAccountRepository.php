@@ -24,15 +24,19 @@ class FloatAccountRepository
             $account->save();
 
             if ($charge > 0) {
-                FloatAccount::findOrFail(1)->transactions()->create([
+                $gl = FloatAccount::findOrFail(1);
+                $gl->transactions()->create([
                     'amount'      => $charge,
+                    'balance'     => $gl->balance - $charge,
                     'type'        => TransactionType::DEBIT,
                     'description' => "$description CHARGE REFUND",
-                ])->floatAccount()->decrement('balance', $charge);
+                ]);
+                $gl->decrement('balance', $charge);
             }
 
             return $account->transactions()->create([
                 'amount'      => $amount + $charge,
+                'balance'      => $account->balance,
                 'type'        => TransactionType::CREDIT,
                 'description' => $description,
                 'extra' => $extra,
@@ -53,11 +57,13 @@ class FloatAccountRepository
         }
 
         return DB::transaction(function() use ($amount, $charge, $description, $account) {
+            $currentBalance = $account->balance;
             $account->balance -= ($amount + $charge);
             $account->save();
 
             $transaction = [
                 'amount'      => $amount,
+                'balance'   => $account->balance,
                 'type'        => TransactionType::DEBIT,
                 'description' => $description,
             ];
@@ -65,16 +71,20 @@ class FloatAccountRepository
             if ($charge > 0) {
                 $chargeTransaction = $account->transactions()->create([
                     'amount'      => $charge,
+                    'balance'     => $currentBalance - $charge,
                     'type'        => TransactionType::CHARGE,
                     'description' => $description.' Charge',
                 ]);
 
-                FloatAccount::findOrFail(1)->transactions()->create([
+                $gl = FloatAccount::findOrFail(1);
+                $gl->transactions()->create([
                     'amount'      => $charge,
+                    'balance'     => $gl->balance + $charge,
                     'type'        => TransactionType::CREDIT,
                     'description' => $description.' Charge',
                     'extra'       => ['charge_transaction_id' => $chargeTransaction->id],
-                ])->floatAccount()->increment('balance', $charge);
+                ]);
+                $gl->increment('balance', $charge);
 
                 $transaction['extra'] = ['charge_transaction_id' => $chargeTransaction->id];
             }
