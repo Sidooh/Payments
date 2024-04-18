@@ -67,7 +67,7 @@ class FloatAccountController extends Controller
         $relations = explode(',', $request->query('with', ''));
 
         if (in_array('transactions', $relations)) {
-            $floatAccount->load('transactions:id,float_account_id,type,amount,description,created_at')
+            $floatAccount->load('transactions:id,float_account_id,type,amount,balance,description,created_at')
                 ->limit(15);
         }
 

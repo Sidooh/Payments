@@ -17,6 +17,7 @@ class FloatAccountTransactionController extends Controller
             'id',
             'type',
             'amount',
+            'balance',
             'description',
             'float_account_id',
             'created_at',
