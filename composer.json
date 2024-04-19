@@ -9,7 +9,7 @@
         "drh/laravel-buni": "^2.1",
         "drh/laravel-jenga": "^2.0",
         "drh/laravel-tendepay": "^2.0",
-        "drh/mpesa": "^3.3",
+        "drh/mpesa": "^4.0",
         "guzzlehttp/guzzle": "^7.8",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",

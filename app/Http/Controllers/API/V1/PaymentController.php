@@ -665,8 +665,9 @@ class PaymentController extends Controller
 
     public function queryMpesaStatus(): JsonResponse
     {
-        $exitCode = Artisan::call('mpesa:query_stk_status');
+        $stkExitCode = Artisan::call('mpesa:query_stk_status');
+        $b2bExitCode = Artisan::call('mpesa:b2b_transaction_status');
 
-        return $this->successResponse(['status' => $exitCode]);
+        return $this->successResponse(['status' => [$stkExitCode, $b2bExitCode]]);
     }
 }

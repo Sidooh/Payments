@@ -57,39 +57,45 @@ class FloatAccountRepository
         }
 
         return DB::transaction(function() use ($amount, $charge, $description, $account) {
-            $currentBalance = $account->balance;
-            $account->balance -= ($amount + $charge);
-            $account->save();
+            $account->balance -= $amount;
 
             $transaction = [
                 'amount'      => $amount,
-                'balance'   => $account->balance,
+                'balance'     => $account->balance,
                 'type'        => TransactionType::DEBIT,
                 'description' => $description,
             ];
 
+            $aTx = $account->transactions()->create($transaction);
+
             if ($charge > 0) {
+                $account->balance -= $charge;
+
                 $chargeTransaction = $account->transactions()->create([
                     'amount'      => $charge,
-                    'balance'     => $currentBalance - $charge,
+                    'balance'     => $account->balance,
                     'type'        => TransactionType::CHARGE,
                     'description' => $description.' Charge',
                 ]);
 
                 $gl = FloatAccount::findOrFail(1);
+                $gl->increment('balance', $charge);
+
                 $gl->transactions()->create([
                     'amount'      => $charge,
-                    'balance'     => $gl->balance + $charge,
+                    'balance'     => $gl->balance,
                     'type'        => TransactionType::CREDIT,
                     'description' => $description.' Charge',
                     'extra'       => ['charge_transaction_id' => $chargeTransaction->id],
                 ]);
-                $gl->increment('balance', $charge);
 
-                $transaction['extra'] = ['charge_transaction_id' => $chargeTransaction->id];
+                $aTx->extra = ['charge_transaction_id' => $chargeTransaction->id];
+                $aTx->save();
             }
 
-            return $account->transactions()->create($transaction);
+            $account->save();
+
+            return $aTx;
         }, 2);
     }
 }
