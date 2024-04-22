@@ -8,6 +8,7 @@ use App\Repositories\SidoohRepositories\FloatAccountRepository;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use DrH\Jenga\Models\JengaBillIpn;
+use DrH\Jenga\Models\JengaIpn;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -16,7 +17,7 @@ class JengaEventRepository
     /**
      * @throws Throwable
      */
-    public static function ipnReceived(JengaBillIpn $ipn): void
+    public static function ipnReceived(JengaIpn $ipn): void
     {
         // TODO: implement this to avoid redundancies
         if ($ipn->status === 'COMPLETED') {
