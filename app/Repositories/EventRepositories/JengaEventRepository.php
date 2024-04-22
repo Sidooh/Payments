@@ -8,7 +8,6 @@ use App\Repositories\SidoohRepositories\FloatAccountRepository;
 use App\Services\SidoohAccounts;
 use App\Services\SidoohNotify;
 use DrH\Jenga\Models\JengaBillIpn;
-use DrH\Jenga\Models\JengaIpn;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -17,35 +16,36 @@ class JengaEventRepository
     /**
      * @throws Throwable
      */
-    public static function ipnReceived(JengaIpn $ipn): void
-    {
-        // TODO: implement this to avoid redundancies
-        if ($ipn->status === 'COMPLETED') {
-            Log::error('ipn already completed', $ipn->id);
-            return;
-        }
-
-        if (!is_numeric($ipn->transaction_bill_number)) {
-            Log::error('reference retrieved is invalid', $ipn->transaction_bill_number);
-            return;
-        }
-
-        $amount = $ipn->transaction_amount;
-
-        // find float account with reference
-        $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($ipn->transaction_bill_number)->firstOrFail();
-        FloatAccountRepository::credit($float->id, $amount, "Account Credit: Equity - $ipn->transaction_additional_info", 0, ["jenga_ipn_id" => $ipn->id]);
-        $float->refresh();
-
-        $amount = 'Ksh'.number_format($amount, 2);
-        $balance = 'Ksh'.number_format($float->balance, 2);
-
-        $message = "Your merchant voucher has been credited with $amount.\n";
-        $message .= "New balance is $balance.";
-
-        $account = SidoohAccounts::find($float->account_id);
-        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
-    }
+//    public static function ipnReceived(JengaIpn $ipn): void
+//    {
+//        // TODO: implement this to avoid redundancies
+//        if ($ipn->status === 'COMPLETED') {
+//            Log::error('ipn already completed', $ipn->id);
+//            return;
+//        }
+//
+//        if (!is_numeric($ipn->transaction_bill_number)) {
+//            Log::error('reference retrieved is invalid', $ipn->transaction_bill_number);
+//            return;
+//        }
+//
+//        $amount = $ipn->transaction_amount;
+//
+//        // find float account with reference
+//        $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($ipn->transaction_bill_number)->firstOrFail();
+//        FloatAccountRepository::credit($float->id, $amount, "Account Credit: Equity - $ipn->transaction_additional_info", 0, ["jenga_ipn_id" => $ipn->id]);
+//        $float->refresh();
+//
+//        $amount = 'Ksh'.number_format($amount, 2);
+//        $balance = 'Ksh'.number_format($float->balance, 2);
+//        $date
+//
+//        $message = "$amount has been added to your merchant voucher account on $date via Equity.\n";
+//        $message .= "New balance is $balance.";
+//
+//        $account = SidoohAccounts::find($float->account_id);
+//        SidoohNotify::notify($account['phone'], $message, EventType::VOUCHER_CREDITED);
+//    }
 
 
     /**
@@ -73,8 +73,9 @@ class JengaEventRepository
 
         $amount = 'Ksh'.number_format($amount, 2);
         $balance = 'Ksh'.number_format($float->balance, 2);
+        $date = $float->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
 
-        $message = "Your merchant voucher has been credited with $amount.\n";
+        $message = "$amount has been added to your merchant voucher account on $date via Equity.\n";
         $message .= "New balance is $balance.";
 
         $account = SidoohAccounts::find($float->account_id);
