@@ -53,7 +53,7 @@ class FloatAccountController extends Controller
             'account_id'     => $request->account_id,
         ], [
             'floatable_id' => $request->reference,
-            'description' => $request->description,
+            'description'  => $request->description,
         ]);
 
         return $this->successResponse($account);
@@ -67,8 +67,14 @@ class FloatAccountController extends Controller
         $relations = explode(',', $request->query('with', ''));
 
         if (in_array('transactions', $relations)) {
-            $floatAccount->load('transactions:id,float_account_id,type,amount,balance,description,created_at')
-                ->limit(15);
+//            $floatAccount->load('transactions:id,float_account_id,type,amount,balance,description,created_at')
+//                ->limit(15);
+
+            $floatAccount->load(['transactions' => function ($query) {
+                $query->select('id', 'float_account_id', 'type', 'amount', 'balance', 'description', 'created_at')
+                    ->orderBy('id', 'desc')
+                    ->limit(100);
+            }]);
         }
 
         if (in_array('account', $relations)) {

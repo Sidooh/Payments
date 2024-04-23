@@ -17,14 +17,15 @@ class FloatAccountRepository
      */
     public static function credit(int $id, int $amount, string $description, int $charge = 0, array $extra = null): FloatAccountTransaction
     {
-        $account = FloatAccount::findOrFail($id);
+        return DB::transaction(function() use ($extra, $charge, $description, $amount, $id) {
+            $account = FloatAccount::lockForUpdate()->findOrFail($id);
+//            $account->balance += $amount + $charge;
+//            $account->save();
+            $account->increment('balance', $amount + $charge);
 
-        return DB::transaction(function() use ($extra, $charge, $description, $amount, $account) {
-            $account->balance += $amount + $charge;
-            $account->save();
 
             if ($charge > 0) {
-                $gl = FloatAccount::findOrFail(1);
+                $gl = FloatAccount::lockForUpdate()->findOrFail(1);
                 $gl->transactions()->create([
                     'amount'      => $charge,
                     'balance'     => $gl->balance - $charge,
@@ -56,7 +57,9 @@ class FloatAccountRepository
             throw new BalanceException('Insufficient float balance.');
         }
 
-        return DB::transaction(function() use ($amount, $charge, $description, $account) {
+        return DB::transaction(function() use ($amount, $charge, $description, $id) {
+            $account = FloatAccount::lockForUpdate()->findOrFail($id);
+
             $account->balance -= $amount;
 
             $transaction = [
@@ -78,7 +81,7 @@ class FloatAccountRepository
                     'description' => $description.' Charge',
                 ]);
 
-                $gl = FloatAccount::findOrFail(1);
+                $gl = FloatAccount::lockForUpdate()->findOrFail(1);
                 $gl->increment('balance', $charge);
 
                 $gl->transactions()->create([
