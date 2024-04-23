@@ -55,12 +55,12 @@ class JengaEventRepository
     {
         // TODO: implement this to avoid redundancies
         if ($ipn->status === 'COMPLETED') {
-            Log::error('ipn already completed', $ipn->id);
+            Log::error('ipn already completed', [$ipn->id]);
             return;
         }
 
         if (!is_numeric($ipn->bill_number)) {
-            Log::error('reference retrieved is invalid', $ipn->bill_number);
+            Log::error('reference retrieved is invalid', [$ipn->bill_number]);
             return;
         }
 
