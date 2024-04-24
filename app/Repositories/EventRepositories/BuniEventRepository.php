@@ -130,8 +130,9 @@ class BuniEventRepository
 
         $amount = 'Ksh'.number_format($amount, 2);
         $balance = 'Ksh'.number_format($float->balance, 2);
+        $date = $float->updated_at->timezone('Africa/Nairobi')->format(config('settings.sms_date_time_format'));
 
-        $message = "Your merchant voucher has been credited with $amount.\n";
+        $message = "$amount has been added to your merchant voucher account on $date via KCB.\n";
         $message .= "New balance is $balance.";
 
         $account = SidoohAccounts::find($float->account_id);
