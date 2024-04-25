@@ -121,7 +121,7 @@ class BuniEventRepository
 
         // find float account with reference
         $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($reference)->first();
-        FloatAccountRepository::credit($float->id, $amount, "Account credit", 0, ["buni_ipn_id" => $ipn->id]);
+        FloatAccountRepository::credit($float->id, $amount, "Account credit: KCB - $ipn->transaction_reference", 0, ["buni_ipn_id" => $ipn->id]);
         $float->refresh();
 
         $ipn->status = 'COMPLETED';
