@@ -19,10 +19,7 @@ class FloatAccountRepository
     {
         return DB::transaction(function() use ($extra, $charge, $description, $amount, $id) {
             $account = FloatAccount::lockForUpdate()->findOrFail($id);
-//            $account->balance += $amount + $charge;
-//            $account->save();
             $account->increment('balance', $amount + $charge);
-
 
             if ($charge > 0) {
                 $gl = FloatAccount::lockForUpdate()->findOrFail(1);

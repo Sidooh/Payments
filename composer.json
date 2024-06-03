@@ -14,18 +14,18 @@
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "propaganistas/laravel-phone": "^5.0",
+        "propaganistas/laravel-phone": "^5.3",
         "sentry/sentry-laravel": "^4.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0",
         "fakerphp/faker": "^1.23",
         "itsgoingd/clockwork": "^5.1",
-        "laravel/pint": "^1.13",
+        "laravel/pint": "^1.15",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
         "phpunit/phpunit": "^11.0",
-        "spatie/laravel-ignition": "^2.4"
+        "spatie/laravel-ignition": "^2.7"
     },
     "autoload": {
         "psr-4": {
