@@ -55,7 +55,7 @@ class JengaEventRepository
     {
         // TODO: implement this to avoid redundancies
         if ($ipn->status === 'COMPLETED') {
-            Log::error('ipn already completed', [$ipn->id]);
+            Log::error('bill ipn already completed', [$ipn->id]);
             return;
         }
 
@@ -70,6 +70,9 @@ class JengaEventRepository
         $float = FloatAccount::whereFloatableType("MERCHANT")->whereDescription($ipn->bill_number)->firstOrFail();
         FloatAccountRepository::credit($float->id, $amount, "Account Credit: Equity Bill - $ipn->bankreference", 0, ["jenga_bill_ipn_id" => $ipn->id]);
         $float->refresh();
+
+        $ipn->status = 'COMPLETED';
+        $ipn->save();
 
         $amount = 'Ksh'.number_format($amount, 2);
         $balance = 'Ksh'.number_format($float->balance, 2);
