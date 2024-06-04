@@ -1,7 +1,6 @@
 <?php
 
 use App\Services\SidoohAccounts;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 if (! function_exists('base_64_url_encode')) {
