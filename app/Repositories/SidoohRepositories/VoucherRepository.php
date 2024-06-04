@@ -5,6 +5,7 @@ namespace App\Repositories\SidoohRepositories;
 use App\Enums\Status;
 use App\Enums\TransactionType;
 use App\Exceptions\BalanceException;
+use App\Exceptions\PaymentException;
 use App\Models\Voucher;
 use App\Models\VoucherTransaction;
 use Exception;
@@ -40,7 +41,7 @@ class VoucherRepository
 
         // TODO: Check if voucher settings and voucher has limit, check this even before if possible
         if ($voucher->balance + $amount > $voucher->voucherType->limit_amount) {
-            throw new Exception('Amount will exceed voucher limit.', 422);
+            throw new PaymentException('Amount will exceed voucher limit.', 422);
         }
 
         return DB::transaction(function() use ($description, $amount, $voucher) {

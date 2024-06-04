@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Exceptions\PaymentException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DisburseVoucherTypeRequest;
 use App\Http\Requests\StoreVoucherTypeRequest;
@@ -10,7 +11,6 @@ use App\Models\VoucherType;
 use App\Repositories\SidoohRepositories\FloatAccountRepository;
 use App\Repositories\SidoohRepositories\VoucherRepository;
 use App\Services\SidoohAccounts;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -95,7 +95,7 @@ class VoucherTypeController extends Controller
                     ->first();
 
                 if (!$voucher) {
-                    throw new Exception('invalid voucher selected', 422);
+                    throw new PaymentException('invalid voucher selected', 422);
                 }
 
                 $fT = FloatAccountRepository::debit($request->source_account, $request->amount, $request->description);
@@ -107,7 +107,7 @@ class VoucherTypeController extends Controller
 
             return $this->successResponse($result, 'Disbursed.');
             // TODO: Change to PaymentException - create one and use internally
-        } catch (Exception|Throwable $err) {
+        } catch (PaymentException|Throwable $err) {
             if ($err->getCode() === 422) {
                 return $this->errorResponse($err->getMessage(), $err->getCode());
             }
