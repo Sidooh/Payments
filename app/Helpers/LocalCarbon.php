@@ -16,7 +16,7 @@ class LocalCarbon
 
     public function init(): Carbon
     {
-        return new Carbon(tz: $this->timezone);
+        return new Carbon(timezone: $this->timezone);
     }
 
     public function today(): Carbon
